@@ -12,6 +12,15 @@ people's brands; SUPERFLY manufactures and sells its own. Same operator, two
 separate companies, two separate repos. Do not mix their products, stock,
 pricing or credentials.
 
+**But they do overlap.** The Durian Bikers store carries SUPERFLY as one of its
+brands — roughly 29 products under `SF/…` SKUs, with `SUPERFLY PROJECT` and
+`SUPERFLY BODYKIT` tabs in the Qbee stock masterlist. So a "SUPERFLY product"
+can mean either a line item in the durianbikers-web catalogue or something on
+SUPERFLY's own store. When a task mentions SUPERFLY stock or SKUs, establish
+which store is meant before touching anything. The `SF/…` SKU convention
+belongs to the Durian Bikers catalogue and has nothing to do with the warranty
+product codes (`ASSCBK`, `ASBKGD`) used here.
+
 ---
 
 ## Two sites, one domain
