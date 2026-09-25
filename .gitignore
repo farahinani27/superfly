@@ -1,0 +1,23 @@
+# Credentials — never commit
+.env
+.env.*
+!.env.example
+*-key.json
+secrets/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+
+# Dependencies / build
+node_modules/
+.wrangler/
+
+# Warranty: local scratch copies of the form
+warranty/form/preview-test.html
+warranty/form/live-test.html
+warranty/form/product-b64.txt
+warranty/form/t.html
+warranty/form/t1.html
+warranty/form/t2.html

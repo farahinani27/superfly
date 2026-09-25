@@ -1,0 +1,213 @@
+<section id="fitment" class="sf-section" aria-labelledby="fitment-title">
+  <div class="sf-wrap">
+
+    <header class="fit-head">
+      <p class="sf-eyebrow">Fitment finder</p>
+      <h2 class="sf-h2" id="fitment-title">Find your <em>fit</em></h2>
+      <p class="sf-lede">Pick your bike. We light up the parts we build for it, with the spec that actually fits — no guessing, no cross-referencing three tabs.</p>
+    </header>
+
+    <div class="fit-grid">
+
+      <!-- ============ BIKE RAIL ============ -->
+      <div class="fit-rail-wrap">
+        <p class="fit-rail__label" id="fit-rail-label">Select your bike</p>
+        <div class="fit-rail" role="tablist" aria-labelledby="fit-rail-label" id="fit-rail">
+
+          <button class="fit-chip" type="button" role="tab" id="fit-tab-y15" aria-selected="true" aria-controls="fit-stage-inner" tabindex="0" data-bike="y15" data-type="underbone">
+            <span class="fit-chip__make">Yamaha</span>
+            <span class="fit-chip__model">Y15ZR / Y16ZR</span>
+            <span class="fit-chip__type">Underbone</span>
+          </button>
+
+          <button class="fit-chip" type="button" role="tab" id="fit-tab-lc135" aria-selected="false" aria-controls="fit-stage-inner" tabindex="-1" data-bike="lc135" data-type="underbone">
+            <span class="fit-chip__make">Yamaha</span>
+            <span class="fit-chip__model">LC135</span>
+            <span class="fit-chip__type">Underbone</span>
+          </button>
+
+          <button class="fit-chip" type="button" role="tab" id="fit-tab-nvx" aria-selected="false" aria-controls="fit-stage-inner" tabindex="-1" data-bike="nvx" data-type="scooter">
+            <span class="fit-chip__make">Yamaha</span>
+            <span class="fit-chip__model">NVX / Aerox</span>
+            <span class="fit-chip__type">Scooter</span>
+          </button>
+
+          <button class="fit-chip" type="button" role="tab" id="fit-tab-nmax" aria-selected="false" aria-controls="fit-stage-inner" tabindex="-1" data-bike="nmax" data-type="scooter">
+            <span class="fit-chip__make">Yamaha</span>
+            <span class="fit-chip__model">NMAX</span>
+            <span class="fit-chip__type">Scooter</span>
+          </button>
+
+          <button class="fit-chip" type="button" role="tab" id="fit-tab-rs150" aria-selected="false" aria-controls="fit-stage-inner" tabindex="-1" data-bike="rs150" data-type="underbone">
+            <span class="fit-chip__make">Honda</span>
+            <span class="fit-chip__model">RS150 / RSX</span>
+            <span class="fit-chip__type">Underbone</span>
+          </button>
+
+          <button class="fit-chip" type="button" role="tab" id="fit-tab-ego" aria-selected="false" aria-controls="fit-stage-inner" tabindex="-1" data-bike="ego" data-type="scooter">
+            <span class="fit-chip__make">Honda</span>
+            <span class="fit-chip__model">EGO / Beat</span>
+            <span class="fit-chip__type">Scooter</span>
+          </button>
+
+          <button class="fit-chip" type="button" role="tab" id="fit-tab-adv" aria-selected="false" aria-controls="fit-stage-inner" tabindex="-1" data-bike="adv" data-type="adv">
+            <span class="fit-chip__make">Honda</span>
+            <span class="fit-chip__model">ADV 150/160</span>
+            <span class="fit-chip__type">Adventure scooter</span>
+          </button>
+
+          <button class="fit-chip" type="button" role="tab" id="fit-tab-vario" aria-selected="false" aria-controls="fit-stage-inner" tabindex="-1" data-bike="vario" data-type="scooter">
+            <span class="fit-chip__make">Honda</span>
+            <span class="fit-chip__model">Vario / Click</span>
+            <span class="fit-chip__type">Scooter</span>
+          </button>
+
+          <button class="fit-chip" type="button" role="tab" id="fit-tab-belang" aria-selected="false" aria-controls="fit-stage-inner" tabindex="-1" data-bike="belang" data-type="underbone">
+            <span class="fit-chip__make">Suzuki</span>
+            <span class="fit-chip__model">Belang / Raider</span>
+            <span class="fit-chip__type">Underbone</span>
+          </button>
+
+          <button class="fit-chip" type="button" role="tab" id="fit-tab-vf3i" aria-selected="false" aria-controls="fit-stage-inner" tabindex="-1" data-bike="vf3i" data-type="underbone">
+            <span class="fit-chip__make">SYM</span>
+            <span class="fit-chip__model">VF3i</span>
+            <span class="fit-chip__type">Underbone</span>
+          </button>
+
+        </div>
+      </div>
+
+      <!-- ============ STAGE ============ -->
+      <div class="fit-stage">
+
+        <div class="fit-stage__inner" id="fit-stage-inner" role="tabpanel" aria-live="polite">
+
+          <svg class="fit-svg" viewBox="0 0 1000 520" role="img" aria-labelledby="fit-svg-title" focusable="false">
+            <title id="fit-svg-title">Motorcycle silhouette for the selected model</title>
+
+            <defs>
+              <!-- Four matched shape families: body (M + 34 C + Z), exhaust and
+                   front fender (M + 2 C), swingarm / CVT case (M + 6 C + Z).
+                   Every `d` in a family has identical commands and number counts,
+                   so GSAP's attr plugin can tween any of them into any other.
+                   The rear shock is not here: it is drawn procedurally in JS from
+                   its two end points, so it can never fall out of sync. -->
+              <path id="fit-d-underbone" d="M296 120C296 120 323.3 114.3 330 106C336.7 97.7 346 58 346 58C346 58 368 70 368 70C368 70 362.7 111.1 364 126C365.3 140.9 373.7 163 378 182C382.3 201 387 220.3 390 240C393 259.7 394.3 283.3 396 300C397.7 316.7 400 340 400 340C400 340 438 352 438 352C438 352 468.3 356.7 482 356C495.7 355.3 520 348 520 348C520 348 536 282 536 282C536 282 562 202 562 202C562 202 600.7 179.7 620 172C639.3 164.3 678 156 678 156C678 156 690 136 690 136C690 136 728.4 130.8 740 130C751.6 129.2 784.3 126.3 806 128C827.7 129.7 851.7 132 870 140C888.3 148 916 176 916 176C916 176 892 202 892 202C892 202 844 212.3 824 216C804 219.7 772.7 225.3 742 230C711.3 234.7 640 244 640 244C640 244 619.3 286.1 614 300C608.7 313.9 603 338.4 600 348C597 357.6 584 396 584 396C584 396 516 420 516 420C516 420 444 412 444 412C444 412 418.9 396.3 412 392C405.1 387.7 399.5 383.5 392 380C384.5 376.5 356 366 356 366C356 366 300 232 300 232C300 232 296 120 296 120Z"/>
+              <path id="fit-e-underbone" d="M556 416C648 448 742 440 810 392C838 372 854 340 864 306"/>
+              <path id="fit-f-underbone" d="M118.3 319C138.6 283.7 176.3 262 217 262C257.7 262 295.4 283.7 315.7 319"/>
+              <path id="fit-s-underbone" d="M600 358C603.7 355.6 654.6 350.9 662 351C669.4 351.1 721.6 358 726 360C730.4 362 741.9 383.8 738 386C734.1 388.2 668.2 396.6 660 397C651.8 397.4 601.5 394.3 598 392C594.5 389.7 596.3 360.4 600 358Z"/>
+              <path id="fit-d-scooter" d="M292 126C292 126 319.3 120.3 326 112C332.7 103.7 342 64 342 64C342 64 364 76 364 76C364 76 358.4 116.8 360 132C361.6 147.2 371.3 170.3 376 190C380.7 209.7 385 230.3 388 250C391 269.7 392.3 292 394 308C395.7 324 398 346 398 346C398 346 436 358 436 358C436 358 467 360.7 482 360C497 359.3 526 354 526 354C526 354 544 290 544 290C544 290 572 214 572 214C572 214 608.3 191.7 628 184C647.7 176.3 690 168 690 168C690 168 704 152 704 152C704 152 741.2 148 752 148C762.8 148 794.3 148.7 812 152C829.7 155.3 844.3 160 858 168C871.7 176 894 200 894 200C894 200 874 228 874 228C874 228 854.3 249.3 846 256C837.7 262.7 824.7 272.7 812 278C799.3 283.3 785 286.7 770 288C755 289.3 736 283.3 722 286C708 288.7 695.9 295.2 686 304C676.1 312.8 648 352 648 352C648 352 616 398 616 398C616 398 562 406 562 406C562 406 529.3 390.9 516 388C502.7 385.1 481.2 385.9 462 384C442.8 382.1 372 374 372 374C372 374 298 248 298 248C298 248 292 126 292 126Z"/>
+              <path id="fit-e-scooter" d="M594 408C660 442 730 440 788 420C818 408 842 392 856 378"/>
+              <path id="fit-f-scooter" d="M124.7 337C142.9 305.4 176.6 286 213 286C249.4 286 283.1 305.4 301.3 337"/>
+              <path id="fit-s-scooter" d="M578 346C586.3 331.7 626.3 329.7 650 330C673.7 330.3 702 338.3 720 348C738 357.7 758 375 758 388C758 401 746.3 421.3 720 426C693.7 430.7 623.7 429.3 600 416C576.3 402.7 569.7 360.3 578 346Z"/>
+              <path id="fit-d-adv" d="M306 110C306 110 333.3 105.3 340 96C346.7 86.7 356 40 356 40C356 40 380 54 380 54C380 54 372.7 102.9 374 120C375.3 137.1 385.3 161.3 390 182C394.7 202.7 399 223.7 402 244C405 264.3 406.3 287.3 408 304C409.7 320.7 412 344 412 344C412 344 452 356 452 356C452 356 484.3 358.7 500 358C515.7 357.3 546 352 546 352C546 352 566 288 566 288C566 288 596 210 596 210C596 210 633.7 187.7 654 180C674.3 172.3 718 164 718 164C718 164 732 148 732 148C732 148 769.2 144 780 144C790.8 144 822.7 144.7 840 148C857.3 151.3 871.3 156 884 164C896.7 172 916 196 916 196C916 196 896 224 896 224C896 224 876.3 245.1 868 252C859.7 258.9 846.7 270 834 276C821.3 282 807 286.3 792 288C777 289.7 758 283 744 286C730 289 717.9 296.9 708 306C698.1 315.1 670 354 670 354C670 354 638 400 638 400C638 400 584 408 584 408C584 408 550.1 392.9 536 390C521.9 387.1 497.2 388.9 478 386C458.8 383.1 392 368 392 368C392 368 286 238 286 238C286 238 306 110 306 110Z"/>
+              <path id="fit-e-adv" d="M616 410C682 444 752 442 810 422C840 410 862 394 876 380"/>
+              <path id="fit-f-adv" d="M140 334.6C160.1 302.5 195.1 282.7 233 282C271 281.4 306.6 299.9 327.9 331.4"/>
+              <path id="fit-s-adv" d="M588 350C597 335.7 638 333.7 662 334C686 334.3 714.7 342.3 732 352C749.3 361.7 766.7 378.7 766 392C765.3 405.3 754.3 427.3 728 432C701.7 436.7 631.3 433.7 608 420C584.7 406.3 579 364.3 588 350Z"/>
+
+              <g id="fit-spoke-set">
+                <line x1="11.6" y1="2.9" x2="87.3" y2="21.8"/>
+                <line x1="0.8" y1="12" x2="6.3" y2="89.8"/>
+                <line x1="-11.1" y1="4.5" x2="-83.4" y2="33.7"/>
+                <line x1="-7.7" y1="-9.2" x2="-57.9" y2="-68.9"/>
+                <line x1="6.4" y1="-10.2" x2="47.7" y2="-76.3"/>
+              </g>
+            </defs>
+
+            <line class="fit-ground" x1="40" y1="470" x2="960" y2="470"/>
+
+            <path class="fit-exhaust" id="fit-exhaust" d="M556 416C648 448 742 440 810 392C838 372 854 340 864 306"/>
+            <line class="fit-limb" id="fit-fork" x1="318" y1="158" x2="217" y2="376"/>
+            <path class="fit-swing" id="fit-swingarm" d="M600 358C603.7 355.6 654.6 350.9 662 351C669.4 351.1 721.6 358 726 360C730.4 362 741.9 383.8 738 386C734.1 388.2 668.2 396.6 660 397C651.8 397.4 601.5 394.3 598 392C594.5 389.7 596.3 360.4 600 358Z"/>
+
+            <path class="fit-body" id="fit-body-ghost" d="M296 120C296 120 323.3 114.3 330 106C336.7 97.7 346 58 346 58C346 58 368 70 368 70C368 70 362.7 111.1 364 126C365.3 140.9 373.7 163 378 182C382.3 201 387 220.3 390 240C393 259.7 394.3 283.3 396 300C397.7 316.7 400 340 400 340C400 340 438 352 438 352C438 352 468.3 356.7 482 356C495.7 355.3 520 348 520 348C520 348 536 282 536 282C536 282 562 202 562 202C562 202 600.7 179.7 620 172C639.3 164.3 678 156 678 156C678 156 690 136 690 136C690 136 728.4 130.8 740 130C751.6 129.2 784.3 126.3 806 128C827.7 129.7 851.7 132 870 140C888.3 148 916 176 916 176C916 176 892 202 892 202C892 202 844 212.3 824 216C804 219.7 772.7 225.3 742 230C711.3 234.7 640 244 640 244C640 244 619.3 286.1 614 300C608.7 313.9 603 338.4 600 348C597 357.6 584 396 584 396C584 396 516 420 516 420C516 420 444 412 444 412C444 412 418.9 396.3 412 392C405.1 387.7 399.5 383.5 392 380C384.5 376.5 356 366 356 366C356 366 300 232 300 232C300 232 296 120 296 120Z"/>
+            <path class="fit-body" id="fit-body"       d="M296 120C296 120 323.3 114.3 330 106C336.7 97.7 346 58 346 58C346 58 368 70 368 70C368 70 362.7 111.1 364 126C365.3 140.9 373.7 163 378 182C382.3 201 387 220.3 390 240C393 259.7 394.3 283.3 396 300C397.7 316.7 400 340 400 340C400 340 438 352 438 352C438 352 468.3 356.7 482 356C495.7 355.3 520 348 520 348C520 348 536 282 536 282C536 282 562 202 562 202C562 202 600.7 179.7 620 172C639.3 164.3 678 156 678 156C678 156 690 136 690 136C690 136 728.4 130.8 740 130C751.6 129.2 784.3 126.3 806 128C827.7 129.7 851.7 132 870 140C888.3 148 916 176 916 176C916 176 892 202 892 202C892 202 844 212.3 824 216C804 219.7 772.7 225.3 742 230C711.3 234.7 640 244 640 244C640 244 619.3 286.1 614 300C608.7 313.9 603 338.4 600 348C597 357.6 584 396 584 396C584 396 516 420 516 420C516 420 444 412 444 412C444 412 418.9 396.3 412 392C405.1 387.7 399.5 383.5 392 380C384.5 376.5 356 366 356 366C356 366 300 232 300 232C300 232 296 120 296 120Z"/>
+
+            <circle class="fit-tyre"    id="fit-tyre-f"    cx="217" cy="376" r="94"/>
+            <circle class="fit-tyre-in" id="fit-tyre-f-in" cx="217" cy="376" r="77"/>
+            <circle class="fit-rim"     id="fit-rim-f"     cx="217" cy="376" r="49"/>
+            <g class="fit-spokes" id="fit-spokes-f" transform="translate(217,376) scale(0.49)"><use href="#fit-spoke-set" xlink:href="#fit-spoke-set"/></g>
+
+            <circle class="fit-tyre"    id="fit-tyre-r"    cx="727" cy="376" r="94"/>
+            <circle class="fit-tyre-in" id="fit-tyre-r-in" cx="727" cy="376" r="77"/>
+            <circle class="fit-rim"     id="fit-rim-r"     cx="727" cy="376" r="49"/>
+            <g class="fit-spokes" id="fit-spokes-r" transform="translate(727,376) scale(0.49)"><use href="#fit-spoke-set" xlink:href="#fit-spoke-set"/></g>
+
+            <path class="fit-fender" id="fit-fender" d="M118.3 319C138.6 283.7 176.3 262 217 262C257.7 262 295.4 283.7 315.7 319"/>
+
+            <!-- rear coil-over: damper rails, spring, and an eye at each end -->
+            <g class="fit-shock" id="fit-shock">
+              <path class="fit-shock__rails" id="fit-shock-rails" d="M667.1 304.4L698.4 376.1M681.7 298L713.1 369.7"/>
+              <path class="fit-shock__coil"  id="fit-shock-coil"  d="M655.4 257.7L645.9 268.6L672.2 263.8L650.9 280L677.2 275.2L655.9 291.3L682.2 286.6L660.9 302.7L687.2 298L677.8 308.9"/>
+              <circle class="fit-shock__eye" id="fit-shock-eye-t" cx="652" cy="250" r="8.5"/>
+              <circle class="fit-shock__eye" id="fit-shock-eye-b" cx="708" cy="378" r="8.5"/>
+            </g>
+
+            <line class="fit-limb" id="fit-bar" x1="244" y1="124" x2="326" y2="150"/>
+          </svg>
+
+          <!-- ============ HOTSPOT PINS ============ -->
+          <div class="fit-pins" id="fit-pins">
+            <button class="fit-pin" type="button" data-slot="rims"    aria-expanded="false" aria-haspopup="dialog">
+              <span class="fit-pin__dot" aria-hidden="true"></span>
+              <span class="fit-pin__label">Sport rims<sup class="fit-dag" aria-hidden="true">†</sup></span>
+            </button>
+            <button class="fit-pin" type="button" data-slot="shock"   aria-expanded="false" aria-haspopup="dialog">
+              <span class="fit-pin__dot" aria-hidden="true"></span>
+              <span class="fit-pin__label">Rear shock<sup class="fit-dag" aria-hidden="true">†</sup></span>
+            </button>
+            <button class="fit-pin" type="button" data-slot="brake"   aria-expanded="false" aria-haspopup="dialog">
+              <span class="fit-pin__dot" aria-hidden="true"></span>
+              <span class="fit-pin__label">Brake disc<sup class="fit-dag" aria-hidden="true">†</sup></span>
+            </button>
+            <button class="fit-pin" type="button" data-slot="pump"    aria-expanded="false" aria-haspopup="dialog">
+              <span class="fit-pin__dot" aria-hidden="true"></span>
+              <span class="fit-pin__label">Master pump<sup class="fit-dag" aria-hidden="true">†</sup></span>
+            </button>
+            <button class="fit-pin" type="button" data-slot="shifter" aria-expanded="false" aria-haspopup="dialog">
+              <span class="fit-pin__dot" aria-hidden="true"></span>
+              <span class="fit-pin__label">Quickshifter<sup class="fit-dag" aria-hidden="true">†</sup></span>
+            </button>
+            <button class="fit-pin" type="button" data-slot="body"    aria-expanded="false" aria-haspopup="dialog">
+              <span class="fit-pin__dot" aria-hidden="true"></span>
+              <span class="fit-pin__label">Bodykit<sup class="fit-dag" aria-hidden="true">†</sup></span>
+            </button>
+          </div>
+
+          <!-- ============ SPEC CARD / BOTTOM SHEET ============ -->
+          <div class="fit-card" id="fit-card" role="dialog" aria-modal="false" aria-labelledby="fit-card-name" hidden>
+            <button class="fit-card__close" id="fit-card-close" type="button" aria-label="Close fitment details">&times;</button>
+            <p class="fit-card__cat" id="fit-card-cat">Category</p>
+            <h3 class="fit-card__name" id="fit-card-name">Product</h3>
+            <dl class="fit-card__specs" id="fit-card-specs"></dl>
+            <div class="fit-card__colours" id="fit-card-colours" hidden>
+              <span class="fit-card__coloursLabel">Colourways</span>
+              <span class="fit-sw fit-sw--nardo" title="Nardo Grey"></span>
+              <span class="fit-sw fit-sw--tblue" title="T-Blue"></span>
+              <span class="fit-sw fit-sw--black" title="Midnight Black"></span>
+            </div>
+            <p class="fit-card__price" id="fit-card-price"></p>
+            <p class="fit-card__note" id="fit-card-note" hidden></p>
+            <a class="fit-card__cta" id="fit-card-link" href="#">View product</a>
+          </div>
+
+        </div>
+
+        <div class="fit-sheet-backdrop" id="fit-sheet-backdrop" hidden></div>
+
+        <div class="fit-readout">
+          <span class="sf-chip" id="fit-readout-model">Yamaha Y15ZR / Y16ZR</span>
+          <span class="sf-chip" id="fit-readout-type">Underbone</span>
+          <span class="sf-chip" id="fit-readout-count">6 parts fit</span>
+        </div>
+      </div>
+
+    </div>
+
+    <p class="fit-foot" id="fit-foot">
+      <span class="fit-foot__legend"><span class="fit-foot__swatch" aria-hidden="true"></span> Dimmed pins have no product for this model.</span>
+      <span class="fit-foot__note">† Indicative fitment — to be confirmed against the SUPERFLY catalogue.</span>
+    </p>
+
+  </div>
+</section>

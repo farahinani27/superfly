@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SUPERFLY — Ride. Race. Research.</title>
+<meta name="description" content="Superfly Motos — technical performance parts for scooters and underbones. Designed and developed at Sepang International Circuit.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,500;0,700;0,800;0,900;1,800;1,900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css?v=1790321611">
+<link rel="stylesheet" href="css/main.css?v=1790321611">
+<link rel="stylesheet" href="css/arsenal.css?v=1790321611">
+<link rel="stylesheet" href="css/fitment.css?v=1790321611">
+</head>
+<body>
+
+<!-- ─────────────────────────  LOADER  ───────────────────────── -->
+<div class="boot" id="boot">
+  <div class="boot__inner">
+    <div class="boot__mark">SUPERFLY</div>
+    <div class="boot__bar"><i></i></div>
+    <div class="boot__pct" id="bootPct">00</div>
+  </div>
+</div>
+
+<!-- ─────────────────────────  NAV  ───────────────────────── -->
+<header class="nav" id="nav">
+  <a class="nav__logo" href="#top">
+    <span>SUPER<em>FLY</em></span>
+    <small>Ride. Race. Research.</small>
+  </a>
+  <nav class="nav__links">
+    <a href="#teardown">Teardown</a>
+    <a href="#arsenal">Arsenal</a>
+    <a href="#fitment">Find your fit</a>
+    <a href="#sepang">Sepang</a>
+    <a href="#moto2">Racing</a>
+  </nav>
+  <div class="nav__meta">
+    <span class="nav__clock" id="navClock">—</span>
+    <a class="nav__cta" href="#arsenal">Shop<i></i></a>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- ═════════════════════════  1 · HERO  ═════════════════════════ -->
+<section class="hero" id="hero">
+
+  <!-- circuit trace -->
+  <svg class="hero__circuit" viewBox="0 0 1000 620" fill="none" aria-hidden="true">
+    <defs>
+      <linearGradient id="cgrad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#FF19AB"/>
+        <stop offset=".55" stop-color="#FF4ABD"/>
+        <stop offset="1" stop-color="#29ABE2"/>
+      </linearGradient>
+      <filter id="cglow" x="-30%" y="-30%" width="160%" height="160%">
+        <feGaussianBlur stdDeviation="7" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+    <path id="circuitGhost" class="hero__circuit-ghost" d=""/>
+    <path id="circuitPath"  class="hero__circuit-line"  d="" filter="url(#cglow)"/>
+    <circle id="circuitDot" class="hero__circuit-dot" r="6"/>
+  </svg>
+
+  <!-- telemetry strip -->
+  <svg class="hero__telemetry" viewBox="0 0 1200 160" preserveAspectRatio="none" aria-hidden="true">
+    <path id="telemGrid" class="hero__telem-grid" d=""/>
+    <path id="telemTrace" class="hero__telem-trace" d=""/>
+    <path id="telemFill"  class="hero__telem-fill"  d=""/>
+  </svg>
+
+  <div class="hero__grain" aria-hidden="true"></div>
+
+  <div class="hero__inner">
+    <div class="hero__copy">
+      <p class="sf-eyebrow">Designed at Sepang International Circuit</p>
+
+      <h1 class="hero__title">
+        <span class="hero__line" data-split>RIDE.</span>
+        <span class="hero__line" data-split>RACE.</span>
+        <span class="hero__line hero__line--accent" data-split>RESEARCH.</span>
+      </h1>
+
+      <p class="hero__lede">
+        Technical parts for scooters and underbones — developed on track,
+        validated by Grand Prix riders, manufactured in Malaysia.
+      </p>
+
+      <div class="hero__actions">
+        <a class="btn btn--primary" href="#teardown">
+          <span>Open the teardown</span><i></i>
+        </a>
+        <a class="btn btn--ghost" href="#fitment">Find parts for my bike</a>
+      </div>
+
+      <dl class="hero__stats">
+        <div><dt>Circuit</dt><dd data-count="5.543" data-dec="3">0.000</dd><span>km · Sepang</span></div>
+        <div><dt>Rebound</dt><dd data-count="6">0</dd><span>clicks · RA</span></div>
+        <div><dt>Grand Prix</dt><dd data-count="2">0</dd><span>riders backed</span></div>
+      </dl>
+    </div>
+
+    <!-- floating product -->
+    <div class="hero__product" id="heroProduct">
+      <div class="hero__product-glow"></div>
+      <div class="hero__product-ring"></div>
+      <img src="assets/products/shock-studio.png" alt="Superfly Project RA Super Shocks adjustable suspension" width="675" height="1164">
+      <div class="hero__tag hero__tag--a"><b>PROJECT RA</b><span>Super Shocks</span></div>
+      <div class="hero__tag hero__tag--b"><b>RM358</b><span>from</span></div>
+    </div>
+  </div>
+
+  <a class="hero__scroll" href="#teardown"><span>Scroll</span><i></i></a>
+</section>
+
+<!-- ═════════════════════════  2 · TEARDOWN (3D)  ═════════════════════════ -->
+<section class="td sf-section" id="teardown">
+  <div class="sf-wrap">
+
+    <div class="td__head">
+      <div>
+        <p class="sf-eyebrow">Teardown · 01</p>
+        <h2 class="sf-h2">Project <em>RA</em><br>Super Shocks</h2>
+      </div>
+      <p class="sf-lede">
+        Six clicks of rebound. A full floating piston. A CNC-machined aluminium
+        chassis that was signed off on track, not in a catalogue. Drag to orbit —
+        tap a marker to go deeper.
+      </p>
+    </div>
+
+    <div class="td__stage-wrap">
+      <!-- WebGL stage -->
+      <div class="td__stage" id="tdStage">
+        <canvas id="tdCanvas"></canvas>
+
+        <!-- 3D-anchored hotspot markers (positions written each frame by JS) -->
+        <div class="td__spots" id="tdSpots"></div>
+
+        <div class="td__hint" id="tdHint"><i></i>Drag to orbit</div>
+        <div class="td__readout">
+          <span>ORBIT</span><b id="tdAzim">000°</b>
+          <span>REBOUND</span><b id="tdClickOut">4</b>
+          <span>COLOUR</span><b id="tdColourOut">MIDNIGHT</b>
+        </div>
+      </div>
+
+      <!-- spec panel -->
+      <aside class="td__panel" id="tdPanel">
+        <div class="td__panel-idx"><span id="tdIdx">01</span><i>/ 06</i></div>
+        <h3 id="tdTitle">CNC-machined aluminium chassis</h3>
+        <p id="tdBody">Billet aerospace aluminium, machined in-house. Stiffer under
+          load than a cast body, and it sheds heat instead of storing it.</p>
+        <ul class="td__panel-specs" id="tdSpecs"></ul>
+        <div class="td__panel-nav">
+          <button type="button" id="tdPrev" aria-label="Previous detail">←</button>
+          <button type="button" id="tdNext" aria-label="Next detail">→</button>
+        </div>
+      </aside>
+    </div>
+
+    <!-- controls -->
+    <div class="td__controls">
+
+      <div class="td__ctrl td__ctrl--clicks">
+        <label>Rebound damping</label>
+        <div class="td__clicks" id="tdClicks" role="group" aria-label="Rebound clicks">
+          <button type="button" data-click="1">1</button>
+          <button type="button" data-click="2">2</button>
+          <button type="button" data-click="3">3</button>
+          <button type="button" data-click="4" class="is-on">4</button>
+          <button type="button" data-click="5">5</button>
+          <button type="button" data-click="6">6</button>
+        </div>
+        <p class="td__ctrl-note" id="tdClickNote">Balanced — the setting most riders start from.</p>
+      </div>
+
+      <!-- damping curve -->
+      <div class="td__ctrl td__ctrl--curve">
+        <label>Damping response</label>
+        <svg class="td__curve" viewBox="0 0 320 120" fill="none" aria-hidden="true">
+          <path class="td__curve-grid" d="M0 30H320M0 60H320M0 90H320M80 0V120M160 0V120M240 0V120"/>
+          <path id="tdCurve" class="td__curve-line" d=""/>
+          <path id="tdCurveFill" class="td__curve-fill" d=""/>
+        </svg>
+        <div class="td__curve-axis"><span>Compression</span><span>Rebound</span></div>
+      </div>
+
+      <div class="td__ctrl td__ctrl--colour">
+        <label>Colourway</label>
+        <div class="td__colours" id="tdColours" role="group" aria-label="Colourway">
+          <button type="button" data-colour="black"  class="is-on" style="--c:#15151A"><span></span>Midnight Black</button>
+          <button type="button" data-colour="tblue"  style="--c:#29ABE2"><span></span>T-Blue</button>
+          <button type="button" data-colour="nardo"  style="--c:#9A9EA3"><span></span>Nardo Grey</button>
+        </div>
+        <p class="td__ctrl-note">Three factory finishes. Spring and stage light retint live.</p>
+      </div>
+
+    </div>
+
+    <p class="td__foot">
+      Stage renders a photographic stand-in of the Project RA while a scanned model
+      is prepared — camera, lighting, platform and every marker anchor are real 3D.
+    </p>
+
+  </div>
+</section>
+
+<!-- ═════════════════════════  3 · ARSENAL  ═════════════════════════ -->
+<div data-slot="arsenal"></div>
+
+<!-- ═════════════════════════  4 · FITMENT  ═════════════════════════ -->
+<div data-slot="fitment"></div>
+
+<!-- ═════════════════════════  5 · SEPANG  ═════════════════════════ -->
+<section class="sep sf-section" id="sepang">
+  <div class="sf-wrap">
+    <div class="sep__head">
+      <p class="sf-eyebrow">Proving ground</p>
+      <h2 class="sf-h2">Developed at <em>5.543 km</em></h2>
+      <p class="sf-lede">
+        Every Superfly part is signed off at Sepang International Circuit. Fifteen
+        corners, each one asking a different question of the hardware.
+      </p>
+    </div>
+
+    <div class="sep__body">
+      <div class="sep__map">
+        <svg viewBox="0 0 1000 620" fill="none" aria-hidden="true">
+          <path id="sepGhost" class="sep__ghost" d=""/>
+          <path id="sepLine"  class="sep__line"  d=""/>
+          <g id="sepMarks"></g>
+        </svg>
+        <div class="sep__marks-html" id="sepMarksHtml"></div>
+      </div>
+
+      <div class="sep__notes">
+        <article class="sep__note is-on" data-corner="1">
+          <h3>Turn 1 — the stop</h3>
+          <p>Hardest braking point on the lap. This is where a master pump either
+            holds a firm lever or goes long. Project RP is tuned here.</p>
+          <div class="sep__note-meta"><span class="sf-chip">Brake pump</span><span class="sf-chip">14 / 16 / 19 mm</span></div>
+        </article>
+        <article class="sep__note" data-corner="9">
+          <h3>Turn 9 — the load</h3>
+          <p>A long, loaded right-hander. Sustained lateral force finds any flex in a
+            rim and any fade in rebound damping.</p>
+          <div class="sep__note-meta"><span class="sf-chip">Sport rims</span><span class="sf-chip">Rebound</span></div>
+        </article>
+        <article class="sep__note" data-corner="15">
+          <h3>Turn 15 — the drive</h3>
+          <p>Final hairpin onto the main straight. Traction on exit is a suspension
+            problem before it is an engine one.</p>
+          <div class="sep__note-meta"><span class="sf-chip">Project RA</span><span class="sf-chip">Preload</span></div>
+        </article>
+      </div>
+    </div>
+
+    <dl class="sep__stats">
+      <div><dt data-count="15">0</dt><dd>Corners</dd></div>
+      <div><dt data-count="5.543" data-dec="3">0.000</dt><dd>Kilometres</dd></div>
+      <div><dt data-count="6">0</dt><dd>Rebound clicks</dd></div>
+      <div><dt data-count="100">0</dt><dd>% Made in Malaysia</dd></div>
+    </dl>
+  </div>
+</section>
+
+<!-- ═════════════════════════  6 · MOTO2  ═════════════════════════ -->
+<section class="m2" id="moto2">
+  <div class="m2__bg" style="background-image:url('assets/riders/riders-banner.jpg')"></div>
+  <div class="m2__veil"></div>
+
+  <div class="sf-wrap m2__inner">
+    <p class="sf-eyebrow">Race proven</p>
+    <h2 class="sf-h2">The <em>feedback loop</em></h2>
+    <p class="sf-lede">
+      Superfly's Ride. Race. Research. team takes Grand Prix race data straight back
+      into the next generation of parts.
+    </p>
+
+    <div class="m2__riders">
+      <article class="m2__rider">
+        <div class="m2__num" data-num>21</div>
+        <div class="m2__photo"><img src="assets/riders/rider-alonso.jpg" alt="Alonso Lopez in Superfly-backed leathers" loading="lazy"></div>
+        <h3>Alonso Lopez</h3>
+        <p class="m2__class">Moto2 World Championship</p>
+        <p>Joined the Ride. Race. Research. team for the 2023 season. What he reports
+          after a session is what gets changed on the next prototype.</p>
+      </article>
+      <article class="m2__rider">
+        <div class="m2__num" data-num>48</div>
+        <div class="m2__photo"><img src="assets/riders/rider-ortola.jpg" alt="Ivan Ortola's Superfly-branded helmet" loading="lazy"></div>
+        <h3>Ivan Ortola</h3>
+        <p class="m2__class">Moto3 World Championship</p>
+        <p>Superfly-backed, carrying the mark on the chin bar. Race feedback feeds
+          straight into production hardware.</p>
+      </article>
+    </div>
+
+    <blockquote class="m2__quote">
+      <p>As a top Moto2 rider, I demand the best racing products for myself.</p>
+      <cite>Alonso Lopez</cite>
+    </blockquote>
+  </div>
+</section>
+
+</main>
+
+<!-- ═════════════════════════  FOOTER  ═════════════════════════ -->
+<footer class="ft">
+  <div class="sf-wrap">
+    <div class="ft__top">
+      <div class="ft__brand">
+        <span>SUPER<em>FLY</em></span>
+        <small>Ride. Race. Research.</small>
+        <p>Technical parts for scooters and underbones. Designed at Sepang
+          International Circuit, manufactured in Malaysia.</p>
+      </div>
+      <nav class="ft__cols">
+        <div><h4>Products</h4>
+          <a href="#">Sport rims</a><a href="#">Suspensions</a><a href="#">Brake systems</a>
+          <a href="#">Quickshifters</a><a href="#">Bodykits</a></div>
+        <div><h4>Support</h4>
+          <a href="#">Warranty registration</a><a href="#">Manuals</a><a href="#">Catalogue</a>
+          <a href="#">FAQ</a><a href="#">Contact</a></div>
+        <div><h4>Company</h4>
+          <a href="#">About us</a><a href="#">Terms &amp; conditions</a>
+          <a href="#">Returns &amp; refunds</a><a href="#">Privacy</a></div>
+      </nav>
+    </div>
+    <div class="ft__rule"></div>
+    <div class="ft__bottom">
+      <p>© 2026 Superfly Motos. Concept revamp — not the live store.</p>
+      <p class="ft__social"><a href="#">Instagram</a><a href="#">YouTube</a></p>
+    </div>
+  </div>
+  <div class="ft__wordmark" aria-hidden="true">SUPERFLY</div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script src="js/arsenal.js?v=1790321611"></script>
+<script src="js/fitment.js?v=1790321611"></script>
+<script src="js/teardown.js?v=1790321611"></script>
+<script src="js/main.js?v=1790321611"></script>
+</body>
+</html>

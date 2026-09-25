@@ -1,0 +1,928 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Warranty Form Preview</title>
+<style>
+ body{margin:0;background:#121212;color:#e6e6e6;font:15px/1.6 Helvetica,Arial,sans-serif}
+ .hdr{background:#121212;padding:18px 24px;border-bottom:1px solid #222;text-align:center}
+ .logo{color:#E32D83;font-weight:800;letter-spacing:.14em;font-size:20px}
+ .crumb{background:#580916;padding:16px 24px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#f2c7cf}
+ .body{padding:44px 24px}
+</style></head><body>
+<div class="hdr"><span class="logo">SUPERFLY</span></div>
+<div class="crumb">Home &nbsp;&rsaquo;&nbsp; Warranty Form</div>
+<div class="body">
+<!--
+  ============================================================================
+  SUPERFLY - WARRANTY REGISTRATION FORM
+  ============================================================================
+
+  Paste this entire block into the Unicart page content editor.
+  Use the editor's Source or HTML view - a visual editor will mangle it.
+
+  BEFORE IT WORKS, DO ONE THING:
+  Find  action="PASTE_YOUR_APPS_SCRIPT_URL_HERE"  below and replace it with
+  your Google Apps Script Web App URL (the one ending in /exec).
+
+  Structure of this file:
+    1. HTML      - the visible markup
+    2. CSS       - all styling, in the style block
+    3. JS        - optional polish, in the script block
+
+  Every class starts with "sfw-" so nothing here can collide with the theme.
+  ============================================================================
+-->
+
+
+<!-- ==========================================================================
+     1. HTML
+     ========================================================================== -->
+
+<div class="sfw-wrap">
+
+  <!-- Page heading -->
+  <div class="sfw-head">
+    <h2 class="sfw-title">Warranty Registration</h2>
+    <p class="sfw-sub">
+      Register your product to activate your warranty.
+      Cover runs for <strong>6 months</strong> from the date you register.
+    </p>
+  </div>
+
+  <div class="sfw-grid">
+
+    <!-- ------------------------------------------------------------------
+         Left column: the product being registered.
+
+         To use this page for a DIFFERENT product, change three things:
+           1. the <img src> below
+           2. the .sfw-pname heading text
+           3. the .sfw-sku badge AND the hidden "sku" input in the form
+         ------------------------------------------------------------------ -->
+    <aside class="sfw-product">
+
+      <div class="sfw-imgbox">
+        <!-- The product photo is embedded directly as base64, so there is no
+             image file to upload and no URL that can break later.
+             The very long line below is just that image data. -->
+        <img
+          class="sfw-img"
+          alt="Suspension Project Air Sus Universal 330mm"
+          src="data:image/jpeg;base64,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">
+      </div>
+
+      <div class="sfw-pmeta">
+        <p class="sfw-eyebrow">You are registering</p>
+        <h3 class="sfw-pname">
+          SUSPENSION PROJECT AIR SUS UNIVERSAL 330MM SILVER CHROME / BLACK
+        </h3>
+        <p class="sfw-sku">SUS-AS-UNI-330-SC-BK</p>
+      </div>
+
+    </aside>
+
+
+    <!-- ------------------------------------------------------------------
+         Right column: the form itself.
+
+         It posts to the Apps Script, targeting the hidden iframe at the
+         bottom of this block. That keeps the customer on this page.
+         ------------------------------------------------------------------ -->
+    <form
+      class="sfw-form"
+      method="POST"
+      action="PASTE_YOUR_APPS_SCRIPT_URL_HERE"
+      target="sfw-sink">
+
+      <!-- Sent along with the form so the spreadsheet knows which product
+           this registration is for. Not visible to the customer. -->
+      <input type="hidden" name="sku"          value="SUS-AS-UNI-330-SC-BK">
+      <input type="hidden" name="product_name" value="SUSPENSION PROJECT AIR SUS UNIVERSAL 330MM SILVER CHROME / BLACK">
+
+      <!-- Honeypot.
+           Hidden off-screen, so a human never sees or fills it.
+           Automated spam bots fill every field they find, so anything that
+           arrives with this filled in is rejected by the script. -->
+      <div class="sfw-hp" aria-hidden="true">
+        <label>
+          Website
+          <input type="text" name="website" tabindex="-1" autocomplete="off">
+        </label>
+      </div>
+
+
+      <!-- Full name -->
+      <div class="sfw-field">
+        <label class="sfw-label" for="sfw-name">
+          Full name <span class="sfw-req">*</span>
+        </label>
+        <input
+          class="sfw-input"
+          id="sfw-name"
+          name="name"
+          type="text"
+          maxlength="120"
+          autocomplete="name"
+          required>
+      </div>
+
+
+      <!-- Phone number -->
+      <div class="sfw-field">
+        <label class="sfw-label" for="sfw-phone">
+          Phone number <span class="sfw-req">*</span>
+        </label>
+        <input
+          class="sfw-input"
+          id="sfw-phone"
+          name="phone"
+          type="tel"
+          inputmode="tel"
+          maxlength="30"
+          placeholder="012-345 6789"
+          autocomplete="tel"
+          required>
+      </div>
+
+
+      <!-- Address -->
+      <div class="sfw-field">
+        <label class="sfw-label" for="sfw-address">
+          Address <span class="sfw-req">*</span>
+        </label>
+        <textarea
+          class="sfw-input sfw-textarea"
+          id="sfw-address"
+          name="address"
+          rows="3"
+          maxlength="400"
+          autocomplete="street-address"
+          required></textarea>
+      </div>
+
+
+      <!-- Email -->
+      <div class="sfw-field">
+        <label class="sfw-label" for="sfw-email">
+          Email <span class="sfw-req">*</span>
+        </label>
+        <input
+          class="sfw-input"
+          id="sfw-email"
+          name="email"
+          type="email"
+          inputmode="email"
+          maxlength="160"
+          autocomplete="email"
+          required>
+        <p class="sfw-hint">Your confirmation is sent here.</p>
+      </div>
+
+
+      <!-- Serial number -->
+      <div class="sfw-field">
+        <label class="sfw-label" for="sfw-serial">
+          Serial number <span class="sfw-req">*</span>
+        </label>
+        <input
+          class="sfw-input sfw-mono"
+          id="sfw-serial"
+          name="serial"
+          type="text"
+          maxlength="60"
+          autocapitalize="characters"
+          spellcheck="false"
+          required>
+        <p class="sfw-hint">
+          Printed on the product and on the warranty card in your box.
+        </p>
+      </div>
+
+
+      <!-- Consent -->
+      <label class="sfw-consent">
+        <input
+          class="sfw-check"
+          type="checkbox"
+          name="consent"
+          value="yes"
+          required>
+        <span>
+          I agree that SUPERFLY may store these details to manage my warranty.
+        </span>
+      </label>
+
+
+      <button class="sfw-btn" type="submit">Activate Warranty</button>
+
+      <p class="sfw-foot">
+        Fields marked <span class="sfw-req">*</span> are required.
+      </p>
+
+    </form>
+
+  </div><!-- /.sfw-grid -->
+
+
+  <!-- Shown ONLY when the server confirms the registration was saved. -->
+  <div class="sfw-done" id="sfw-done" hidden>
+    <div class="sfw-tick">&#10003;</div>
+    <h3>Warranty registered</h3>
+    <p>
+      Thank you. Your registration has been received and a confirmation
+      email is on its way.
+    </p>
+    <p class="sfw-ref" id="sfw-ref" hidden></p>
+  </div>
+
+  <!-- Shown when the server reports it could NOT save the registration. -->
+  <div class="sfw-fail" id="sfw-fail" hidden>
+    <div class="sfw-cross">!</div>
+    <h3>Not registered</h3>
+    <p>
+      Something went wrong and your registration was not saved.
+      Nothing has been recorded, so please try again.
+    </p>
+    <button class="sfw-retry" type="button" id="sfw-retry">Try again</button>
+  </div>
+
+
+  <!-- The form posts into this hidden frame instead of navigating away. -->
+  <iframe name="sfw-sink" class="sfw-sink" title="submission target"></iframe>
+
+</div><!-- /.sfw-wrap -->
+
+
+
+<!-- ==========================================================================
+     2. CSS
+     ========================================================================== -->
+
+<style>
+
+/* --------------------------------------------------------------------------
+   Colours, taken from the live SUPERFLY storefront so the form matches.
+   Change a value here and it updates everywhere it is used.
+   -------------------------------------------------------------------------- */
+
+.sfw-wrap {
+  --sfw-bg:     #121212;   /* page background          */
+  --sfw-panel:  #1a1a1a;   /* card background          */
+  --sfw-line:   #2e2e2e;   /* borders                  */
+  --sfw-red:    #FF001A;   /* accent, buttons          */
+  --sfw-maroon: #580916;   /* SKU badge                */
+  --sfw-text:   #e6e6e6;   /* body text                */
+  --sfw-mute:   #8c8c8c;   /* hints and secondary text */
+
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 8px 0 48px;
+  color: var(--sfw-text);
+  font-family: inherit;
+  box-sizing: border-box;
+  -webkit-text-size-adjust: 100%;
+}
+
+.sfw-wrap *,
+.sfw-wrap *::before,
+.sfw-wrap *::after {
+  box-sizing: border-box;
+}
+
+/* An explicit display: rule beats the HTML "hidden" attribute, so force
+   hidden back on. Without this the form stays visible after submitting. */
+.sfw-wrap [hidden] {
+  display: none !important;
+}
+
+
+/* --------------------------------------------------------------------------
+   Page heading
+   -------------------------------------------------------------------------- */
+
+.sfw-head {
+  margin: 0 0 28px;
+  padding: 2px 0 2px 16px;
+  border-left: 4px solid var(--sfw-red);
+}
+
+.sfw-title {
+  margin: 0 0 6px;
+  color: #fff;
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.sfw-sub {
+  margin: 0;
+  color: var(--sfw-mute);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.sfw-sub strong {
+  color: var(--sfw-text);
+}
+
+
+/* --------------------------------------------------------------------------
+   Two column layout: product on the left, form on the right.
+   Collapses to a single column on phones - see the media query at the end.
+   -------------------------------------------------------------------------- */
+
+.sfw-grid {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+
+/* --------------------------------------------------------------------------
+   Product panel
+   -------------------------------------------------------------------------- */
+
+.sfw-product {
+  padding: 20px;
+  background: var(--sfw-panel);
+  border: 1px solid var(--sfw-line);
+  border-radius: 10px;
+  text-align: center;
+}
+
+/* White box behind the photo, so a product shot with a white background
+   does not appear to float on the dark panel. */
+.sfw-imgbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 190px;
+  margin: 0 0 16px;
+  padding: 14px;
+  background: #fff;
+  border-radius: 8px;
+}
+
+.sfw-img {
+  display: block;
+  max-width: 100%;
+  max-height: 230px;
+  height: auto;
+}
+
+.sfw-eyebrow {
+  margin: 0 0 6px;
+  color: var(--sfw-mute);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.sfw-pname {
+  margin: 0 0 10px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+/* white-space: nowrap stops a product code breaking across two lines,
+   which makes it unreadable. */
+.sfw-sku {
+  display: inline-block;
+  max-width: 100%;
+  margin: 0;
+  padding: 4px 10px;
+  background: var(--sfw-maroon);
+  border-radius: 4px;
+  color: #ffdfe4;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  overflow-x: auto;
+}
+
+
+/* --------------------------------------------------------------------------
+   Form
+   -------------------------------------------------------------------------- */
+
+.sfw-form {
+  padding: 26px;
+  background: var(--sfw-panel);
+  border: 1px solid var(--sfw-line);
+  border-radius: 10px;
+}
+
+.sfw-field {
+  margin: 0 0 20px;
+}
+
+.sfw-label {
+  display: block;
+  margin: 0 0 7px;
+  color: #cfcfcf;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* The red asterisk on required fields. */
+.sfw-req {
+  color: var(--sfw-red);
+}
+
+/* !important is used on the three properties OpenCart themes most often
+   override on form fields. Without it the inputs inherit the theme's own
+   light styling and become unreadable on this dark panel. */
+.sfw-wrap .sfw-input {
+  display: block;
+  width: 100%;
+  height: auto;
+  padding: 12px 14px;
+  color: #fff !important;
+  background: #101010 !important;
+  border: 1px solid var(--sfw-line) !important;
+  border-radius: 6px;
+  box-shadow: none;
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 1.4;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.sfw-wrap .sfw-input::placeholder {
+  color: #5c5c5c;
+}
+
+.sfw-wrap .sfw-input:focus {
+  outline: none;
+  border-color: var(--sfw-red) !important;
+  box-shadow: 0 0 0 3px rgba(255, 0, 26, 0.18);
+}
+
+/* :user-invalid, not :invalid.
+   :invalid would mark every empty required field red the moment the page
+   loads, before the customer has typed anything. :user-invalid waits until
+   they have actually interacted with the field. */
+.sfw-wrap .sfw-input:user-invalid {
+  border-color: #b3001b !important;
+  box-shadow: 0 0 0 3px rgba(179, 0, 27, 0.14);
+}
+
+.sfw-textarea {
+  min-height: 88px;
+  resize: vertical;
+}
+
+/* Serial numbers are easier to check character by character in a
+   monospaced face. */
+.sfw-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sfw-hint {
+  margin: 7px 0 0;
+  color: var(--sfw-mute);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+
+/* --------------------------------------------------------------------------
+   Consent checkbox
+   -------------------------------------------------------------------------- */
+
+.sfw-consent {
+  display: flex;
+  gap: 11px;
+  align-items: flex-start;
+  margin: 0 0 22px;
+  color: #bdbdbd;
+  font-size: 13px;
+  line-height: 1.55;
+  cursor: pointer;
+}
+
+.sfw-wrap .sfw-check {
+  flex: 0 0 auto;
+  width: 17px;
+  height: 17px;
+  margin: 1px 0 0;
+  accent-color: var(--sfw-red);
+  cursor: pointer;
+}
+
+
+/* --------------------------------------------------------------------------
+   Submit button
+   -------------------------------------------------------------------------- */
+
+.sfw-wrap .sfw-btn {
+  display: block;
+  width: 100%;
+  padding: 15px 20px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--sfw-red);
+  color: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: filter 0.15s, transform 0.05s;
+}
+
+.sfw-wrap .sfw-btn:hover {
+  filter: brightness(1.12);
+}
+
+.sfw-wrap .sfw-btn:active {
+  transform: translateY(1px);
+}
+
+/* Applied while the form is being submitted, to stop double submissions. */
+.sfw-wrap .sfw-btn[disabled] {
+  opacity: 0.55;
+  filter: none;
+  cursor: not-allowed;
+}
+
+.sfw-foot {
+  margin: 14px 0 0;
+  color: var(--sfw-mute);
+  font-size: 12px;
+  text-align: center;
+}
+
+
+/* --------------------------------------------------------------------------
+   Things the customer should not see
+   -------------------------------------------------------------------------- */
+
+/* The honeypot. Positioned off-screen rather than display:none, because
+   some bots deliberately skip fields that are display:none. */
+.sfw-hp {
+  position: absolute !important;
+  left: -9999px !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* The frame the form posts into. */
+.sfw-sink {
+  display: none;
+  width: 0;
+  height: 0;
+  border: 0;
+}
+
+
+/* --------------------------------------------------------------------------
+   Success panel
+   -------------------------------------------------------------------------- */
+
+.sfw-done {
+  padding: 44px 26px;
+  background: var(--sfw-panel);
+  border: 1px solid var(--sfw-red);
+  border-radius: 10px;
+  text-align: center;
+}
+
+.sfw-tick {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 18px;
+  background: var(--sfw-red);
+  border-radius: 50%;
+  color: #fff;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 56px;
+}
+
+.sfw-done h3 {
+  margin: 0 0 10px;
+  color: #fff;
+  font-size: 20px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.sfw-done p {
+  margin: 0;
+  color: var(--sfw-mute);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+
+/* The reference number, shown once the server confirms it. */
+.sfw-ref {
+  margin: 16px 0 0 !important;
+  padding: 10px 14px;
+  display: inline-block;
+  background: #101010;
+  border: 1px solid var(--sfw-line);
+  border-radius: 6px;
+  color: #fff !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+}
+
+
+/* --------------------------------------------------------------------------
+   Failure panel
+   -------------------------------------------------------------------------- */
+
+.sfw-fail {
+  padding: 44px 26px;
+  background: var(--sfw-panel);
+  border: 1px solid #b3001b;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.sfw-cross {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 18px;
+  background: #b3001b;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 56px;
+}
+
+.sfw-fail h3 {
+  margin: 0 0 10px;
+  color: #fff;
+  font-size: 20px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.sfw-fail p {
+  margin: 0 0 22px;
+  color: var(--sfw-mute);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.sfw-wrap .sfw-retry {
+  padding: 13px 30px;
+  border: 0;
+  border-radius: 6px;
+  background: #b3001b;
+  color: #fff;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+/* When the server's reply cannot be confirmed by message, the frame itself
+   is revealed so the customer reads the real response instead of a guess. */
+.sfw-wrap .sfw-sink.sfw-sink-visible {
+  display: block;
+  width: 100%;
+  min-height: 420px;
+  border: 1px solid var(--sfw-line);
+  border-radius: 10px;
+  background: var(--sfw-bg);
+}
+
+
+/* --------------------------------------------------------------------------
+   Phones and small tablets
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 760px) {
+
+  /* Single column. */
+  .sfw-grid {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+
+  /* The product panel becomes a compact row: photo on the left, details
+     on the right. .sfw-pmeta must stay a single wrapper, otherwise every
+     text element becomes its own flex column and the layout breaks. */
+  .sfw-product {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    padding: 14px;
+    text-align: left;
+  }
+
+  .sfw-imgbox {
+    flex: 0 0 84px;
+    min-height: 0;
+    margin: 0;
+    padding: 8px;
+  }
+
+  .sfw-img {
+    max-height: 110px;
+  }
+
+  .sfw-pmeta {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .sfw-pname {
+    font-size: 12px;
+  }
+
+  .sfw-sku {
+    font-size: 10px;
+    letter-spacing: 0.03em;
+  }
+
+  .sfw-form {
+    padding: 20px 16px;
+  }
+
+  .sfw-title {
+    font-size: 21px;
+  }
+
+}
+
+</style>
+
+
+
+<!-- ==========================================================================
+     3. JAVASCRIPT
+
+     This is optional polish only. If Unicart strips this block out, the
+     form still works: it posts normally and the confirmation appears as
+     its own page instead of inline. Nothing is lost.
+     ========================================================================== -->
+
+<script>
+(function () {
+
+  var wrap = document.querySelector('.sfw-wrap');
+  if (!wrap) {
+    return;
+  }
+
+  var form      = wrap.querySelector('.sfw-form');
+  var sink      = wrap.querySelector('.sfw-sink');
+  var grid      = wrap.querySelector('.sfw-grid');
+  var button    = wrap.querySelector('.sfw-btn');
+  var donePanel = wrap.querySelector('#sfw-done');
+  var failPanel = wrap.querySelector('#sfw-fail');
+  var refLine   = wrap.querySelector('#sfw-ref');
+  var retry     = wrap.querySelector('#sfw-retry');
+
+  var wasSubmitted = false;
+  var gotAnswer    = false;
+  var fallbackTimer = null;
+
+  // How long to wait for the server to report its result before giving up
+  // and showing the customer the server's own reply instead.
+  var ANSWER_TIMEOUT_MS = 6000;
+
+
+  /**
+   * The registration was saved. This runs ONLY when the server says so.
+   */
+  function showSuccess(reference) {
+
+    grid.hidden = true;
+    failPanel.hidden = true;
+    donePanel.hidden = false;
+
+    if (reference) {
+      refLine.textContent = 'Reference: ' + reference;
+      refLine.hidden = false;
+    }
+
+    wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+
+  /**
+   * The server explicitly reported a failure. Say so plainly - never let a
+   * customer believe they are covered when nothing was saved.
+   */
+  function showFailure() {
+
+    grid.hidden = true;
+    donePanel.hidden = true;
+    failPanel.hidden = false;
+
+    wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+
+  /**
+   * No result arrived, so we genuinely do not know what happened.
+   *
+   * Rather than guess, reveal the frame the form posted into. It holds the
+   * server's own reply - either the confirmation with a reference number,
+   * or the error page. Whichever it is, it is the truth.
+   */
+  function revealServerReply() {
+
+    grid.hidden = true;
+    sink.className += ' sfw-sink-visible';
+
+    wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+
+  /**
+   * The server announces its result by posting a message, because this page
+   * is not allowed to read inside the frame - it is served from Google's
+   * domain, and browsers forbid cross-origin reads.
+   */
+  window.addEventListener('message', function (event) {
+
+    // Only listen to Google, and only to our own message.
+    if (!event.origin || event.origin.indexOf('google') === -1) {
+      return;
+    }
+
+    var data = event.data;
+
+    if (!data || typeof data !== 'object') {
+      return;
+    }
+
+    if (data.source !== 'superfly-warranty') {
+      return;
+    }
+
+    gotAnswer = true;
+    clearTimeout(fallbackTimer);
+
+    if (data.ok) {
+      showSuccess(data.reference);
+    } else {
+      showFailure();
+    }
+  });
+
+
+  form.addEventListener('submit', function () {
+
+    // The browser blocks submission when required fields are empty.
+    // Leave the button alone in that case.
+    if (!form.checkValidity()) {
+      return;
+    }
+
+    wasSubmitted = true;
+    button.disabled = true;
+    button.textContent = 'Submitting\u2026';
+  });
+
+
+  sink.addEventListener('load', function () {
+
+    // The frame fires "load" once when the page first opens, before
+    // anything has been sent. Ignore that one.
+    if (!wasSubmitted || gotAnswer) {
+      return;
+    }
+
+    fallbackTimer = setTimeout(function () {
+      if (!gotAnswer) {
+        revealServerReply();
+      }
+    }, ANSWER_TIMEOUT_MS);
+  });
+
+
+  if (retry) {
+    retry.addEventListener('click', function () {
+      window.location.reload();
+    });
+  }
+
+})();
+</script>
+
+<!-- ======================= END SUPERFLY WARRANTY FORM ======================= -->
+
+</div></body></html>

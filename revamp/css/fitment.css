@@ -1,0 +1,373 @@
+/* ============================================================
+   SUPERFLY revamp — "Find your fit" fitment finder
+   Scoped entirely under #fitment. Consumes tokens.css; never
+   redefines a token or restyles a shared primitive.
+   Mobile first: base = <900px, enhanced at >=900px.
+   ============================================================ */
+
+#fitment{ overflow:hidden; }
+
+#fitment .fit-head{ max-width:70ch; }
+
+/* ---------- layout ---------- */
+#fitment .fit-grid{
+  margin-top:clamp(36px,6vh,64px);
+  display:grid;
+  grid-template-columns:1fr;
+  gap:clamp(24px,4vh,40px);
+}
+/* Grid/flex items default to min-width:auto, so the fixed-width chip rail
+   would force the whole section to its min-content width (~1580px) and blow
+   out the mobile layout. These two lines are load-bearing. */
+#fitment .fit-rail-wrap,
+#fitment .fit-stage{ min-width:0; }
+
+/* ---------- bike rail ---------- */
+#fitment .fit-rail__label{
+  font:500 11px/1 var(--sf-mono);
+  letter-spacing:.24em; text-transform:uppercase;
+  color:var(--sf-text-3); margin:0 0 14px;
+}
+
+#fitment .fit-rail{
+  display:flex; gap:10px;
+  overflow-x:auto; overflow-y:hidden;
+  scroll-snap-type:x mandatory;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:thin;
+  scrollbar-color:var(--sf-ash) transparent;
+  padding-bottom:10px;
+  /* bleed to the gutter edge so the rail reads as scrollable */
+  margin-inline:calc(var(--sf-gutter) * -1);
+  padding-inline:var(--sf-gutter);
+}
+#fitment .fit-rail::-webkit-scrollbar{ height:3px; }
+#fitment .fit-rail::-webkit-scrollbar-thumb{ background:var(--sf-ash); }
+
+#fitment .fit-chip{
+  flex:0 0 auto; width:158px;
+  scroll-snap-align:start;
+  display:flex; flex-direction:column; gap:5px;
+  text-align:left; cursor:pointer;
+  padding:13px 14px;
+  background:var(--sf-carbon);
+  border:1px solid var(--sf-steel);
+  border-left:2px solid var(--sf-steel);
+  border-radius:2px;
+  color:var(--sf-text-2);
+  transition:border-color .3s var(--sf-ease), background .3s var(--sf-ease), color .3s var(--sf-ease);
+}
+#fitment .fit-chip__make{
+  font:500 9px/1 var(--sf-mono); letter-spacing:.22em;
+  text-transform:uppercase; color:var(--sf-text-3);
+}
+#fitment .fit-chip__model{
+  font:700 14px/1.2 var(--sf-display); letter-spacing:-.01em;
+  text-transform:uppercase; color:var(--sf-text);
+}
+#fitment .fit-chip__type{
+  font:400 10px/1 var(--sf-mono); letter-spacing:.1em; color:var(--sf-text-3);
+}
+#fitment .fit-chip:hover{ border-color:var(--sf-ash); background:var(--sf-steel); }
+#fitment .fit-chip:focus-visible{ outline:2px solid var(--sf-magenta); outline-offset:2px; }
+#fitment .fit-chip[aria-selected="true"]{
+  background:var(--sf-magenta-dim);
+  border-color:rgba(255,25,171,.4);
+  border-left-color:var(--sf-magenta);
+}
+#fitment .fit-chip[aria-selected="true"] .fit-chip__make,
+#fitment .fit-chip[aria-selected="true"] .fit-chip__type{ color:var(--sf-magenta-hi); }
+
+/* ---------- stage ---------- */
+#fitment .fit-stage__inner{
+  position:relative;
+  aspect-ratio:1000 / 520;   /* keeps % pin coords locked to the viewBox */
+  width:100%;
+  background:
+    radial-gradient(60% 70% at 50% 62%, rgba(255,25,171,.09), transparent 70%),
+    var(--sf-black);
+  border:1px solid var(--sf-steel);
+  border-radius:3px;
+}
+
+#fitment .fit-svg{ display:block; width:100%; height:100%; }
+
+#fitment .fit-ground{ stroke:var(--sf-steel); stroke-width:2; }
+#fitment .fit-body{
+  fill:rgba(255,25,171,.11);
+  stroke:var(--sf-magenta); stroke-width:3.5; stroke-linejoin:round;
+}
+#fitment .fit-body#fit-body-ghost{ opacity:0; }   /* crossfade fallback layer */
+#fitment .fit-limb{
+  fill:none; stroke:var(--sf-magenta); stroke-width:10;
+  stroke-linecap:round; stroke-opacity:.72;
+}
+/* upswept exhaust + front mudguard / ADV beak */
+#fitment .fit-exhaust{
+  fill:none; stroke:var(--sf-magenta); stroke-width:6;
+  stroke-linecap:round; stroke-opacity:.55;
+}
+#fitment .fit-fender{
+  fill:none; stroke:var(--sf-magenta); stroke-width:8;
+  stroke-linecap:round; stroke-opacity:.8;
+}
+/* rear coil-over — SUPERFLY's flagship product, so it is drawn brightest */
+#fitment .fit-shock__rails{
+  fill:none; stroke:var(--sf-magenta-hi); stroke-width:6; stroke-linecap:round;
+}
+#fitment .fit-shock__coil{
+  fill:none; stroke:var(--sf-magenta-hi); stroke-width:5;
+  stroke-linejoin:round; stroke-linecap:round;
+}
+#fitment .fit-shock__eye{
+  fill:none; stroke:var(--sf-magenta-hi); stroke-width:5;
+}
+
+/* swingarm (underbone) / engine-CVT case (scooters) — one solid low mass */
+#fitment .fit-swing{
+  fill:rgba(255,25,171,.3); stroke:var(--sf-magenta);
+  stroke-width:4; stroke-linejoin:round;
+}
+
+/* tyre carcass = two concentric circles with a gap; rim sits inside */
+#fitment .fit-tyre{ fill:none; stroke:var(--sf-magenta); stroke-width:5; }
+#fitment .fit-tyre-in{ fill:none; stroke:var(--sf-magenta); stroke-width:5; }
+#fitment .fit-rim{ fill:none; stroke:var(--sf-magenta); stroke-width:3; stroke-opacity:.5; }
+#fitment .fit-spokes line{ stroke:var(--sf-magenta); stroke-width:4; stroke-opacity:.3; }
+
+/* ---------- hotspot pins ---------- */
+#fitment .fit-pins{ position:absolute; inset:0; }
+
+#fitment .fit-pin{
+  position:absolute;
+  transform:translate(-50%,-50%);   /* GSAP animates .fit-pin__dot, never this */
+  /* Fixed 28px box so the DOT lands on the coordinate. A flex row here would
+     centre dot+label together and push the dot ~50px left of its target. */
+  display:grid; place-items:center;
+  width:28px; height:28px;
+  padding:0; margin:0; border:0; background:none;
+  cursor:pointer; white-space:nowrap;
+}
+#fitment .fit-pin__dot{
+  position:relative; flex:none;
+  width:14px; height:14px; border-radius:50%;
+  background:var(--sf-magenta);
+  box-shadow:0 0 0 4px rgba(255,25,171,.18), 0 0 14px rgba(255,25,171,.6);
+}
+#fitment .fit-pin__dot::after{
+  content:''; position:absolute; inset:-9px;
+  border:1px solid var(--sf-magenta); border-radius:50%;
+  opacity:.5;
+}
+#fitment .fit-pin__label{
+  position:absolute; left:calc(100% - 2px); top:50%;
+  transform:translateY(-50%);
+  font:500 10px/1 var(--sf-mono); letter-spacing:.14em;
+  text-transform:uppercase; color:var(--sf-text);
+  background:rgba(8,8,11,.86);
+  border:1px solid var(--sf-steel);
+  padding:6px 8px; border-radius:2px;
+  opacity:0; pointer-events:none;
+  transition:opacity .25s var(--sf-ease);
+}
+#fitment .fit-pin:hover .fit-pin__label,
+#fitment .fit-pin:focus-visible .fit-pin__label,
+#fitment .fit-pin.is-open .fit-pin__label{ opacity:1; }
+#fitment .fit-pin:focus-visible{ outline:2px solid var(--sf-magenta); outline-offset:6px; border-radius:2px; }
+
+/* pin whose product has invented fitment data */
+#fitment .fit-pin[data-assumed="true"] .fit-pin__dot{
+  box-shadow:0 0 0 4px rgba(255,25,171,.12), 0 0 10px rgba(255,25,171,.4);
+}
+/* dagger only shows when the shown value is invented */
+#fitment .fit-dag{ color:var(--sf-magenta-hi); font-size:1em; margin-left:2px; }
+#fitment .fit-pin:not([data-assumed="true"]) .fit-dag{ display:none; }
+
+/* no product for this bike */
+#fitment .fit-pin.is-inactive{ pointer-events:none; }
+#fitment .fit-pin.is-inactive .fit-pin__dot{
+  background:var(--sf-ash); box-shadow:none; opacity:.55;
+}
+#fitment .fit-pin.is-inactive .fit-pin__dot::after{ border-color:var(--sf-ash); opacity:.35; }
+
+#fitment .fit-pin.is-open .fit-pin__dot{ background:var(--sf-magenta-hi); }
+
+/* ---------- spec card (mobile: bottom sheet) ---------- */
+#fitment .fit-card{
+  position:fixed; z-index:60;
+  left:0; right:0; bottom:0; top:auto; width:auto;
+  transform:translateY(101%);
+  opacity:1; visibility:hidden;
+  display:flex; flex-direction:column; gap:10px;
+  padding:22px var(--sf-gutter) calc(22px + env(safe-area-inset-bottom));
+  background:var(--sf-carbon);
+  border-top:1px solid var(--sf-steel);
+  border-radius:14px 14px 0 0;
+  box-shadow:0 -24px 60px rgba(0,0,0,.6);
+  transition:transform .4s var(--sf-ease), visibility .4s;
+}
+#fitment .fit-card.is-open{ transform:translateY(0); visibility:visible; }
+#fitment .fit-card[hidden]{ display:none; }
+
+#fitment .fit-card__close{
+  position:absolute; top:10px; right:14px;
+  width:32px; height:32px; line-height:1;
+  font-size:22px; color:var(--sf-text-2);
+  background:none; border:0; cursor:pointer;
+}
+#fitment .fit-card__close:hover{ color:var(--sf-text); }
+#fitment .fit-card__close:focus-visible{ outline:2px solid var(--sf-magenta); outline-offset:2px; }
+
+#fitment .fit-card__cat{
+  font:500 10px/1 var(--sf-mono); letter-spacing:.24em;
+  text-transform:uppercase; color:var(--sf-magenta); margin:0;
+}
+#fitment .fit-card__name{
+  font:800 19px/1.15 var(--sf-display); letter-spacing:-.02em;
+  text-transform:uppercase; color:var(--sf-text); margin:0; padding-right:34px;
+}
+#fitment .fit-card__specs{ margin:2px 0 0; display:grid; gap:7px; }
+#fitment .fit-card__specs > div{
+  display:flex; justify-content:space-between; align-items:baseline; gap:14px;
+  border-bottom:1px dashed var(--sf-steel); padding-bottom:6px;
+}
+#fitment .fit-card__specs dt{
+  font:400 10px/1.3 var(--sf-mono); letter-spacing:.12em;
+  text-transform:uppercase; color:var(--sf-text-3);
+}
+#fitment .fit-card__specs dd{
+  margin:0; text-align:right;
+  font:500 12px/1.3 var(--sf-mono); color:var(--sf-text);
+}
+#fitment .fit-card__specs dd[data-assumed="true"]{ color:var(--sf-text-2); }
+
+#fitment .fit-card__colours{ display:flex; align-items:center; gap:8px; margin-top:2px; }
+#fitment .fit-card__colours[hidden]{ display:none; }
+#fitment .fit-card__coloursLabel{
+  font:400 10px/1 var(--sf-mono); letter-spacing:.12em;
+  text-transform:uppercase; color:var(--sf-text-3); margin-right:2px;
+}
+#fitment .fit-sw{
+  width:15px; height:15px; border-radius:50%;
+  border:1px solid var(--sf-ash); display:inline-block;
+}
+#fitment .fit-sw--nardo{ background:var(--sf-nardo); }
+#fitment .fit-sw--tblue{ background:var(--sf-blue); }
+#fitment .fit-sw--black{ background:#15151b; }
+
+#fitment .fit-card__price{
+  margin:2px 0 0;
+  font:700 17px/1 var(--sf-display); color:var(--sf-text); letter-spacing:-.01em;
+}
+#fitment .fit-card__price.is-unknown{
+  font:400 11px/1.4 var(--sf-mono); color:var(--sf-text-3); letter-spacing:.08em;
+}
+#fitment .fit-card__note{
+  margin:0; font:400 10px/1.5 var(--sf-mono);
+  color:var(--sf-text-3); letter-spacing:.04em;
+}
+#fitment .fit-card__note[hidden]{ display:none; }
+
+#fitment .fit-card__cta{
+  margin-top:6px; align-self:flex-start;
+  font:500 11px/1 var(--sf-mono); letter-spacing:.2em; text-transform:uppercase;
+  color:var(--sf-void); background:var(--sf-magenta);
+  padding:12px 18px; border-radius:2px; text-decoration:none;
+  transition:background .25s var(--sf-ease);
+}
+#fitment .fit-card__cta:hover{ background:var(--sf-magenta-hi); }
+#fitment .fit-card__cta:focus-visible{ outline:2px solid var(--sf-text); outline-offset:2px; }
+
+#fitment .fit-sheet-backdrop{
+  position:fixed; inset:0; z-index:55;
+  background:rgba(8,8,11,.6); backdrop-filter:blur(2px);
+  opacity:0; transition:opacity .35s var(--sf-ease);
+}
+#fitment .fit-sheet-backdrop[hidden]{ display:none; }
+#fitment .fit-sheet-backdrop.is-open{ opacity:1; }
+
+/* ---------- readout + footnote ---------- */
+#fitment .fit-readout{
+  display:flex; flex-wrap:wrap; gap:8px; margin-top:16px;
+}
+#fitment .fit-foot{
+  margin:clamp(28px,4vh,44px) 0 0;
+  display:flex; flex-direction:column; gap:6px;
+  font:400 11px/1.6 var(--sf-mono);
+  letter-spacing:.04em; color:var(--sf-text-3);
+}
+#fitment .fit-foot__legend{ display:flex; align-items:center; gap:8px; }
+#fitment .fit-foot__swatch{
+  width:9px; height:9px; border-radius:50%;
+  background:var(--sf-ash); flex:none;
+}
+
+/* ============================================================
+   DESKTOP  >=900px
+   ============================================================ */
+@media (min-width:900px){
+
+  #fitment .fit-grid{
+    grid-template-columns:minmax(230px,300px) 1fr;
+    gap:clamp(28px,4vw,56px);
+    align-items:start;
+  }
+
+  #fitment .fit-rail{
+    flex-direction:column;
+    overflow-x:visible; overflow-y:auto;
+    max-height:min(560px,68vh);
+    scroll-snap-type:none;
+    margin-inline:0; padding-inline:0; padding-right:6px;
+    padding-bottom:0;
+  }
+  #fitment .fit-chip{ width:auto; }
+
+  /* fade the rail's scroll edge so the cut-off reads as intentional */
+  #fitment .fit-rail{
+    -webkit-mask-image:linear-gradient(180deg,#000 0,#000 calc(100% - 44px),transparent 100%);
+            mask-image:linear-gradient(180deg,#000 0,#000 calc(100% - 44px),transparent 100%);
+  }
+
+  /* pin cards become anchored popovers */
+  #fitment .fit-card{
+    position:absolute; z-index:20;
+    left:0; top:0; right:auto; bottom:auto;
+    width:272px; padding:18px;
+    border:1px solid var(--sf-steel); border-radius:3px;
+    box-shadow:0 24px 60px rgba(0,0,0,.55);
+    transform:translate(-50%,calc(-100% - 20px)) scale(.96);
+    opacity:0;
+    transition:opacity .28s var(--sf-ease), transform .28s var(--sf-ease), visibility .28s;
+  }
+  #fitment .fit-card.is-open{ opacity:1; transform:translate(-50%,calc(-100% - 20px)) scale(1); }
+  #fitment .fit-card.is-anchor-left{ transform:translate(-8%,calc(-100% - 20px)) scale(.96); }
+  #fitment .fit-card.is-anchor-left.is-open{ transform:translate(-8%,calc(-100% - 20px)) scale(1); }
+  #fitment .fit-card.is-anchor-right{ transform:translate(-92%,calc(-100% - 20px)) scale(.96); }
+  #fitment .fit-card.is-anchor-right.is-open{ transform:translate(-92%,calc(-100% - 20px)) scale(1); }
+  /* pin sits high in the stage -> drop the card below it */
+  #fitment .fit-card.is-below{ transform:translate(-50%,20px) scale(.96); }
+  #fitment .fit-card.is-below.is-open{ transform:translate(-50%,20px) scale(1); }
+  #fitment .fit-card.is-below.is-anchor-left{ transform:translate(-8%,20px) scale(.96); }
+  #fitment .fit-card.is-below.is-anchor-left.is-open{ transform:translate(-8%,20px) scale(1); }
+  #fitment .fit-card.is-below.is-anchor-right{ transform:translate(-92%,20px) scale(.96); }
+  #fitment .fit-card.is-below.is-anchor-right.is-open{ transform:translate(-92%,20px) scale(1); }
+
+  #fitment .fit-sheet-backdrop{ display:none !important; }
+
+  #fitment .fit-pin__dot{ width:16px; height:16px; }
+}
+
+/* very small phones: trim the pin footprint */
+@media (max-width:420px){
+  #fitment .fit-pin__dot{ width:12px; height:12px; }
+  #fitment .fit-pin__dot::after{ inset:-7px; }
+  #fitment .fit-chip{ width:146px; }
+}
+
+/* ---------- reduced motion ----------
+   tokens.css already collapses all transition/animation durations, so the
+   card still positions itself correctly; only the scale flourish is dropped. */
+@media (prefers-reduced-motion:reduce){
+  #fitment .fit-pin__dot::after{ display:none; }
+}

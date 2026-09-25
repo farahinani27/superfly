@@ -1,0 +1,458 @@
+/* =========================================================================
+   SUPERFLY revamp - "THE ARSENAL"
+   Pinned horizontal product-line scroller with self-drawing blueprints.
+
+   Depends on css/tokens.css for variables and the shared primitives
+   (.sf-eyebrow, .sf-h2, .sf-lede, .sf-wrap, .sf-chip). Nothing here
+   redefines a token or restyles a primitive globally - everything is
+   scoped under #arsenal.
+
+   Layout model, mobile first:
+     base            -> panels stack vertically, normal page scroll
+     >=900px + motion -> stage is pinned, .ars-track slides horizontally
+     prefers-reduced-motion -> never leaves the stacked layout
+   ========================================================================= */
+
+/* -------------------------------------------------------------- shell -- */
+/* main.css already resets this globally; repeated here so the section is
+   self-sufficient if it is ever dropped into a page that does not. */
+#arsenal,
+#arsenal *,
+#arsenal *::before,
+#arsenal *::after { box-sizing: border-box; }
+
+#arsenal {
+  position: relative;
+  background: var(--sf-void);
+  color: var(--sf-text);
+}
+
+/* faint blueprint grid behind the whole section */
+#arsenal::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, .028) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, .028) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(120% 90% at 50% 40%, #000 30%, transparent 78%);
+  -webkit-mask-image: radial-gradient(120% 90% at 50% 40%, #000 30%, transparent 78%);
+  z-index: 0;
+}
+
+#arsenal > * { position: relative; z-index: 1; }
+
+/* -------------------------------------------------------------- intro -- */
+#arsenal .ars-intro {
+  padding: clamp(72px, 11vh, 150px) var(--sf-gutter) clamp(30px, 5vh, 58px);
+}
+
+#arsenal .ars-intro .sf-lede { margin-top: 24px; }
+
+#arsenal .ars-intro__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 26px;
+  margin: 30px 0 0;
+  font: 500 11px/1 var(--sf-mono);
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  color: var(--sf-text-3);
+}
+
+#arsenal .ars-intro__hint { color: var(--sf-magenta); }
+
+#arsenal .ars-intro__hint i {
+  display: inline-block;
+  font-style: normal;
+  animation: ars-nudge 1.9s var(--sf-ease) infinite;
+}
+
+@keyframes ars-nudge {
+  0%, 100% { transform: translateX(0); }
+  50%      { transform: translateX(7px); }
+}
+
+/* -------------------------------------------------------------- stage -- */
+/* On mobile the stage is just a wrapper; the head bar is desktop-only. */
+#arsenal .ars-stagehead { display: none; }
+
+/* -------------------------------------------------------------- panel -- */
+#arsenal .ars-panel {
+  position: relative;
+  border-top: 1px solid var(--sf-steel);
+  padding: clamp(40px, 6vh, 72px) var(--sf-gutter) clamp(48px, 7vh, 84px);
+}
+
+#arsenal .ars-panel:last-child { border-bottom: 1px solid var(--sf-steel); }
+
+#arsenal .ars-panel__inner {
+  position: relative;
+  max-width: var(--sf-max);
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* huge outlined index numeral, sits behind the copy */
+#arsenal .ars-panel__index {
+  position: absolute;
+  top: -.18em;
+  right: 0;
+  z-index: 0;
+  font: 900 clamp(104px, 27vw, 190px)/.78 var(--sf-display);
+  letter-spacing: -.055em;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--sf-ash);
+  text-stroke: 1px var(--sf-ash);
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* browsers without text-stroke: fall back to a solid, very dark numeral */
+@supports not ((-webkit-text-stroke: 1px #000) or (text-stroke: 1px #000)) {
+  #arsenal .ars-panel__index { color: var(--sf-steel); }
+}
+
+#arsenal .ars-panel__copy { position: relative; z-index: 1; }
+
+/* the panel title carries .sf-h2 for its look; only the size is tuned here
+   so six titles fit a single viewport panel */
+#arsenal .ars-panel__title {
+  font-size: clamp(34px, 9vw, 58px);
+  margin-top: 16px;
+}
+
+#arsenal .ars-panel__lede { margin-top: 16px; max-width: 46ch; }
+
+#arsenal .ars-specs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+#arsenal .ars-specs .sf-chip { display: inline-flex; align-items: center; }
+
+#arsenal .ars-cta { margin: 26px 0 0; }
+
+#arsenal .ars-cta__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 2px 0 6px;
+  font: 500 11px/1 var(--sf-mono);
+  letter-spacing: .26em;
+  text-transform: uppercase;
+  color: var(--sf-text);
+  text-decoration: none;
+  border-bottom: 1px solid var(--sf-ash);
+  transition: color .3s var(--sf-ease), border-color .3s var(--sf-ease);
+}
+
+#arsenal .ars-cta__link span { transition: transform .35s var(--sf-ease); }
+#arsenal .ars-cta__link:hover,
+#arsenal .ars-cta__link:focus-visible { color: var(--sf-magenta); border-color: var(--sf-magenta); }
+#arsenal .ars-cta__link:hover span,
+#arsenal .ars-cta__link:focus-visible span { transform: translateX(6px); }
+
+#arsenal a:focus-visible {
+  outline: 2px solid var(--sf-magenta);
+  outline-offset: 4px;
+  border-radius: 1px;
+}
+
+/* -------------------------------------------------------------- media -- */
+#arsenal .ars-panel__media { margin: 30px 0 0; }
+
+#arsenal .ars-panel__cap {
+  margin: 12px 0 0;
+  font: 500 10px/1.4 var(--sf-mono);
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--sf-text-3);
+}
+
+#arsenal .ars-mediarow {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  gap: 14px;
+  align-items: stretch;   /* photo plate sets the height, frame matches it */
+}
+
+@media (min-width: 600px) {
+  #arsenal .ars-mediarow { grid-template-columns: 132px minmax(0, 1fr); gap: 18px; }
+}
+
+/* reference photo plate (Project RA). The source PNG carries leftover
+   studio background down its left edge and along the bottom, so the frame
+   crops to the product: x 70-500, y 0-1105 of a 675x1164 file. */
+#arsenal .ars-plate {
+  position: relative;
+  overflow: hidden;
+  align-self: start;      /* keep the crop exact; the frame stretches instead */
+  aspect-ratio: 430 / 1105;
+  border: 1px solid var(--sf-steel);
+  background:
+    radial-gradient(70% 45% at 50% 22%, rgba(255, 25, 171, .18), transparent 70%),
+    linear-gradient(180deg, var(--sf-carbon), var(--sf-black));
+}
+
+#arsenal .ars-plate__img {
+  position: absolute;
+  top: 0;
+  left: -16.28%;   /* 70px of 430px of visible width */
+  width: 157%;     /* 675 / 430 */
+  height: auto;
+  filter: brightness(1.16) contrast(1.05);
+}
+
+#arsenal .ars-plate__tag {
+  position: absolute;
+  left: 6px;
+  bottom: 6px;
+  font: 500 9px/1 var(--sf-mono);
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--sf-text-3);
+  background: rgba(8, 8, 11, .7);
+  padding: 4px 6px;
+}
+
+/* schematic frame with blueprint corner ticks */
+#arsenal .ars-schem {
+  position: relative;
+  display: grid;
+  align-content: center;
+  padding: clamp(10px, 1.6vw, 18px);
+  border: 1px solid var(--sf-steel);
+  background:
+    radial-gradient(120% 80% at 50% 0%, rgba(255, 25, 171, .07), transparent 62%),
+    var(--sf-black);
+}
+
+#arsenal .ars-schem::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  pointer-events: none;
+  --c: var(--sf-magenta);
+  background:
+    linear-gradient(var(--c), var(--c)) left top / 11px 1px no-repeat,
+    linear-gradient(var(--c), var(--c)) left top / 1px 11px no-repeat,
+    linear-gradient(var(--c), var(--c)) right top / 11px 1px no-repeat,
+    linear-gradient(var(--c), var(--c)) right top / 1px 11px no-repeat,
+    linear-gradient(var(--c), var(--c)) left bottom / 11px 1px no-repeat,
+    linear-gradient(var(--c), var(--c)) left bottom / 1px 11px no-repeat,
+    linear-gradient(var(--c), var(--c)) right bottom / 11px 1px no-repeat,
+    linear-gradient(var(--c), var(--c)) right bottom / 1px 11px no-repeat;
+  opacity: .6;
+}
+
+/* ------------------------------------------------------ svg blueprint -- */
+#arsenal .ars-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-inline: auto;
+  aspect-ratio: 620 / 460;
+}
+
+/* stroked geometry: never filled, always a true hairline on screen */
+#arsenal .ars-svg .s-main,
+#arsenal .ars-svg .s-aux,
+#arsenal .ars-svg .s-ghost,
+#arsenal .ars-svg .s-dim,
+#arsenal .ars-svg .s-ext,
+#arsenal .ars-svg .s-lead,
+#arsenal .ars-svg .s-cl,
+#arsenal .ars-svg .s-cut,
+#arsenal .ars-svg .s-hatch,
+#arsenal .ars-svg .s-seam,
+#arsenal .ars-svg .s-stitch,
+#arsenal .ars-svg .s-thresh,
+#arsenal .ars-svg .s-tb,
+#arsenal .ars-svg .s-gridline,
+#arsenal .ars-svg .s-gridline2 {
+  fill: none;
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+#arsenal .ars-svg .s-main   { stroke: var(--sf-magenta); stroke-width: 1.5; }
+#arsenal .ars-svg .s-aux    { stroke: rgba(255, 25, 171, .58); stroke-width: 1.1; }
+#arsenal .ars-svg .s-ghost  { stroke: var(--sf-ash); stroke-width: 1; }
+#arsenal .ars-svg .s-hatch  { stroke: rgba(255, 25, 171, .34); stroke-width: .9; }
+#arsenal .ars-svg .s-dim,
+#arsenal .ars-svg .s-ext,
+#arsenal .ars-svg .s-lead   { stroke: var(--sf-text-3); stroke-width: 1; }
+#arsenal .ars-svg .s-cl     { stroke: rgba(154, 158, 163, .34); stroke-width: 1; stroke-dasharray: 16 5 3 5; }
+#arsenal .ars-svg .s-cut    { stroke: var(--sf-magenta); stroke-width: 1.6; stroke-dasharray: 18 7; }
+#arsenal .ars-svg .s-seam   { stroke: rgba(242, 242, 245, .26); stroke-width: 1; stroke-dasharray: 7 6; }
+#arsenal .ars-svg .s-stitch { stroke: rgba(255, 25, 171, .42); stroke-width: 1; stroke-dasharray: 2 5; }
+#arsenal .ars-svg .s-thresh { stroke: rgba(41, 171, 226, .65); stroke-width: 1; stroke-dasharray: 5 5; }
+#arsenal .ars-svg .s-tb     { stroke: rgba(255, 255, 255, .16); stroke-width: 1; }
+
+#arsenal .ars-svg .s-gridline  { stroke: rgba(255, 255, 255, .055); stroke-width: 1; }
+#arsenal .ars-svg .s-gridline2 { stroke: rgba(255, 255, 255, .07); stroke-width: 1; }
+#arsenal .ars-svg .s-grid      { pointer-events: none; }
+
+/* solid bits */
+#arsenal .ars-svg .s-fillbody { fill: var(--sf-black); stroke: none; }
+#arsenal .ars-svg .s-dot      { fill: var(--sf-text-3); stroke: none; }
+#arsenal .ars-svg .s-ah       { fill: var(--sf-text-3); stroke: none; }
+
+/* callout type */
+#arsenal .ars-svg .s-lab {
+  font: 500 12px/1 var(--sf-mono);
+  fill: var(--sf-text-2);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+#arsenal .ars-svg .s-lab--hi  { fill: var(--sf-magenta); }
+#arsenal .ars-svg .s-lab--dim { fill: var(--sf-text-3); }
+
+/* The SVG scales with its container, so callout type has to be counter-sized
+   per breakpoint to land near 9-11px on screen. */
+/* 15px is the ceiling: the schematics were laid out so callouts do not
+   collide or leave the viewBox at that size. Bigger (20px was tried) and
+   the long callouts run off the right edge of the drawing. */
+@media (max-width: 599px) {
+  #arsenal .ars-svg .s-lab { font-size: 15px; letter-spacing: .04em; }
+}
+
+@media (min-width: 600px) and (max-width: 899px) {
+  #arsenal .ars-svg .s-lab { font-size: 11px; }
+}
+
+/* ============================================ desktop: pinned horizontal */
+@media (min-width: 900px) and (prefers-reduced-motion: no-preference) {
+
+  #arsenal .ars-intro { padding-bottom: clamp(24px, 4vh, 48px); }
+
+  #arsenal .ars-stage {
+    height: 100vh;
+    height: 100svh;
+    min-height: 620px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;           /* hides the off-screen panels */
+  }
+
+  #arsenal .ars-stagehead {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: clamp(16px, 3vw, 40px);
+    padding: 18px var(--sf-gutter);
+    border-top: 1px solid var(--sf-steel);
+    border-bottom: 1px solid var(--sf-steel);
+    font: 500 10px/1 var(--sf-mono);
+    letter-spacing: .26em;
+    text-transform: uppercase;
+    color: var(--sf-text-3);
+  }
+
+  #arsenal .ars-stagehead__id { flex: none; color: var(--sf-text-2); }
+  #arsenal .ars-stagehead__count { flex: none; }
+  #arsenal .ars-stagehead__count b { color: var(--sf-magenta); font-weight: 500; }
+
+  #arsenal .ars-progress {
+    position: relative;
+    flex: 1 1 auto;
+    height: 1px;
+    background: var(--sf-steel);
+    overflow: hidden;
+  }
+
+  #arsenal .ars-progress__bar {
+    position: absolute;
+    inset: 0;
+    display: block;
+    background: var(--sf-magenta);
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+  }
+
+  #arsenal .ars-track {
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 0;
+    will-change: transform;
+  }
+
+  #arsenal .ars-panel {
+    flex: 0 0 clamp(560px, 78vw, 1180px);
+    width: clamp(560px, 78vw, 1180px);
+    display: flex;
+    align-items: center;
+    border-top: 0;
+    border-right: 1px solid var(--sf-steel);
+    padding: clamp(24px, 4vh, 56px) clamp(30px, 3.4vw, 64px);
+  }
+
+  #arsenal .ars-panel:last-child { border-bottom: 0; }
+
+  #arsenal .ars-panel__index {
+    top: auto;
+    bottom: -.1em;
+    right: clamp(10px, 2vw, 28px);
+    font-size: clamp(120px, 14vw, 210px);
+  }
+
+  #arsenal .ars-panel__media { margin-top: 26px; }
+  #arsenal .ars-svg { max-height: 46vh; }
+}
+
+/* two columns once a panel is genuinely wide */
+@media (min-width: 1280px) and (prefers-reduced-motion: no-preference) {
+  #arsenal .ars-panel__inner {
+    display: grid;
+    grid-template-columns: minmax(270px, .92fr) minmax(360px, 1.12fr);
+    gap: clamp(28px, 3vw, 58px);
+    align-items: center;
+  }
+
+  #arsenal .ars-panel__media { margin-top: 0; }
+  #arsenal .ars-panel__title { font-size: clamp(42px, 3.6vw, 62px); }
+  #arsenal .ars-svg { max-height: 56vh; }
+
+  /* two columns means each schematic renders at roughly 0.7 scale, so the
+     callout type is counter-sized again (15px is the validated ceiling) */
+  #arsenal .ars-svg .s-lab { font-size: 13.5px; letter-spacing: .06em; }
+
+  /* the one panel that shares its row with a reference photo loses about a
+     quarter of its width on top of that, so it is bumped further */
+  #arsenal .ars-mediarow { grid-template-columns: 120px minmax(0, 1fr); gap: 16px; }
+  #arsenal .ars-mediarow .ars-svg .s-lab { font-size: 15px; letter-spacing: .05em; }
+}
+
+/* ===================================================== reduced motion === */
+/* No pin, no horizontal travel, schematics simply sit there fully drawn.
+   The stacked base layout above already covers it - this just makes sure
+   nothing is left hidden or clipped if JS bailed out mid-way. */
+@media (prefers-reduced-motion: reduce) {
+  #arsenal .ars-stage { height: auto; min-height: 0; overflow: visible; display: block; }
+  #arsenal .ars-track { display: block; transform: none !important; }
+  #arsenal .ars-stagehead { display: none; }
+  #arsenal .ars-intro__hint i { animation: none; }
+
+  #arsenal .ars-draw {
+    stroke-dasharray: none !important;
+    stroke-dashoffset: 0 !important;
+  }
+
+  #arsenal .ars-draw,
+  #arsenal .ars-fade,
+  #arsenal .ars-in {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+  }
+}

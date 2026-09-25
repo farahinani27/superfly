@@ -1,0 +1,65 @@
+/* SUPERFLY revamp — shared design tokens. Do not restyle; extend in your own section file. */
+:root{
+  /* Core */
+  --sf-void:#08080B;        /* page base */
+  --sf-black:#0B0B0F;
+  --sf-carbon:#121218;      /* raised surface */
+  --sf-steel:#1C1C24;       /* borders / inset */
+  --sf-ash:#2A2A34;
+
+  /* Brand */
+  --sf-magenta:#FF19AB;     /* pulled from live site */
+  --sf-magenta-hi:#FF4ABD;
+  --sf-magenta-dim:rgba(255,25,171,.14);
+  --sf-blue:#29ABE2;        /* T-Blue product colourway */
+  --sf-nardo:#9A9EA3;       /* Nardo Grey colourway */
+
+  /* Text */
+  --sf-text:#F2F2F5;
+  --sf-text-2:#9B9BA8;
+  --sf-text-3:#5E5E6C;
+
+  /* Type */
+  --sf-display:'Archivo', 'Arial Black', system-ui, sans-serif;
+  --sf-mono:'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* Rhythm */
+  --sf-gutter:clamp(20px, 5vw, 80px);
+  --sf-max:1440px;
+  --sf-ease:cubic-bezier(.22,1,.36,1);
+}
+
+/* Shared primitives every section may use */
+.sf-eyebrow{
+  font:500 11px/1 var(--sf-mono);
+  letter-spacing:.34em; text-transform:uppercase;
+  color:var(--sf-magenta);
+  display:flex; align-items:center; gap:14px;
+}
+.sf-eyebrow::before{
+  content:''; width:28px; height:1px; background:var(--sf-magenta); flex:none;
+}
+.sf-h2{
+  font:800 clamp(38px,7vw,96px)/.92 var(--sf-display);
+  letter-spacing:-.035em; text-transform:uppercase;
+  color:var(--sf-text); margin:18px 0 0;
+}
+.sf-h2 em{ font-style:italic; color:var(--sf-magenta); }
+.sf-lede{
+  font:400 clamp(15px,1.5vw,18px)/1.65 var(--sf-display);
+  color:var(--sf-text-2); max-width:56ch; margin:20px 0 0;
+}
+.sf-section{ padding:clamp(80px,12vh,160px) var(--sf-gutter); position:relative; }
+.sf-wrap{ max-width:var(--sf-max); margin:0 auto; }
+.sf-rule{ height:1px; background:linear-gradient(90deg,var(--sf-steel),transparent); }
+
+/* Data chip — used for specs, fitment, telemetry readouts */
+.sf-chip{
+  font:500 11px/1 var(--sf-mono); letter-spacing:.12em; text-transform:uppercase;
+  color:var(--sf-text-2); border:1px solid var(--sf-steel);
+  padding:8px 12px; border-radius:2px; background:rgba(255,255,255,.02);
+}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{ animation-duration:.001ms !important; transition-duration:.001ms !important; }
+}
