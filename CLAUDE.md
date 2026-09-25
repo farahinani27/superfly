@@ -104,11 +104,16 @@ It reads `PRODUCTS` from `warranty/form/build-forms.py`, so the product codes
 in the artwork cannot drift from the codes the form accepts. To add a product,
 add it there — never hand-edit a `.svg` or `.eps`.
 
-Each card prints the QR with the **product code and colour underneath**
-(`ASSCBK` / `SILVER CHROME / BLACK`). This is not decoration: two bare QR codes
-are indistinguishable to a human, so without the label a supplier or warehouse
-can put the wrong sticker on the wrong box and nothing looks wrong until the
-warranty data is already corrupt.
+The artwork is a **bare QR** — no printed code, by the operator's decision
+(2026-09-25). `PRINT_LABEL = True` in the generator adds the product code and
+colour underneath if that is ever reconsidered.
+
+Know what the bare version costs: two QR codes are indistinguishable to a
+human, so a supplier or warehouse can put the wrong sticker on the wrong box
+and nothing looks wrong until the warranty data is already corrupt. With no
+label on the code itself, **that protection has to come from somewhere else** —
+the surrounding card artwork, or naming the files unambiguously when you hand
+them to the printer and stating in writing which file is which colourway.
 
 ### Before anything goes to the printer
 
