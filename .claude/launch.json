@@ -4,14 +4,38 @@
     {
       "name": "superfly-revamp",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8770", "--directory", "revamp"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8770",
+        "--directory",
+        "revamp"
+      ],
       "port": 8770
     },
     {
       "name": "warranty-form",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8771", "--directory", "warranty/form"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8771",
+        "--directory",
+        "warranty/form"
+      ],
       "port": 8771
+    },
+    {
+      "name": "warranty-qr",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8772",
+        "--directory",
+        "warranty/qr"
+      ],
+      "port": 8772
     }
   ]
 }

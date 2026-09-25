@@ -81,19 +81,39 @@ printed card.
 **Never print a QR pointing at `superfly.durianbikers.com`.** That host is
 temporary scaffolding.
 
+### The artwork is generated, not hand-drawn
+
+`warranty/qr/make-qr.py` (stdlib only, needs `qrencode` on PATH) builds all
+three formats per product and re-verifies the encoded URL afterwards by
+re-encoding and comparing the module matrix:
+
+```bash
+python3 warranty/qr/make-qr.py
+```
+
+It reads `PRODUCTS` from `warranty/form/build-forms.py`, so the product codes
+in the artwork cannot drift from the codes the form accepts. To add a product,
+add it there — never hand-edit a `.svg` or `.eps`.
+
+Each card prints the QR with the **product code and colour underneath**
+(`ASSCBK` / `SILVER CHROME / BLACK`). This is not decoration: two bare QR codes
+are indistinguishable to a human, so without the label a supplier or warehouse
+can put the wrong sticker on the wrong box and nothing looks wrong until the
+warranty data is already corrupt.
+
 ### Before anything goes to the printer
 
-- The two QR files are **visually identical to a human** — there is no printed
-  code on the artwork. `ASSCBK` and `ASBKGD` cannot be told apart without
-  scanning, so a mixed-up batch produces silently wrong warranty data. Add a
-  human-readable code under each QR before sending to print.
-- Send the printer the **`.eps`** (vector). The `.png` is 574×574 and will not
-  survive being scaled up.
-- Minimum **25 mm** square. Keep the white quiet zone — the artwork's viewBox is
-  41 modules for a 33-module code precisely because of that 4-module border.
-  Cropping it is the classic failure.
+- Send the printer the **`.eps`**. It is true vector and exactly 30 mm wide.
+  The `.png` is a preview, not a print file — it will not survive scaling.
+- Minimum **25 mm** square if the printer rescales. Keep the white quiet zone:
+  the artwork is 41 modules wide for a 33-module code precisely because of that
+  4-module border. Cropping it is the classic failure.
 - **Black on white.** The brand magenta (`#FF19AB`) on near-black does not
   reliably scan.
+- **`warranty/qr/obsolete/` must never be printed.** Those files encode
+  `warranty.superflymotos.com.my`, a host that does not exist, left over from
+  the spec's abandoned architecture. They are kept only so nobody wonders where
+  they went. See the `DO-NOT-PRINT.md` in there.
 
 ### A known tension
 
