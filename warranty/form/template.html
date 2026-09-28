@@ -42,33 +42,33 @@
     target="sfw-sink">
 
     <!-- ------------------------------------------------------------------
-         Left column: the product being registered.
-
-         To use this page for a DIFFERENT product, change three things:
-           1. the <img src> below
-           2. the .sfw-pname heading text
-           3. the .sfw-sku badge AND the hidden "sku" input in the form
-         ------------------------------------------------------------------ -->
-    <!-- ------------------------------------------------------------------
          Which product is being registered.
 
-         The card's QR adds ?v=<code> to the URL. The matching option is
-         selected automatically and the others are greyed out, so nobody
-         registers the wrong product by a stray tap.
+         One QR per product TYPE, not per colour - a single card is sealed
+         into boxes of every colourway, so the card cannot know the colour.
+         The QR adds ?p=<product code>; the page then shows that product and
+         narrows the dropdown to its colours.
 
-         The lock is deliberately soft. A box can reach a customer with the
-         wrong sticker on it, and a card that dead-ends is a card thrown away
-         along with the stock it is sitting in - so "Not this product?"
-         re-enables everything. An unrecognised code locks nothing at all,
-         and if no JavaScript runs the page behaves exactly as it always did.
+         The colour starts unchosen on purpose. Defaulting to one would let
+         a customer register the wrong colourway without ever looking at the
+         field.
+
+         An unknown or missing ?p= shows every product instead of
+         dead-ending, and with no JavaScript the dropdown still lists
+         everything and still posts correctly.
          ------------------------------------------------------------------ -->
     <fieldset class="sfw-picker">
       <legend class="sfw-picker-legend">Your product</legend>
-{{CHOICES}}
-      <p class="sfw-locknote" id="sfw-locknote" style="display:none">
-        Locked to the product on your warranty card.
-        <button type="button" class="sfw-unlock" id="sfw-unlock">Not this product?</button>
-      </p>
+{{PRODUCTS}}
+      <div class="sfw-field sfw-variant">
+        <label class="sfw-label" for="sfw-variant">
+          Colour <span class="sfw-req">*</span>
+        </label>
+        <select class="sfw-input sfw-select" id="sfw-variant" name="variant" required>
+          <option value="">Choose your colour&hellip;</option>
+{{OPTIONS}}        </select>
+        <p class="sfw-hint">Pick the colourway printed on your unit.</p>
+      </div>
     </fieldset>
 
 
@@ -265,7 +265,7 @@
   --sfw-text:   #e6e6e6;   /* body text                */
   --sfw-mute:   #8c8c8c;   /* hints and secondary text */
 
-  max-width: 1000px;
+  max-width: 720px;
   margin: 0 auto;
   padding: 8px 0 48px;
   color: var(--sfw-text);
@@ -409,14 +409,6 @@
   margin: 0;
   padding: 0;
   border: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 14px;
-}
-
-/* A fieldset's legend sits outside the grid flow. */
-.sfw-picker-legend {
-  grid-column: 1 / -1;
 }
 
 .sfw-picker-legend {
@@ -429,165 +421,80 @@
   text-transform: uppercase;
 }
 
-.sfw-choice {
-  display: block;
-  cursor: pointer;
-}
-
-/* The radio is hidden from sight but still focusable and still read by
-   screen readers - never display:none, which would remove it entirely. */
-.sfw-choice input {
-  position: absolute;
-  opacity: 0;
-  width: 1px;
-  height: 1px;
-}
-
-.sfw-choice-box {
+/* The product named by the scanned QR. Presentational only - the customer
+   picks the colour from the dropdown below it. */
+.sfw-prod {
   display: flex;
   gap: 14px;
   align-items: center;
   padding: 12px;
+  margin: 0 0 18px;
   background: var(--sfw-panel);
-  border: 2px solid var(--sfw-line);
+  border: 1px solid var(--sfw-line);
   border-radius: 10px;
-  transition: border-color 0.15s, background 0.15s;
 }
 
-.sfw-choice:hover .sfw-choice-box {
-  border-color: #4a4a4a;
+.sfw-prod .sfw-imgbox {
+  flex: 0 0 64px;
+  width: 64px;
+  height: 78px;
+  background: #fff;
+  border-radius: 6px;
+  overflow: hidden;
 }
 
-.sfw-choice input:checked + .sfw-choice-box {
-  border-color: var(--sfw-red);
-  background: #1f1416;
+.sfw-prod .sfw-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
-.sfw-choice input:focus-visible + .sfw-choice-box {
-  outline: 2px solid var(--sfw-red);
-  outline-offset: 2px;
-}
-
-.sfw-choice .sfw-imgbox {
-  flex: 0 0 68px;
-  min-height: 0;
-  margin: 0;
-  padding: 6px;
-}
-
-.sfw-choice .sfw-img {
-  max-height: 86px;
-}
-
-.sfw-choice-meta {
-  flex: 1 1 auto;
+.sfw-prod-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   min-width: 0;
-  text-align: left;
 }
 
-/* These are spans inside a label, so they need to be made block-level
-   or the SKU badge runs on from the end of the product name. */
-.sfw-choice .sfw-pname {
-  display: block;
-  margin: 0 0 8px;
-  font-size: 12px;
-}
-
-.sfw-choice .sfw-sku {
-  display: inline-block;
-}
-
-/* A tick that only appears on the selected card. */
-.sfw-choice-mark {
-  flex: 0 0 auto;
-  width: 22px;
-  height: 22px;
-  border: 2px solid var(--sfw-line);
-  border-radius: 50%;
-  color: transparent;
+.sfw-prod .sfw-pname {
   font-size: 13px;
-  line-height: 19px;
-  text-align: center;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: 0.02em;
 }
 
-.sfw-choice input:checked + .sfw-choice-box .sfw-choice-mark {
-  background: var(--sfw-red);
-  border-color: var(--sfw-red);
-  color: #fff;
+.sfw-prod .sfw-sku {
+  align-self: flex-start;
+  padding: 3px 8px;
+  background: var(--sfw-maroon);
+  border-radius: 4px;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
 }
 
-
-/* A product locked out because the scanned card is for a different one.
-   Greyed and unclickable, but never removed - the customer still sees what
-   the other option was, and "Not this product?" brings it back.
-
-   Dimming is done with this element's own colours rather than opacity on the
-   whole card. .sfw-wrap is a transparent fragment pasted into a Unicart page,
-   so opacity would blend toward the host page's background - dark there, but
-   white anywhere the fragment is viewed on its own, which reads as
-   highlighted rather than disabled. */
-.sfw-choice.sfw-locked {
-  cursor: not-allowed;
-}
-
-.sfw-choice.sfw-locked .sfw-choice-box {
-  border-style: dashed;
-  border-color: var(--sfw-line);
-  background: transparent;
-}
-
-.sfw-choice.sfw-locked:hover .sfw-choice-box {
-  border-color: var(--sfw-line);
-}
-
-.sfw-choice.sfw-locked .sfw-img,
-.sfw-choice.sfw-locked .sfw-imgbox {
-  filter: grayscale(1);
-  opacity: 0.45;
-}
-
-.sfw-choice.sfw-locked .sfw-pname,
-.sfw-choice.sfw-locked .sfw-sku {
-  color: var(--sfw-mute);
-  background: transparent;
-}
-
-/* The tick stays invisible - a locked product is not a selected one, and a
-   greyed-but-visible check reads as "chosen". */
-.sfw-choice.sfw-locked .sfw-choice-mark {
-  color: transparent;
-  border-color: var(--sfw-line);
-  background: transparent;
-}
-
-/* The picker is a grid, so the note has to span it or it lands in the next
-   column beside the products instead of under them. */
-.sfw-locknote {
-  grid-column: 1 / -1;
-  margin: 0 2px;
-  font-size: 13px;
-  line-height: 1.5;
-  color: var(--sfw-mute);
-}
-
-.sfw-unlock {
-  display: inline;
-  padding: 0;
-  border: 0;
-  background: none;
-  font: inherit;
-  color: var(--sfw-red);
-  text-decoration: underline;
+/* The colour dropdown. A native <select> so it works with no JavaScript and
+   gets the platform's own picker on a phone. */
+.sfw-select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 38px;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--sfw-mute) 50%),
+    linear-gradient(135deg, var(--sfw-mute) 50%, transparent 50%);
+  background-position: calc(100% - 20px) 52%, calc(100% - 14px) 52%;
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
   cursor: pointer;
 }
 
-.sfw-unlock:hover {
-  color: #fff;
+.sfw-select option {
+  background: var(--sfw-panel);
+  color: var(--sfw-text);
 }
 
-.sfw-unlock:focus-visible {
-  outline: 2px solid var(--sfw-red);
-  outline-offset: 2px;
+.sfw-variant {
+  margin-bottom: 0;
 }
 
 
@@ -595,9 +502,10 @@
    Form
    -------------------------------------------------------------------------- */
 
+/* Centred, not hugging the left edge. The wrap is 1000px but the form reads
+   badly that wide, so it keeps a comfortable measure and centres inside it. */
 .sfw-form {
   padding: 26px;
-  max-width: 640px;
   background: var(--sfw-panel);
   border: 1px solid var(--sfw-line);
   border-radius: 10px;
@@ -1006,8 +914,7 @@
   var failPanel = wrap.querySelector('#sfw-fail');
   var refLine   = wrap.querySelector('#sfw-ref');
   var retry     = wrap.querySelector('#sfw-retry');
-  var note      = wrap.querySelector('#sfw-locknote');
-  var unlockBtn = wrap.querySelector('#sfw-unlock');
+  var variant   = wrap.querySelector('#sfw-variant');
 
   var wasSubmitted = false;
   var gotAnswer    = false;
@@ -1100,77 +1007,47 @@
 
 
   /**
-   * Reads ?v=CODE from the address, selects that product and locks the
-   * others out so a stray tap cannot register the wrong warranty.
+   * Reads ?p=CODE from the address and narrows the page to that product:
+   * its panel is the only one shown, and the colour dropdown offers only
+   * its colours.
    *
-   * This is convenience only. If it does not run, the customer simply
-   * chooses from the list themselves and the result is identical.
+   * This is convenience only. If it does not run, every product is listed
+   * and the customer picks from the whole set - the posted result is
+   * identical either way.
    */
-  function preselectFromUrl() {
+  function narrowToProduct() {
 
-    var match = window.location.search.match(/[?&]v=([A-Za-z0-9_-]+)/);
+    var match = window.location.search.match(/[?&]p=([A-Za-z0-9_-]+)/);
     if (!match) {
       return;
     }
 
     var wanted = match[1].toUpperCase();
-    var radios = wrap.querySelectorAll('input[name="variant"]');
+    var groups = wrap.querySelectorAll('#sfw-variant optgroup');
+    var panels = wrap.querySelectorAll('.sfw-prod');
+    var hits = 0;
 
-    for (var i = 0; i < radios.length; i++) {
-      if (radios[i].value.toUpperCase() === wanted) {
-        radios[i].checked = true;
-        lockOthers(radios[i]);
-        return;
+    for (var g = 0; g < groups.length; g++) {
+      if ((groups[g].getAttribute('data-product') || '').toUpperCase() === wanted) {
+        hits++;
       }
     }
 
-    // Code we do not recognise: lock nothing. A card that dead-ends is a
-    // card thrown away along with the stock it is sitting in.
-  }
-
-
-  /** The <label class="sfw-choice"> wrapping a radio. */
-  function choiceOf(radio) {
-    return radio.parentNode;
-  }
-
-
-  /** Grey out and disable every product except the scanned one. */
-  function lockOthers(chosen) {
-
-    var radios = wrap.querySelectorAll('input[name="variant"]');
-    var locked = 0;
-
-    for (var i = 0; i < radios.length; i++) {
-      if (radios[i] === chosen) {
-        continue;
-      }
-      radios[i].disabled = true;
-      choiceOf(radios[i]).className += ' sfw-locked';
-      locked++;
+    // A code we do not recognise narrows nothing. A card that leads nowhere
+    // is a card thrown away along with the stock it is sitting in.
+    if (!hits) {
+      return;
     }
 
-    // Nothing was locked when the card is the only product - saying so
-    // would just confuse.
-    if (locked && note) {
-      note.style.display = '';
-    }
-  }
-
-
-  /** Undo the lock, for a box that reached the customer mis-stickered. */
-  function unlockAll() {
-
-    var radios = wrap.querySelectorAll('input[name="variant"]');
-
-    for (var i = 0; i < radios.length; i++) {
-      radios[i].disabled = false;
-      var choice = choiceOf(radios[i]);
-      choice.className = choice.className.replace(/\s*sfw-locked\b/g, '');
+    for (var i = 0; i < panels.length; i++) {
+      var mine = (panels[i].getAttribute('data-product') || '').toUpperCase() === wanted;
+      panels[i].style.display = mine ? '' : 'none';
     }
 
-    if (note) {
-      note.style.display = 'none';
+    for (var j = 0; j < groups.length; j++) {
+      var keep = (groups[j].getAttribute('data-product') || '').toUpperCase() === wanted;
+      groups[j].disabled = !keep;
+      groups[j].style.display = keep ? '' : 'none';
     }
   }
 
@@ -1181,16 +1058,17 @@
    */
   function updateSerialPrefix() {
 
-    var chosen = wrap.querySelector('input[name="variant"]:checked');
+    var select = wrap.querySelector('#sfw-variant');
     var prefixBox = wrap.querySelector('#sfw-prefix');
     var hint = wrap.querySelector('#sfw-serial-hint');
     var input = wrap.querySelector('#sfw-serial');
 
-    if (!chosen || !prefixBox) {
+    if (!select || !prefixBox) {
       return;
     }
 
-    var prefix = chosen.getAttribute('data-prefix') || '';
+    var chosen = select.options[select.selectedIndex];
+    var prefix = (chosen && chosen.getAttribute('data-prefix')) || '';
 
     if (prefix) {
       prefixBox.textContent = prefix + '-';
@@ -1201,21 +1079,26 @@
                          '-</strong> &mdash; enter only the number that follows it.';
       }
     } else {
+      // No colour chosen yet, so there is no prefix to show. Say why, rather
+      // than leaving a serial field that looks ready but is missing half its
+      // value.
       prefixBox.hidden = true;
+      if (input) {
+        input.placeholder = '';
+      }
+      if (hint) {
+        hint.textContent = 'Choose your colour above first \u2014 it sets the ' +
+                           'prefix your serial starts with.';
+      }
     }
   }
 
 
-  preselectFromUrl();
-
-  if (unlockBtn) {
-    unlockBtn.addEventListener('click', unlockAll);
-  }
+  narrowToProduct();
   updateSerialPrefix();
 
-  var variantRadios = wrap.querySelectorAll('input[name="variant"]');
-  for (var r = 0; r < variantRadios.length; r++) {
-    variantRadios[r].addEventListener('change', updateSerialPrefix);
+  if (variant) {
+    variant.addEventListener('change', updateSerialPrefix);
   }
 
 

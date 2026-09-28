@@ -67,7 +67,8 @@ nowhere and no registration is ever recorded.
 
 ## 6. Test before printing anything
 
-Submit the form yourself and confirm all three happen:
+Open `/warranty?p=AIRSUS330` on a phone, pick a colour, and submit. Confirm all
+three happen:
 
 1. A row appears in the sheet, with a reference like `SF-WR-2026-0001`.
 2. The confirmation email arrives.

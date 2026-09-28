@@ -56,15 +56,23 @@ The supplier prints warranty cards (300+ pieces) that are sealed inside product
 boxes. **A printed QR can never be changed.** Everything below is subordinate to
 that.
 
-The production QR artwork in `warranty/qr/` encodes exactly:
+**One QR per product TYPE, not per colour** (changed 2026-09-28). A single
+card is sealed into boxes of every colourway, so the card cannot know which
+colour it is sitting in — the customer picks the colour from a dropdown on the
+form. The production QR artwork in `warranty/qr/` encodes exactly:
 
 ```
-https://superflymotos.com.my/warranty?v=ASSCBK    (SUS-AS-UNI-330-SC-BK, black/silver)
-https://superflymotos.com.my/warranty?v=ASBKGD    (SUS-AS-UNI-330-BK-GD, black/gold)
+https://superflymotos.com.my/warranty?p=AIRSUS330
+    covers ASSCBK  330MM SILVER CHROME / BLACK  (SUS-AS-UNI-330-SC-BK)
+    covers ASBKGD  330MM BLACK / GOLD           (SUS-AS-UNI-330-BK-GD)
 ```
 
-QR version 4 (33×33 modules), error correction level **Q**. Verified by
-re-encoding each candidate URL and comparing the module matrix — not by eye.
+QR version 5 (37×37 modules), error correction level **Q**, 0.67 mm modules at
+30 mm. Verified by re-encoding each candidate URL and comparing the module
+matrix — not by eye.
+
+The per-colour `?v=ASSCBK` / `?v=ASBKGD` codes are **retired** and sit in
+`warranty/qr/obsolete/`. Nothing was ever printed from them.
 
 The encoded domain is `superflymotos.com.my`, which is the domain being
 **kept**. Only the platform underneath changes. So printed cards survive the
@@ -74,17 +82,17 @@ Unicart → WooCommerce migration, provided all of the following stay true:
    Not `warranty-registration`, not `warranty-form`. WordPress will silently
    give you a different slug and nothing will look wrong until stickers are in
    customers' hands.
-2. That page reads `?v=<code>` and preselects the product. If it ignores the
-   parameter the form still works — the customer just picks manually — but the
-   experience degrades.
+2. That page reads `?p=<product code>` and narrows to that product. If it
+   ignores the parameter the form still works — every product is listed and
+   the customer picks — but the experience degrades.
 3. **HTTPS is live on the new host before DNS moves.** A scan landing on a
    certificate warning is a dead card.
 4. Add a permanent redirect from `/warranty` on the new site. If the form ever
    moves again, you edit one rule instead of reprinting 300 stickers.
 
 **Cutover order, never deviate:** build on `superfly.durianbikers.com` → point
-`superflymotos.com.my` at WooCommerce → verify `/warranty?v=ASSCBK` returns 200
-and preselects → *then* cancel Unicart. Cancelling Unicart first kills every
+`superflymotos.com.my` at WooCommerce → verify `/warranty?p=AIRSUS330` returns 200
+and shows that product → *then* cancel Unicart. Cancelling Unicart first kills every
 printed card.
 
 **Never print a QR pointing at `superfly.durianbikers.com`.** That host is
@@ -102,18 +110,18 @@ python3 warranty/qr/make-qr.py
 
 It reads `PRODUCTS` from `warranty/form/build-forms.py`, so the product codes
 in the artwork cannot drift from the codes the form accepts. To add a product,
-add it there — never hand-edit a `.svg` or `.eps`.
+add it there — never hand-edit a `.svg` or `.eps`. Adding a *colour* to an
+existing product needs no new QR: the product's card already covers it.
 
 The artwork is a **bare QR** — no printed code, by the operator's decision
 (2026-09-25). `PRINT_LABEL = True` in the generator adds the product code and
 colour underneath if that is ever reconsidered.
 
-Know what the bare version costs: two QR codes are indistinguishable to a
-human, so a supplier or warehouse can put the wrong sticker on the wrong box
-and nothing looks wrong until the warranty data is already corrupt. With no
-label on the code itself, **that protection has to come from somewhere else** —
-the surrounding card artwork, or naming the files unambiguously when you hand
-them to the printer and stating in writing which file is which colourway.
+The mixup risk that used to make the label matter is now largely gone: there
+is only one QR for the whole product, so there is no wrong sticker to apply.
+It returns the moment a second product type exists — two bare codes are
+indistinguishable to a human — so if you add one, either turn the label on or
+name the handover files unambiguously.
 
 ### Before anything goes to the printer
 
@@ -133,10 +141,14 @@ them to the printer and stating in writing which file is which colourway.
 
 The original spec (`docs/superpowers/specs/2026-09-24-warranty-registration-design.md`,
 section 3) says the URL should carry **no query strings**, because caching
-layers can strip them. The shipped QR uses `?v=<code>` anyway. It works today
-(verified: 200, no redirect, correct preselect), but on WooCommerce watch that
-LiteSpeed page cache varies on the query string — see the equivalent
-LiteSpeed caching traps on the Durian Bikers side.
+layers can strip them. The shipped QR uses `?p=<product code>` anyway. It works
+today (verified: 200, no redirect), but on WooCommerce watch that LiteSpeed
+page cache varies on the query string — see the equivalent LiteSpeed caching
+traps on the Durian Bikers side.
+
+The blast radius is small by design: if `?p=` is ever stripped, the page falls
+back to listing every product and the customer picks from the dropdown. The
+registration still completes and lands in the sheet correctly.
 
 ---
 

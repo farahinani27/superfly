@@ -40,6 +40,11 @@ FORM = os.path.join(os.path.dirname(HERE), "form")
 # already printed — see the warranty QR contract in CLAUDE.md.
 BASE_URL = "https://superflymotos.com.my/warranty"
 
+# One QR per product TYPE, not per colour: a single card is sealed into boxes
+# of every colourway, so the card cannot know which colour it is sitting in.
+# The customer picks the colour on the form.
+PARAM = "p"
+
 # Error correction Q (25%). Stickers get scuffed inside a product box.
 ECC = "Q"
 
@@ -321,8 +326,9 @@ def build_png(grid, code, sub, scale=14):
 def main():
     ok = True
     for p in products():
-        code, sub = p["code"], p["colour"]
-        url = "%s?v=%s" % (BASE_URL, code)
+        code = p["code"]
+        sub = p["name"]
+        url = "%s?%s=%s" % (BASE_URL, PARAM, code)
         grid = matrix(url)
         n = len(grid)
 
@@ -333,7 +339,9 @@ def main():
 
         # Re-encode and compare, rather than trusting that nothing shifted.
         assert matrix(url) == grid
-        print("%-8s %s" % (code, url))
+        print("%-10s %s" % (code, url))
+        for v in p["variants"]:
+            print("           covers %-8s %s" % (v["code"], v["colour"]))
         label = "label %r / %r" % (code, sub) if PRINT_LABEL else "bare code, no label"
         print("         %d x %d modules (version %d, ECC %s), %s"
               % (n, n, (n - 17) // 4, ECC, label))

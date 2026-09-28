@@ -42,69 +42,46 @@
     target="sfw-sink">
 
     <!-- ------------------------------------------------------------------
-         Left column: the product being registered.
-
-         To use this page for a DIFFERENT product, change three things:
-           1. the <img src> below
-           2. the .sfw-pname heading text
-           3. the .sfw-sku badge AND the hidden "sku" input in the form
-         ------------------------------------------------------------------ -->
-    <!-- ------------------------------------------------------------------
          Which product is being registered.
 
-         The card's QR adds ?v=<code> to the URL. The matching option is
-         selected automatically and the others are greyed out, so nobody
-         registers the wrong product by a stray tap.
+         One QR per product TYPE, not per colour - a single card is sealed
+         into boxes of every colourway, so the card cannot know the colour.
+         The QR adds ?p=<product code>; the page then shows that product and
+         narrows the dropdown to its colours.
 
-         The lock is deliberately soft. A box can reach a customer with the
-         wrong sticker on it, and a card that dead-ends is a card thrown away
-         along with the stock it is sitting in - so "Not this product?"
-         re-enables everything. An unrecognised code locks nothing at all,
-         and if no JavaScript runs the page behaves exactly as it always did.
+         The colour starts unchosen on purpose. Defaulting to one would let
+         a customer register the wrong colourway without ever looking at the
+         field.
+
+         An unknown or missing ?p= shows every product instead of
+         dead-ending, and with no JavaScript the dropdown still lists
+         everything and still posts correctly.
          ------------------------------------------------------------------ -->
     <fieldset class="sfw-picker">
       <legend class="sfw-picker-legend">Your product</legend>
-      <label class="sfw-choice">
-        <input
-          type="radio"
-          name="variant"
-          value="ASSCBK"
-          data-prefix="ASSCBK"
-          required>
-        <span class="sfw-choice-box">
-          <span class="sfw-imgbox">
-            <img class="sfw-img" src="data:image/jpeg;base64,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" alt="SUPERFLY SUSPENSION PROJECT AIR SUS UNIVERSAL 330MM SILVER CHROME / BLACK">
-          </span>
-          <span class="sfw-choice-meta">
-            <span class="sfw-pname">SUPERFLY SUSPENSION PROJECT AIR SUS UNIVERSAL 330MM SILVER CHROME / BLACK</span>
-            <span class="sfw-sku">SUS-AS-UNI-330-SC-BK</span>
-          </span>
-          <span class="sfw-choice-mark">&#10003;</span>
+      <div class="sfw-prod" data-product="AIRSUS330">
+        <span class="sfw-imgbox">
+          <img class="sfw-img" src="data:image/jpeg;base64,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" alt="SUPERFLY SUSPENSION PROJECT AIR SUS UNIVERSAL 330MM">
         </span>
-      </label>
-      <label class="sfw-choice">
-        <input
-          type="radio"
-          name="variant"
-          value="ASBKGD"
-          data-prefix="ASBKGD"
-          required>
-        <span class="sfw-choice-box">
-          <span class="sfw-imgbox">
-            <img class="sfw-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDAiIGhlaWdodD0iMTgwIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZTllOWU5Ii8+PHJlY3QgeD0iNiIgeT0iNiIgd2lkdGg9IjEyOCIgaGVpZ2h0PSIxNjgiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2IzMDAxYiIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtZGFzaGFycmF5PSI4IDYiLz48dGV4dCB4PSI3MCIgeT0iODUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJIZWx2ZXRpY2EsQXJpYWwiIGZvbnQtc2l6ZT0iMTMiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjYjMwMDFiIj5QSE9UTzwvdGV4dD48dGV4dCB4PSI3MCIgeT0iMTAzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iSGVsdmV0aWNhLEFyaWFsIiBmb250LXNpemU9IjEzIiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0iI2IzMDAxYiI+TkVFREVEPC90ZXh0Pjwvc3ZnPg==" alt="SUPERFLY SUSPENSION PROJECT AIR SUS UNIVERSAL 330MM BLACK / GOLD">
-          </span>
-          <span class="sfw-choice-meta">
-            <span class="sfw-pname">SUPERFLY SUSPENSION PROJECT AIR SUS UNIVERSAL 330MM BLACK / GOLD</span>
-            <span class="sfw-sku">SUS-AS-UNI-330-BK-GD</span>
-          </span>
-          <span class="sfw-choice-mark">&#10003;</span>
+        <span class="sfw-prod-meta">
+          <span class="sfw-pname">SUPERFLY SUSPENSION PROJECT AIR SUS UNIVERSAL 330MM</span>
+          <span class="sfw-sku">SUS-AS-UNI-330-SC-BK, SUS-AS-UNI-330-BK-GD</span>
         </span>
-      </label>
+      </div>
 
-      <p class="sfw-locknote" id="sfw-locknote" style="display:none">
-        Locked to the product on your warranty card.
-        <button type="button" class="sfw-unlock" id="sfw-unlock">Not this product?</button>
-      </p>
+      <div class="sfw-field sfw-variant">
+        <label class="sfw-label" for="sfw-variant">
+          Colour <span class="sfw-req">*</span>
+        </label>
+        <select class="sfw-input sfw-select" id="sfw-variant" name="variant" required>
+          <option value="">Choose your colour&hellip;</option>
+      <optgroup label="SUPERFLY SUSPENSION PROJECT AIR SUS UNIVERSAL 330MM" data-product="AIRSUS330">
+        <option value="ASSCBK" data-prefix="ASSCBK" data-product="AIRSUS330" data-sku="SUS-AS-UNI-330-SC-BK">330MM SILVER CHROME / BLACK</option>
+        <option value="ASBKGD" data-prefix="ASBKGD" data-product="AIRSUS330" data-sku="SUS-AS-UNI-330-BK-GD">330MM BLACK / GOLD</option>
+      </optgroup>
+        </select>
+        <p class="sfw-hint">Pick the colourway printed on your unit.</p>
+      </div>
     </fieldset>
 
 
@@ -301,7 +278,7 @@
   --sfw-text:   #e6e6e6;   /* body text                */
   --sfw-mute:   #8c8c8c;   /* hints and secondary text */
 
-  max-width: 1000px;
+  max-width: 720px;
   margin: 0 auto;
   padding: 8px 0 48px;
   color: var(--sfw-text);
@@ -445,14 +422,6 @@
   margin: 0;
   padding: 0;
   border: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 14px;
-}
-
-/* A fieldset's legend sits outside the grid flow. */
-.sfw-picker-legend {
-  grid-column: 1 / -1;
 }
 
 .sfw-picker-legend {
@@ -465,165 +434,80 @@
   text-transform: uppercase;
 }
 
-.sfw-choice {
-  display: block;
-  cursor: pointer;
-}
-
-/* The radio is hidden from sight but still focusable and still read by
-   screen readers - never display:none, which would remove it entirely. */
-.sfw-choice input {
-  position: absolute;
-  opacity: 0;
-  width: 1px;
-  height: 1px;
-}
-
-.sfw-choice-box {
+/* The product named by the scanned QR. Presentational only - the customer
+   picks the colour from the dropdown below it. */
+.sfw-prod {
   display: flex;
   gap: 14px;
   align-items: center;
   padding: 12px;
+  margin: 0 0 18px;
   background: var(--sfw-panel);
-  border: 2px solid var(--sfw-line);
+  border: 1px solid var(--sfw-line);
   border-radius: 10px;
-  transition: border-color 0.15s, background 0.15s;
 }
 
-.sfw-choice:hover .sfw-choice-box {
-  border-color: #4a4a4a;
+.sfw-prod .sfw-imgbox {
+  flex: 0 0 64px;
+  width: 64px;
+  height: 78px;
+  background: #fff;
+  border-radius: 6px;
+  overflow: hidden;
 }
 
-.sfw-choice input:checked + .sfw-choice-box {
-  border-color: var(--sfw-red);
-  background: #1f1416;
+.sfw-prod .sfw-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
-.sfw-choice input:focus-visible + .sfw-choice-box {
-  outline: 2px solid var(--sfw-red);
-  outline-offset: 2px;
-}
-
-.sfw-choice .sfw-imgbox {
-  flex: 0 0 68px;
-  min-height: 0;
-  margin: 0;
-  padding: 6px;
-}
-
-.sfw-choice .sfw-img {
-  max-height: 86px;
-}
-
-.sfw-choice-meta {
-  flex: 1 1 auto;
+.sfw-prod-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   min-width: 0;
-  text-align: left;
 }
 
-/* These are spans inside a label, so they need to be made block-level
-   or the SKU badge runs on from the end of the product name. */
-.sfw-choice .sfw-pname {
-  display: block;
-  margin: 0 0 8px;
-  font-size: 12px;
-}
-
-.sfw-choice .sfw-sku {
-  display: inline-block;
-}
-
-/* A tick that only appears on the selected card. */
-.sfw-choice-mark {
-  flex: 0 0 auto;
-  width: 22px;
-  height: 22px;
-  border: 2px solid var(--sfw-line);
-  border-radius: 50%;
-  color: transparent;
+.sfw-prod .sfw-pname {
   font-size: 13px;
-  line-height: 19px;
-  text-align: center;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: 0.02em;
 }
 
-.sfw-choice input:checked + .sfw-choice-box .sfw-choice-mark {
-  background: var(--sfw-red);
-  border-color: var(--sfw-red);
-  color: #fff;
+.sfw-prod .sfw-sku {
+  align-self: flex-start;
+  padding: 3px 8px;
+  background: var(--sfw-maroon);
+  border-radius: 4px;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
 }
 
-
-/* A product locked out because the scanned card is for a different one.
-   Greyed and unclickable, but never removed - the customer still sees what
-   the other option was, and "Not this product?" brings it back.
-
-   Dimming is done with this element's own colours rather than opacity on the
-   whole card. .sfw-wrap is a transparent fragment pasted into a Unicart page,
-   so opacity would blend toward the host page's background - dark there, but
-   white anywhere the fragment is viewed on its own, which reads as
-   highlighted rather than disabled. */
-.sfw-choice.sfw-locked {
-  cursor: not-allowed;
-}
-
-.sfw-choice.sfw-locked .sfw-choice-box {
-  border-style: dashed;
-  border-color: var(--sfw-line);
-  background: transparent;
-}
-
-.sfw-choice.sfw-locked:hover .sfw-choice-box {
-  border-color: var(--sfw-line);
-}
-
-.sfw-choice.sfw-locked .sfw-img,
-.sfw-choice.sfw-locked .sfw-imgbox {
-  filter: grayscale(1);
-  opacity: 0.45;
-}
-
-.sfw-choice.sfw-locked .sfw-pname,
-.sfw-choice.sfw-locked .sfw-sku {
-  color: var(--sfw-mute);
-  background: transparent;
-}
-
-/* The tick stays invisible - a locked product is not a selected one, and a
-   greyed-but-visible check reads as "chosen". */
-.sfw-choice.sfw-locked .sfw-choice-mark {
-  color: transparent;
-  border-color: var(--sfw-line);
-  background: transparent;
-}
-
-/* The picker is a grid, so the note has to span it or it lands in the next
-   column beside the products instead of under them. */
-.sfw-locknote {
-  grid-column: 1 / -1;
-  margin: 0 2px;
-  font-size: 13px;
-  line-height: 1.5;
-  color: var(--sfw-mute);
-}
-
-.sfw-unlock {
-  display: inline;
-  padding: 0;
-  border: 0;
-  background: none;
-  font: inherit;
-  color: var(--sfw-red);
-  text-decoration: underline;
+/* The colour dropdown. A native <select> so it works with no JavaScript and
+   gets the platform's own picker on a phone. */
+.sfw-select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 38px;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--sfw-mute) 50%),
+    linear-gradient(135deg, var(--sfw-mute) 50%, transparent 50%);
+  background-position: calc(100% - 20px) 52%, calc(100% - 14px) 52%;
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
   cursor: pointer;
 }
 
-.sfw-unlock:hover {
-  color: #fff;
+.sfw-select option {
+  background: var(--sfw-panel);
+  color: var(--sfw-text);
 }
 
-.sfw-unlock:focus-visible {
-  outline: 2px solid var(--sfw-red);
-  outline-offset: 2px;
+.sfw-variant {
+  margin-bottom: 0;
 }
 
 
@@ -631,9 +515,10 @@
    Form
    -------------------------------------------------------------------------- */
 
+/* Centred, not hugging the left edge. The wrap is 1000px but the form reads
+   badly that wide, so it keeps a comfortable measure and centres inside it. */
 .sfw-form {
   padding: 26px;
-  max-width: 640px;
   background: var(--sfw-panel);
   border: 1px solid var(--sfw-line);
   border-radius: 10px;
@@ -1042,8 +927,7 @@
   var failPanel = wrap.querySelector('#sfw-fail');
   var refLine   = wrap.querySelector('#sfw-ref');
   var retry     = wrap.querySelector('#sfw-retry');
-  var note      = wrap.querySelector('#sfw-locknote');
-  var unlockBtn = wrap.querySelector('#sfw-unlock');
+  var variant   = wrap.querySelector('#sfw-variant');
 
   var wasSubmitted = false;
   var gotAnswer    = false;
@@ -1136,77 +1020,47 @@
 
 
   /**
-   * Reads ?v=CODE from the address, selects that product and locks the
-   * others out so a stray tap cannot register the wrong warranty.
+   * Reads ?p=CODE from the address and narrows the page to that product:
+   * its panel is the only one shown, and the colour dropdown offers only
+   * its colours.
    *
-   * This is convenience only. If it does not run, the customer simply
-   * chooses from the list themselves and the result is identical.
+   * This is convenience only. If it does not run, every product is listed
+   * and the customer picks from the whole set - the posted result is
+   * identical either way.
    */
-  function preselectFromUrl() {
+  function narrowToProduct() {
 
-    var match = window.location.search.match(/[?&]v=([A-Za-z0-9_-]+)/);
+    var match = window.location.search.match(/[?&]p=([A-Za-z0-9_-]+)/);
     if (!match) {
       return;
     }
 
     var wanted = match[1].toUpperCase();
-    var radios = wrap.querySelectorAll('input[name="variant"]');
+    var groups = wrap.querySelectorAll('#sfw-variant optgroup');
+    var panels = wrap.querySelectorAll('.sfw-prod');
+    var hits = 0;
 
-    for (var i = 0; i < radios.length; i++) {
-      if (radios[i].value.toUpperCase() === wanted) {
-        radios[i].checked = true;
-        lockOthers(radios[i]);
-        return;
+    for (var g = 0; g < groups.length; g++) {
+      if ((groups[g].getAttribute('data-product') || '').toUpperCase() === wanted) {
+        hits++;
       }
     }
 
-    // Code we do not recognise: lock nothing. A card that dead-ends is a
-    // card thrown away along with the stock it is sitting in.
-  }
-
-
-  /** The <label class="sfw-choice"> wrapping a radio. */
-  function choiceOf(radio) {
-    return radio.parentNode;
-  }
-
-
-  /** Grey out and disable every product except the scanned one. */
-  function lockOthers(chosen) {
-
-    var radios = wrap.querySelectorAll('input[name="variant"]');
-    var locked = 0;
-
-    for (var i = 0; i < radios.length; i++) {
-      if (radios[i] === chosen) {
-        continue;
-      }
-      radios[i].disabled = true;
-      choiceOf(radios[i]).className += ' sfw-locked';
-      locked++;
+    // A code we do not recognise narrows nothing. A card that leads nowhere
+    // is a card thrown away along with the stock it is sitting in.
+    if (!hits) {
+      return;
     }
 
-    // Nothing was locked when the card is the only product - saying so
-    // would just confuse.
-    if (locked && note) {
-      note.style.display = '';
-    }
-  }
-
-
-  /** Undo the lock, for a box that reached the customer mis-stickered. */
-  function unlockAll() {
-
-    var radios = wrap.querySelectorAll('input[name="variant"]');
-
-    for (var i = 0; i < radios.length; i++) {
-      radios[i].disabled = false;
-      var choice = choiceOf(radios[i]);
-      choice.className = choice.className.replace(/\s*sfw-locked\b/g, '');
+    for (var i = 0; i < panels.length; i++) {
+      var mine = (panels[i].getAttribute('data-product') || '').toUpperCase() === wanted;
+      panels[i].style.display = mine ? '' : 'none';
     }
 
-    if (note) {
-      note.style.display = 'none';
+    for (var j = 0; j < groups.length; j++) {
+      var keep = (groups[j].getAttribute('data-product') || '').toUpperCase() === wanted;
+      groups[j].disabled = !keep;
+      groups[j].style.display = keep ? '' : 'none';
     }
   }
 
@@ -1217,16 +1071,17 @@
    */
   function updateSerialPrefix() {
 
-    var chosen = wrap.querySelector('input[name="variant"]:checked');
+    var select = wrap.querySelector('#sfw-variant');
     var prefixBox = wrap.querySelector('#sfw-prefix');
     var hint = wrap.querySelector('#sfw-serial-hint');
     var input = wrap.querySelector('#sfw-serial');
 
-    if (!chosen || !prefixBox) {
+    if (!select || !prefixBox) {
       return;
     }
 
-    var prefix = chosen.getAttribute('data-prefix') || '';
+    var chosen = select.options[select.selectedIndex];
+    var prefix = (chosen && chosen.getAttribute('data-prefix')) || '';
 
     if (prefix) {
       prefixBox.textContent = prefix + '-';
@@ -1237,21 +1092,26 @@
                          '-</strong> &mdash; enter only the number that follows it.';
       }
     } else {
+      // No colour chosen yet, so there is no prefix to show. Say why, rather
+      // than leaving a serial field that looks ready but is missing half its
+      // value.
       prefixBox.hidden = true;
+      if (input) {
+        input.placeholder = '';
+      }
+      if (hint) {
+        hint.textContent = 'Choose your colour above first \u2014 it sets the ' +
+                           'prefix your serial starts with.';
+      }
     }
   }
 
 
-  preselectFromUrl();
-
-  if (unlockBtn) {
-    unlockBtn.addEventListener('click', unlockAll);
-  }
+  narrowToProduct();
   updateSerialPrefix();
 
-  var variantRadios = wrap.querySelectorAll('input[name="variant"]');
-  for (var r = 0; r < variantRadios.length; r++) {
-    variantRadios[r].addEventListener('change', updateSerialPrefix);
+  if (variant) {
+    variant.addEventListener('change', updateSerialPrefix);
   }
 
 
