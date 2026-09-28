@@ -62,7 +62,7 @@ colour it is sitting in — the customer picks the colour from a dropdown on the
 form. The production QR artwork in `warranty/qr/` encodes exactly:
 
 ```
-https://superflymotos.com.my/warranty?p=AIRSUS330
+https://superflymotos.com.my/warranty?p=SUS-AS-UNI-330
     covers ASSCBK  330MM SILVER CHROME / BLACK  (SUS-AS-UNI-330-SC-BK)
     covers ASBKGD  330MM BLACK / GOLD           (SUS-AS-UNI-330-BK-GD)
 ```
@@ -91,7 +91,7 @@ Unicart → WooCommerce migration, provided all of the following stay true:
    moves again, you edit one rule instead of reprinting 300 stickers.
 
 **Cutover order, never deviate:** build on `superfly.durianbikers.com` → point
-`superflymotos.com.my` at WooCommerce → verify `/warranty?p=AIRSUS330` returns 200
+`superflymotos.com.my` at WooCommerce → verify `/warranty?p=SUS-AS-UNI-330` returns 200
 and shows that product → *then* cancel Unicart. Cancelling Unicart first kills every
 printed card.
 

@@ -44,7 +44,7 @@ SCRIPT_URL = ("https://script.google.com/macros/s/"
 # Each variant's "code" is what the form submits and the serial prefix.
 PRODUCTS = [
     {
-        "code":  "AIRSUS330",
+        "code":  "SUS-AS-UNI-330",
         "name":  "SUPERFLY SUSPENSION PROJECT AIR SUS UNIVERSAL 330MM",
         "image": "product-SUS-AS-UNI-330-SC-BK.jpg",
         "variants": [

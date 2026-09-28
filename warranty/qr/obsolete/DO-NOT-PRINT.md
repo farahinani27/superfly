@@ -36,4 +36,18 @@ and cannot know which colour it is sitting in. The customer picks the colour
 from a dropdown on the form instead.
 
 Nothing was ever printed from these. The live artwork is
-`warranty-AIRSUS330.*`, one directory up.
+`warranty-SUS-AS-UNI-330.*`, one directory up.
+
+---
+
+## Also retired 2026-09-28: `warranty-AIRSUS330.*`
+
+Same one-QR-per-product model as the live artwork, but a product code Claude
+invented by shortening the product name. It existed nowhere in SUPERFLY's SKUs,
+the masterlist or `Code.gs`.
+
+Replaced by `SUS-AS-UNI-330` — the stem the product's two SKUs already share —
+so the printed URL uses SUPERFLY's own scheme rather than a parallel one
+invented for the occasion.
+
+Never printed. Lived for about ten minutes.
