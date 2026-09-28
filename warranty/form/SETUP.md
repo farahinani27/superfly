@@ -42,18 +42,28 @@ to send email as you. Copy the **Web app URL**, which ends in `/exec`.
 
 ## 4. Put the URL in the form
 
-Open `paste-into-unicart.html` and replace:
+Set `SCRIPT_URL` near the top of `build-forms.py` to your `/exec` URL, then build
+the page:
 
-```
-action="PASTE_YOUR_APPS_SCRIPT_URL_HERE"
+```bash
+python3 build-forms.py
 ```
 
-with your `/exec` URL. That is the only edit needed.
+That writes **`warranty-page.html`** with the URL already filled in. It is the
+only file you paste, and it is generated — never hand-edit it. To change a
+product, edit `PRODUCTS` in `build-forms.py` (and the matching list in
+`Code.gs`) and build again.
 
 ## 5. Paste into Unicart
 
-Paste the whole block into the warranty page's content editor. If the editor has a
-**Source / HTML / `<>`** view, use it — a visual editor will mangle the markup.
+Paste the whole of **`warranty-page.html`** into the warranty page's content
+editor. If the editor has a **Source / HTML / `<>`** view, use it — a visual
+editor will mangle the markup.
+
+Paste the generated file, not any other copy lying around. A stale copy will
+silently be missing whatever changed since, and if its
+`PASTE_YOUR_APPS_SCRIPT_URL_HERE` placeholder is still in place the form posts
+nowhere and no registration is ever recorded.
 
 ## 6. Test before printing anything
 

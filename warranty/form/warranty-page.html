@@ -52,10 +52,15 @@
     <!-- ------------------------------------------------------------------
          Which product is being registered.
 
-         The card's QR adds ?v=<code> to the URL and the matching option is
-         selected automatically. It stays visible and changeable so someone
-         who scanned the wrong card can correct it - and so the page still
-         works if no JavaScript runs.
+         The card's QR adds ?v=<code> to the URL. The matching option is
+         selected automatically and the others are greyed out, so nobody
+         registers the wrong product by a stray tap.
+
+         The lock is deliberately soft. A box can reach a customer with the
+         wrong sticker on it, and a card that dead-ends is a card thrown away
+         along with the stock it is sitting in - so "Not this product?"
+         re-enables everything. An unrecognised code locks nothing at all,
+         and if no JavaScript runs the page behaves exactly as it always did.
          ------------------------------------------------------------------ -->
     <fieldset class="sfw-picker">
       <legend class="sfw-picker-legend">Your product</legend>
@@ -95,6 +100,11 @@
           <span class="sfw-choice-mark">&#10003;</span>
         </span>
       </label>
+
+      <p class="sfw-locknote" id="sfw-locknote" style="display:none">
+        Locked to the product on your warranty card.
+        <button type="button" class="sfw-unlock" id="sfw-unlock">Not this product?</button>
+      </p>
     </fieldset>
 
 
@@ -543,6 +553,80 @@
 }
 
 
+/* A product locked out because the scanned card is for a different one.
+   Greyed and unclickable, but never removed - the customer still sees what
+   the other option was, and "Not this product?" brings it back.
+
+   Dimming is done with this element's own colours rather than opacity on the
+   whole card. .sfw-wrap is a transparent fragment pasted into a Unicart page,
+   so opacity would blend toward the host page's background - dark there, but
+   white anywhere the fragment is viewed on its own, which reads as
+   highlighted rather than disabled. */
+.sfw-choice.sfw-locked {
+  cursor: not-allowed;
+}
+
+.sfw-choice.sfw-locked .sfw-choice-box {
+  border-style: dashed;
+  border-color: var(--sfw-line);
+  background: transparent;
+}
+
+.sfw-choice.sfw-locked:hover .sfw-choice-box {
+  border-color: var(--sfw-line);
+}
+
+.sfw-choice.sfw-locked .sfw-img,
+.sfw-choice.sfw-locked .sfw-imgbox {
+  filter: grayscale(1);
+  opacity: 0.45;
+}
+
+.sfw-choice.sfw-locked .sfw-pname,
+.sfw-choice.sfw-locked .sfw-sku {
+  color: var(--sfw-mute);
+  background: transparent;
+}
+
+/* The tick stays invisible - a locked product is not a selected one, and a
+   greyed-but-visible check reads as "chosen". */
+.sfw-choice.sfw-locked .sfw-choice-mark {
+  color: transparent;
+  border-color: var(--sfw-line);
+  background: transparent;
+}
+
+/* The picker is a grid, so the note has to span it or it lands in the next
+   column beside the products instead of under them. */
+.sfw-locknote {
+  grid-column: 1 / -1;
+  margin: 0 2px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--sfw-mute);
+}
+
+.sfw-unlock {
+  display: inline;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: var(--sfw-red);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.sfw-unlock:hover {
+  color: #fff;
+}
+
+.sfw-unlock:focus-visible {
+  outline: 2px solid var(--sfw-red);
+  outline-offset: 2px;
+}
+
+
 /* --------------------------------------------------------------------------
    Form
    -------------------------------------------------------------------------- */
@@ -958,6 +1042,8 @@
   var failPanel = wrap.querySelector('#sfw-fail');
   var refLine   = wrap.querySelector('#sfw-ref');
   var retry     = wrap.querySelector('#sfw-retry');
+  var note      = wrap.querySelector('#sfw-locknote');
+  var unlockBtn = wrap.querySelector('#sfw-unlock');
 
   var wasSubmitted = false;
   var gotAnswer    = false;
@@ -1050,7 +1136,8 @@
 
 
   /**
-   * Reads ?v=CODE from the address and selects that product.
+   * Reads ?v=CODE from the address, selects that product and locks the
+   * others out so a stray tap cannot register the wrong warranty.
    *
    * This is convenience only. If it does not run, the customer simply
    * chooses from the list themselves and the result is identical.
@@ -1068,8 +1155,58 @@
     for (var i = 0; i < radios.length; i++) {
       if (radios[i].value.toUpperCase() === wanted) {
         radios[i].checked = true;
+        lockOthers(radios[i]);
         return;
       }
+    }
+
+    // Code we do not recognise: lock nothing. A card that dead-ends is a
+    // card thrown away along with the stock it is sitting in.
+  }
+
+
+  /** The <label class="sfw-choice"> wrapping a radio. */
+  function choiceOf(radio) {
+    return radio.parentNode;
+  }
+
+
+  /** Grey out and disable every product except the scanned one. */
+  function lockOthers(chosen) {
+
+    var radios = wrap.querySelectorAll('input[name="variant"]');
+    var locked = 0;
+
+    for (var i = 0; i < radios.length; i++) {
+      if (radios[i] === chosen) {
+        continue;
+      }
+      radios[i].disabled = true;
+      choiceOf(radios[i]).className += ' sfw-locked';
+      locked++;
+    }
+
+    // Nothing was locked when the card is the only product - saying so
+    // would just confuse.
+    if (locked && note) {
+      note.style.display = '';
+    }
+  }
+
+
+  /** Undo the lock, for a box that reached the customer mis-stickered. */
+  function unlockAll() {
+
+    var radios = wrap.querySelectorAll('input[name="variant"]');
+
+    for (var i = 0; i < radios.length; i++) {
+      radios[i].disabled = false;
+      var choice = choiceOf(radios[i]);
+      choice.className = choice.className.replace(/\s*sfw-locked\b/g, '');
+    }
+
+    if (note) {
+      note.style.display = 'none';
     }
   }
 
@@ -1106,6 +1243,10 @@
 
 
   preselectFromUrl();
+
+  if (unlockBtn) {
+    unlockBtn.addEventListener('click', unlockAll);
+  }
   updateSerialPrefix();
 
   var variantRadios = wrap.querySelectorAll('input[name="variant"]');
