@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contact Us - local preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Archivo+Black&family=Chakra+Petch:wght@500;600;700&display=swap" rel="stylesheet">
+<!-- the real stylesheet, in the theme - not a copy of it -->
+<link rel="stylesheet" href="../../twentytwentyfour-child/assets/css/contact.css">
+<style>
+  /* The only rule here. WordPress puts no margin on <body> and sets the text
+     colour from theme.json; locally neither of those exists, so this stands
+     in for them. Everything else - including the page background - comes from
+     the theme stylesheet above, so the preview cannot drift from the site. */
+  html, body { margin: 0; color: #f2f2f4; }
+</style>
+</head>
+<!-- the body class the live page carries. functions.php adds it via the
+     body_class filter, and contact.css hangs the carbon-weave background off
+     it, so the preview gets the real background -->
+<body class="superfly-contact-page">
+<!-- contact.html is injected here so the markup is never duplicated either -->
+<div id="mount">Loading contact.html&hellip;</div>
+<script>
+  fetch('contact.html')
+    .then(function (r) { return r.text(); })
+    .then(function (h) { document.getElementById('mount').innerHTML = h; })
+    .catch(function () {
+      document.getElementById('mount').textContent =
+        'Open this over http (see README), not as a file:// path.';
+    });
+</script>
+</body>
+</html>

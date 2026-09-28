@@ -1,0 +1,201 @@
+<!-- ============================================================
+     SUPERFLY - Contact Us page markup
+     superfly.durianbikers.com/contact-us/
+
+     Goes into the page's own wp:html block, the same way the
+     privacy and FAQ pages do it - NOT an Elementor widget, so
+     there is no render cache to clear after an edit.
+
+     Markup only - the CSS lives in
+     twentytwentyfour-child/assets/css/contact.css and is
+     enqueued by the theme. See README.md.
+
+     STRUCTURE: three routes segmented by audience, then the
+     company stated formally beside the map, then the general
+     enquiry form as the fallback. That order is deliberate and
+     follows the convention manufacturers use - see the note at
+     the top of contact.css.
+
+     Nothing the operator has not supplied yet appears on the
+     page - no placeholder rows, no dagger footnotes. See the
+     gaps listed in README.md instead.
+     ============================================================ -->
+<div class="superfly-contact">
+  <div class="superfly-contact-wrap">
+
+    <header class="superfly-contact-head">
+      <p class="superfly-contact-eyebrow">Superfly / Contact</p>
+      <h1 class="superfly-contact-title">Contact <span class="superfly-contact-title-end">Superfly<i></i></span></h1>
+      <p class="superfly-contact-sub">Superfly Motorsport Sdn Bhd designs and
+        manufactures motorcycle suspension, wheels and braking systems in Malaysia,
+        developed at Sepang International Circuit. Please use the route below that
+        matches your enquiry.</p>
+    </header>
+
+    <!-- ---------------- the three routes ---------------- -->
+    <div class="superfly-contact-bar">
+      <p class="superfly-contact-bar-name">How to reach us</p>
+      <p class="superfly-contact-bar-count">03 routes</p>
+    </div>
+
+    <div class="superfly-contact-routes">
+
+      <section class="superfly-contact-route">
+        <p class="superfly-contact-route-number">01</p>
+        <h2 class="superfly-contact-route-name">Riders &amp; customers</h2>
+        <p class="superfly-contact-route-text">Product fitment and specification,
+          existing orders, delivery, returns and warranty.</p>
+        <p class="superfly-contact-route-text">Warranty registration is a separate
+          form &mdash; <a href="/warranty">register a product</a>. Cover runs six
+          months from the registration date.</p>
+        <p class="superfly-contact-route-action"><a href="#superfly-contact-enquiry">Use the enquiry form below</a></p>
+      </section>
+
+      <section class="superfly-contact-route">
+        <p class="superfly-contact-route-number">02</p>
+        <h2 class="superfly-contact-route-name">Dealers &amp; distributors</h2>
+        <p class="superfly-contact-route-text">Trade accounts, wholesale pricing,
+          stock availability and applications to carry Superfly products.</p>
+        <p class="superfly-contact-route-action"><a href="mailto:superflymotosofficial@gmail.com?subject=Dealer%20enquiry">superflymotosofficial@gmail.com</a></p>
+        <!-- All three routes currently reach the same inbox: the domain has
+             no MX records, so there are no departmental mailboxes to route
+             to. See "The routes are not really separate yet" in README.md. -->
+      </section>
+
+      <section class="superfly-contact-route">
+        <p class="superfly-contact-route-number">03</p>
+        <h2 class="superfly-contact-route-name">Media &amp; partnerships</h2>
+        <p class="superfly-contact-route-text">Press enquiries, product samples for
+          review, racing and sponsorship. Superfly supports Alonso Lopez in Moto2 and
+          Ivan Ortola in Moto3.</p>
+        <p class="superfly-contact-route-action"><a href="mailto:superflymotosofficial@gmail.com?subject=Media%20enquiry">superflymotosofficial@gmail.com</a></p>
+      </section>
+
+    </div>
+
+    <!-- ---------------- company information ---------------- -->
+    <div class="superfly-contact-bar">
+      <p class="superfly-contact-bar-name">Company information</p>
+      <p class="superfly-contact-bar-count">Registered in Malaysia</p>
+    </div>
+
+    <div class="superfly-contact-company">
+
+      <div class="superfly-contact-company-info">
+        <p class="superfly-contact-company-name">Superfly Motorsport Sdn Bhd</p>
+        <p class="superfly-contact-address">
+          3, Jln Tiong Emas 1, Taman Mount Austin,<br>
+          81100 Johor Bahru, Johor, Malaysia<br>
+          <a href="https://www.google.com/maps/dir/?api=1&amp;destination=Superflymotos+Malaysia">Get directions</a>
+        </p>
+
+        <div class="superfly-contact-detail">
+          <p class="superfly-contact-detail-key">Email</p>
+          <p class="superfly-contact-detail-value"><a href="mailto:superflymotosofficial@gmail.com">superflymotosofficial@gmail.com</a></p>
+        </div>
+
+        <!-- Telephone, company registration and opening hours are omitted
+             until the operator supplies real values - an empty placeholder
+             row reads worse than no row. The 03-456 7554 in the live theme's
+             header bar is a demo placeholder, not a usable number: 03 is
+             Kuala Lumpur, the company is in Johor. -->
+
+        <div class="superfly-contact-detail">
+          <p class="superfly-contact-detail-key">Follow</p>
+          <p class="superfly-contact-detail-value">
+            <a href="https://www.facebook.com/SuperflyMotos/">Facebook</a> &middot;
+            <a href="https://www.instagram.com/superflymotos/">Instagram</a> &middot;
+            <a href="https://www.youtube.com/superflymotos/">YouTube</a>
+          </p>
+        </div>
+      </div>
+
+      <div class="superfly-contact-company-map">
+        <!-- the exact embed the live Unicart contact page uses, so the pin is
+             guaranteed to be the right place (Superflymotos Malaysia) -->
+        <iframe
+          title="Superfly Motorsport, Taman Mount Austin, Johor Bahru"
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.3708519254947!2d103.76737581744385!3d1.5434008999999955!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31da6df8b2c8d8a7%3A0xc68bc0dd639307a7!2sSuperflymotos%20Malaysia!5e0!3m2!1sen!2smy!4v1677553657750!5m2!1sen!2smy"
+          loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+      </div>
+
+    </div>
+
+    <!-- ---------------- general enquiry ---------------- -->
+    <div class="superfly-contact-bar" id="superfly-contact-enquiry">
+      <p class="superfly-contact-bar-name">General enquiry</p>
+      <p class="superfly-contact-bar-count">Reply target 1 business day</p>
+    </div>
+
+    <p class="superfly-contact-form-intro">If your enquiry does not fit one of the
+      routes above, use this form. Fields marked <b>*</b> are required.</p>
+
+    <!-- THE FORM DOES NOT SUBMIT ANYWHERE YET. action="#" is a placeholder:
+         no form handler is installed on this site. See "The form has no
+         backend" in README.md before this page is linked from the footer. -->
+    <form class="superfly-contact-form" action="#" method="post">
+
+      <!-- four across on a wide screen, two on a tablet, one on a phone -->
+      <div class="superfly-contact-form-row superfly-contact-form-row-four">
+        <div class="superfly-contact-field">
+          <label for="superfly-contact-first">First name <b>*</b></label>
+          <input id="superfly-contact-first" name="first" type="text" autocomplete="given-name" required>
+        </div>
+        <div class="superfly-contact-field">
+          <label for="superfly-contact-last">Last name <b>*</b></label>
+          <input id="superfly-contact-last" name="last" type="text" autocomplete="family-name" required>
+        </div>
+        <div class="superfly-contact-field">
+          <label for="superfly-contact-email">Email address <b>*</b></label>
+          <input id="superfly-contact-email" name="email" type="email" autocomplete="email" required>
+        </div>
+        <div class="superfly-contact-field">
+          <label for="superfly-contact-phone">Phone number</label>
+          <input id="superfly-contact-phone" name="phone" type="tel" autocomplete="tel">
+        </div>
+      </div>
+
+      <div class="superfly-contact-form-row">
+        <!-- With one mailbox and no departmental addresses, this field is the
+             routing. Required, not optional. -->
+        <div class="superfly-contact-field">
+          <label for="superfly-contact-topic">Subject <b>*</b></label>
+          <select id="superfly-contact-topic" name="topic" required>
+            <option value="">Please select</option>
+            <option>Product fitment or specification</option>
+            <option>An existing order</option>
+            <option>Warranty</option>
+            <option>Becoming a dealer</option>
+            <option>Media or partnership</option>
+            <option>Something else</option>
+          </select>
+        </div>
+        <div class="superfly-contact-field">
+          <label for="superfly-contact-bike">Motorcycle model</label>
+          <input id="superfly-contact-bike" name="bike" type="text" placeholder="e.g. Y15ZR, NVX, RS150">
+          <span class="superfly-contact-hint">Helps us answer fitment questions in one reply.</span>
+        </div>
+      </div>
+
+      <div class="superfly-contact-field">
+        <label for="superfly-contact-message">Message <b>*</b></label>
+        <textarea id="superfly-contact-message" name="message" required></textarea>
+      </div>
+
+      <label class="superfly-contact-check">
+        <input type="checkbox" name="subscribe" value="1">
+        <span>I would like to receive product news and race updates by email.</span>
+      </label>
+
+      <div class="superfly-contact-form-foot">
+        <p class="superfly-contact-privacy">The details you submit are used only to
+          answer your enquiry. See our <a href="/privacy-policy/">Privacy Policy</a>.</p>
+        <button class="superfly-contact-submit" type="submit">
+          <span class="superfly-contact-submit-label">Submit enquiry</span>
+        </button>
+      </div>
+
+    </form>
+
+  </div>
+</div>

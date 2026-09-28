@@ -1,0 +1,738 @@
+/* =============================================================
+ * SUPERFLY - CONTACT US
+ *
+ * Built on the convention manufacturers in this sector use, not
+ * on a generic contact template. Brembo's corporate contact page
+ * segments by WHO IS ASKING - Road Products, Racing Products,
+ * Brembo Group - three routes that each go somewhere different,
+ * with the registered address and VAT number stated plainly.
+ *
+ * So this page leads with three audiences (riders, dealers,
+ * media), states the company formally underneath beside the map,
+ * and puts the general enquiry form last, as the fallback it
+ * actually is. A single form with a Subject dropdown is a shop's
+ * contact page; this is a manufacturer's.
+ *
+ * FULL WIDTH: the sections run the whole viewport with only a
+ * side gutter. Running prose is still capped by max-width on the
+ * individual paragraphs - a structural grid is better full-bleed,
+ * a 200-character line of body copy is not, at any width.
+ *
+ * Every class is scoped under .superfly-contact, so nothing here
+ * can reach the rest of the site. Names are spelled out - no
+ * `sf-` shorthand, no BEM `__` separators - matching faq.css,
+ * privacy.css and terms.css.
+ *
+ * No shorthand properties anywhere: every declaration names the
+ * one thing it sets, the same rule faq.css follows. Longer, but
+ * it can be skimmed and edited a line at a time without working
+ * out which of four values a shorthand is quietly also resetting.
+ *
+ * Markup: the page's own wp:html block (a copy is kept at
+ * wordpress/contact-us/contact.html in this repo)
+ * Enqueue: functions.php - superfly_contact_assets()
+ * ============================================================= */
+
+
+/* ---- the carbon weave ----
+ * Same recipe as the privacy, terms and FAQ pages. Hangs off a body class
+ * the theme adds (superfly_contact_body_class in functions.php), not off
+ * body.page-id-N, so the page can be deleted and rebuilt without breaking
+ * its background as long as the slug stays contact-us. */
+body.superfly-contact-page {
+	background-color: #0d0d11;
+	background-image:
+		repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.022) 0 2px, transparent 2px 4px),
+		repeating-linear-gradient(-45deg, rgba(0, 0, 0, 0.3) 0 2px, transparent 2px 4px);
+	background-attachment: fixed;
+}
+
+
+/* -------------------------------------------------------------
+ * The block
+ * ----------------------------------------------------------- */
+
+.superfly-contact {
+	/* colour */
+	--superfly-contact-text: #f2f2f4;
+	--superfly-contact-muted: rgba(242, 242, 244, 0.66);
+	--superfly-contact-faint: rgba(242, 242, 244, 0.40);
+	--superfly-contact-line: rgba(242, 242, 244, 0.16);
+	--superfly-contact-hair: rgba(242, 242, 244, 0.08);
+	--superfly-contact-accent: #ec1e79;
+	--superfly-contact-panel: #131318;
+	--superfly-contact-inset: #0a0a0e;
+
+	/* geometry - the hero's skew */
+	--superfly-contact-slant: -8deg;
+
+	/* type */
+	--superfly-contact-font-title: "Archivo Black", "Arial Black", sans-serif;
+	--superfly-contact-font-body: "Archivo", "Inter", sans-serif;
+	--superfly-contact-font-tech: "Chakra Petch", "Archivo", sans-serif;
+
+	color: var(--superfly-contact-text);
+	font-family: var(--superfly-contact-font-body);
+}
+
+.superfly-contact *,
+.superfly-contact *::before,
+.superfly-contact *::after {
+	box-sizing: border-box;
+}
+
+/* Full width. No max-width and no centring - only a gutter so nothing
+   touches the edge of the screen. */
+.superfly-contact-wrap {
+	width: 100%;
+	padding-left: clamp(20px, 3.5vw, 64px);
+	padding-right: clamp(20px, 3.5vw, 64px);
+	padding-bottom: clamp(60px, 9vw, 120px);
+}
+
+
+/* -------------------------------------------------------------
+ * Masthead
+ * Shared with privacy, terms and FAQ: eyebrow, one italic line
+ * of Archivo Black closed by a magenta square, sub, hairline.
+ * ----------------------------------------------------------- */
+
+.superfly-contact-head {
+	padding-top: clamp(34px, 4.6vw, 64px);
+	padding-bottom: clamp(28px, 3.4vw, 44px);
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: var(--superfly-contact-line);
+}
+
+.superfly-contact-eyebrow {
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 14px;
+	margin-left: 0;
+
+	font-family: var(--superfly-contact-font-tech);
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.22em;
+	text-transform: uppercase;
+	color: var(--superfly-contact-accent);
+}
+
+.superfly-contact-title {
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 16px;
+	margin-left: 0;
+
+	font-family: var(--superfly-contact-font-title);
+	font-weight: 400;
+	font-style: italic;
+	font-size: clamp(28px, 4.4vw, 50px);
+	line-height: 1.02;
+	letter-spacing: -0.012em;
+	text-transform: uppercase;
+}
+
+/* Holds the last word and the square together so the square can never wrap
+   alone onto the next line - the same guard faq.css and terms.css use. */
+.superfly-contact-title-end {
+	white-space: nowrap;
+}
+
+.superfly-contact-title i {
+	display: inline-block;
+	width: 0.2em;
+	height: 0.2em;
+	margin-left: 0.11em;
+	background-color: var(--superfly-contact-accent);
+}
+
+.superfly-contact-sub {
+	/* capped although the layout is full width - see the file header */
+	max-width: 60ch;
+
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
+
+	font-size: clamp(14.5px, 1.15vw, 16.5px);
+	line-height: 1.75;
+	color: var(--superfly-contact-muted);
+}
+
+
+/* -------------------------------------------------------------
+ * Section bars
+ * ----------------------------------------------------------- */
+
+.superfly-contact-bar {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	column-gap: 20px;
+
+	margin-top: clamp(34px, 4.2vw, 58px);
+	margin-right: 0;
+	margin-bottom: clamp(18px, 2.2vw, 26px);
+	margin-left: 0;
+
+	padding-bottom: 14px;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: var(--superfly-contact-line);
+}
+
+.superfly-contact-bar-name,
+.superfly-contact-bar-count {
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
+
+	font-family: var(--superfly-contact-font-tech);
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.22em;
+	text-transform: uppercase;
+}
+
+.superfly-contact-bar-name {
+	color: var(--superfly-contact-faint);
+}
+
+.superfly-contact-bar-count {
+	color: var(--superfly-contact-accent);
+}
+
+
+/* -------------------------------------------------------------
+ * The three routes
+ * ----------------------------------------------------------- */
+
+.superfly-contact-routes {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	column-gap: clamp(12px, 1.4vw, 18px);
+	row-gap: clamp(12px, 1.4vw, 18px);
+}
+
+@media (min-width: 860px) {
+	.superfly-contact-routes {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+}
+
+.superfly-contact-route {
+	/* a column so the action can be pushed to the bottom edge */
+	display: flex;
+	flex-direction: column;
+
+	padding-top: clamp(26px, 2.8vw, 36px);
+	padding-right: clamp(20px, 2.2vw, 28px);
+	padding-bottom: clamp(26px, 2.8vw, 36px);
+	padding-left: clamp(20px, 2.2vw, 28px);
+
+	background-color: var(--superfly-contact-panel);
+
+	border-top-width: 2px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-top-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
+	border-left-style: solid;
+	border-top-color: var(--superfly-contact-accent);
+	border-right-color: var(--superfly-contact-hair);
+	border-bottom-color: var(--superfly-contact-hair);
+	border-left-color: var(--superfly-contact-hair);
+}
+
+.superfly-contact-route-number {
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 14px;
+	margin-left: 0;
+
+	font-family: var(--superfly-contact-font-tech);
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.2em;
+	color: var(--superfly-contact-accent);
+}
+
+.superfly-contact-route-name {
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 12px;
+	margin-left: 0;
+
+	font-family: var(--superfly-contact-font-title);
+	font-weight: 400;
+	font-size: clamp(14px, 1.3vw, 17px);
+	line-height: 1.3;
+	text-transform: uppercase;
+}
+
+.superfly-contact-route-text {
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 18px;
+	margin-left: 0;
+
+	font-size: 14.5px;
+	line-height: 1.75;
+	color: var(--superfly-contact-muted);
+}
+
+.superfly-contact-route-text a {
+	color: var(--superfly-contact-accent);
+	text-underline-offset: 3px;
+}
+
+/* margin-top:auto pins the action to the bottom, so all three cards line
+   their links up however uneven the copy above them is */
+.superfly-contact-route-action {
+	margin-top: auto;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
+	padding-top: 4px;
+}
+
+.superfly-contact-route-action a {
+	font-size: 14.5px;
+	font-weight: 600;
+	color: var(--superfly-contact-accent);
+	text-underline-offset: 4px;
+	/* the support address is long enough to overflow a narrow card */
+	word-break: break-word;
+}
+
+
+/* -------------------------------------------------------------
+ * Company information, beside the map
+ * ----------------------------------------------------------- */
+
+.superfly-contact-company {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 900px) {
+	.superfly-contact-company {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+.superfly-contact-company-info {
+	padding-top: clamp(24px, 2.8vw, 34px);
+	padding-right: clamp(20px, 2.4vw, 30px);
+	padding-bottom: clamp(24px, 2.8vw, 34px);
+	padding-left: clamp(20px, 2.4vw, 30px);
+
+	background-color: var(--superfly-contact-panel);
+
+	border-top-width: 1px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-top-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
+	border-left-style: solid;
+	border-top-color: var(--superfly-contact-hair);
+	border-right-color: var(--superfly-contact-hair);
+	border-bottom-color: var(--superfly-contact-hair);
+	border-left-color: var(--superfly-contact-hair);
+}
+
+.superfly-contact-company-name {
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 6px;
+	margin-left: 0;
+
+	font-family: var(--superfly-contact-font-title);
+	font-weight: 400;
+	font-size: clamp(14px, 1.35vw, 18px);
+	line-height: 1.3;
+	text-transform: uppercase;
+}
+
+.superfly-contact-address {
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 22px;
+	margin-left: 0;
+
+	font-size: 15px;
+	line-height: 1.8;
+	color: var(--superfly-contact-muted);
+}
+
+.superfly-contact-address a {
+	color: var(--superfly-contact-accent);
+	text-underline-offset: 3px;
+}
+
+/* one row of the company details list */
+.superfly-contact-detail {
+	padding-top: 12px;
+	padding-bottom: 12px;
+	border-top-width: 1px;
+	border-top-style: solid;
+	border-top-color: var(--superfly-contact-hair);
+}
+
+@media (min-width: 520px) {
+	.superfly-contact-detail {
+		display: grid;
+		grid-template-columns: 160px minmax(0, 1fr);
+		column-gap: 16px;
+		align-items: baseline;
+	}
+}
+
+.superfly-contact-detail-key {
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
+
+	font-family: var(--superfly-contact-font-tech);
+	font-size: 10.5px;
+	font-weight: 700;
+	letter-spacing: 0.2em;
+	text-transform: uppercase;
+	color: var(--superfly-contact-faint);
+}
+
+.superfly-contact-detail-value {
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
+
+	font-size: 14.5px;
+	line-height: 1.7;
+	color: var(--superfly-contact-text);
+}
+
+.superfly-contact-detail-value a {
+	color: var(--superfly-contact-accent);
+	text-underline-offset: 3px;
+	word-break: break-word;
+}
+
+.superfly-contact-company-map {
+	min-height: 300px;
+
+	border-top-width: 0;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-top-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
+	border-left-style: solid;
+	border-top-color: var(--superfly-contact-hair);
+	border-right-color: var(--superfly-contact-hair);
+	border-bottom-color: var(--superfly-contact-hair);
+	border-left-color: var(--superfly-contact-hair);
+}
+
+@media (min-width: 900px) {
+	/* side by side, so the shared edge must not be drawn twice */
+	.superfly-contact-company-map {
+		border-top-width: 1px;
+		border-left-width: 0;
+	}
+}
+
+.superfly-contact-company-map iframe {
+	display: block;
+	width: 100%;
+	height: 100%;
+	min-height: 300px;
+	border-top-width: 0;
+	border-right-width: 0;
+	border-bottom-width: 0;
+	border-left-width: 0;
+	border-top-style: none;
+	border-right-style: none;
+	border-bottom-style: none;
+	border-left-style: none;
+
+	/* Google's embed has no dark theme without the paid JS API. Inverting
+	   and rotating the hue fakes one so the map matches the panel beside it
+	   instead of glaring white out of the page.
+	   NB: NEVER put clip-path on an ancestor of this iframe. It stops the
+	   map rendering its tiles at all - the frame loads and Google's own
+	   place card draws, but the map stays flat grey. Verified. */
+	filter: invert(92%) hue-rotate(180deg) saturate(0.85) contrast(1.05);
+}
+
+
+/* -------------------------------------------------------------
+ * The general enquiry form
+ * ----------------------------------------------------------- */
+
+.superfly-contact-form-intro {
+	max-width: 64ch;
+
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: clamp(22px, 2.6vw, 30px);
+	margin-left: 0;
+
+	font-size: 15px;
+	line-height: 1.75;
+	color: var(--superfly-contact-muted);
+}
+
+.superfly-contact-form-intro b {
+	color: var(--superfly-contact-accent);
+	font-weight: 600;
+}
+
+.superfly-contact-form {
+	display: grid;
+	row-gap: clamp(18px, 2.2vw, 24px);
+}
+
+.superfly-contact-form-row {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	column-gap: clamp(18px, 2.2vw, 24px);
+	row-gap: clamp(18px, 2.2vw, 24px);
+}
+
+@media (min-width: 600px) {
+	.superfly-contact-form-row {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+/* On a wide screen a two-up row stretches each field absurdly long, so the
+   identity row opens out to four across rather than stretching two. */
+@media (min-width: 1100px) {
+	.superfly-contact-form-row-four {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+	}
+}
+
+.superfly-contact-field {
+	display: grid;
+	row-gap: 8px;
+}
+
+.superfly-contact-field label {
+	font-size: 14px;
+	line-height: 1.4;
+	font-weight: 600;
+	color: var(--superfly-contact-text);
+}
+
+.superfly-contact-field label b {
+	color: var(--superfly-contact-accent);
+	font-weight: 600;
+}
+
+.superfly-contact-field input,
+.superfly-contact-field textarea,
+.superfly-contact-field select {
+	width: 100%;
+
+	padding-top: 12px;
+	padding-right: 14px;
+	padding-bottom: 12px;
+	padding-left: 14px;
+
+	background-color: var(--superfly-contact-inset);
+	color: var(--superfly-contact-text);
+
+	border-top-width: 1px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-top-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
+	border-left-style: solid;
+	border-top-color: var(--superfly-contact-line);
+	border-right-color: var(--superfly-contact-line);
+	border-bottom-color: var(--superfly-contact-line);
+	border-left-color: var(--superfly-contact-line);
+
+	font-family: var(--superfly-contact-font-body);
+	font-size: 15px;
+	line-height: 1.5;
+}
+
+.superfly-contact-field textarea {
+	min-height: 150px;
+	resize: vertical;
+}
+
+.superfly-contact-field input:focus,
+.superfly-contact-field textarea:focus,
+.superfly-contact-field select:focus {
+	outline-style: none;
+	border-top-color: var(--superfly-contact-accent);
+	border-right-color: var(--superfly-contact-accent);
+	border-bottom-color: var(--superfly-contact-accent);
+	border-left-color: var(--superfly-contact-accent);
+}
+
+.superfly-contact-field input::placeholder,
+.superfly-contact-field textarea::placeholder {
+	color: rgba(242, 242, 244, 0.26);
+}
+
+.superfly-contact-hint {
+	font-size: 13px;
+	line-height: 1.5;
+	color: var(--superfly-contact-faint);
+}
+
+.superfly-contact-check {
+	display: flex;
+	align-items: flex-start;
+	column-gap: 12px;
+
+	font-size: 14.5px;
+	line-height: 1.65;
+	color: var(--superfly-contact-muted);
+}
+
+.superfly-contact-check input {
+	margin-top: 0.2em;
+	width: 17px;
+	height: 17px;
+	accent-color: var(--superfly-contact-accent);
+	flex-grow: 0;
+	flex-shrink: 0;
+	flex-basis: auto;
+}
+
+/* The form's closing row: data-handling note on the left, submit on the
+   right. Right-aligning the submit is the convention on a wide form - the
+   eye finishes a row of fields on the right and expects the action there.
+   wrap-reverse puts the BUTTON first when the row wraps on a narrow
+   screen, so the action never ends up underneath the small print. */
+.superfly-contact-form-foot {
+	display: flex;
+	flex-wrap: wrap-reverse;
+	align-items: center;
+	justify-content: space-between;
+	column-gap: 32px;
+	row-gap: 18px;
+
+	padding-top: 20px;
+	border-top-width: 1px;
+	border-top-style: solid;
+	border-top-color: var(--superfly-contact-hair);
+}
+
+.superfly-contact-privacy {
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
+
+	flex-grow: 1;
+	flex-shrink: 1;
+	flex-basis: 32ch;
+	max-width: 60ch;
+
+	font-size: 13px;
+	line-height: 1.65;
+	color: var(--superfly-contact-faint);
+}
+
+.superfly-contact-privacy a {
+	color: var(--superfly-contact-muted);
+	text-underline-offset: 3px;
+}
+
+/* The 3px nudge is not a fudge: skewX leans the button without changing its
+   layout box, so its bottom-right corner sits about h/2 * tan(8deg) further
+   right than the box does - roughly 3.3px at this height. Left uncorrected
+   the button's visible edge overhangs the right edge of the fields above it
+   by just enough to look wrong on a right-aligned row. */
+.superfly-contact-submit {
+	margin-right: 3px;
+
+	padding-top: 15px;
+	padding-right: 34px;
+	padding-bottom: 15px;
+	padding-left: 34px;
+
+	border-top-width: 0;
+	border-right-width: 0;
+	border-bottom-width: 0;
+	border-left-width: 0;
+	border-top-style: none;
+	border-right-style: none;
+	border-bottom-style: none;
+	border-left-style: none;
+
+	cursor: pointer;
+	background-color: var(--superfly-contact-accent);
+	color: #ffffff;
+
+	font-family: var(--superfly-contact-font-tech);
+	font-size: 13px;
+	font-weight: 700;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+
+	transform: skewX(var(--superfly-contact-slant));
+}
+
+/* the inner span un-skews the label, so the box leans but the words stand
+   upright - the same trick the hero's buttons use */
+.superfly-contact-submit-label {
+	display: inline-block;
+	transform: skewX(calc(var(--superfly-contact-slant) * -1));
+}
+
+.superfly-contact-submit:hover {
+	background-color: #ffffff;
+	color: #0a0a0a;
+}
+
+.superfly-contact-submit:focus-visible {
+	outline-width: 2px;
+	outline-style: solid;
+	outline-color: #ffffff;
+	outline-offset: 3px;
+}
+
+
+/* -------------------------------------------------------------
+ * Print
+ * The map is useless on paper and the form cannot be filled in,
+ * so both go; the addresses and routes are what someone printing
+ * this page actually wants.
+ * ----------------------------------------------------------- */
+
+@media print {
+	.superfly-contact-company-map,
+	.superfly-contact-form,
+	.superfly-contact-form-intro {
+		display: none;
+	}
+
+	.superfly-contact-route,
+	.superfly-contact-company-info {
+		background-color: transparent;
+		border-top-color: #999999;
+		border-right-color: transparent;
+		border-bottom-color: transparent;
+		border-left-color: transparent;
+	}
+}
