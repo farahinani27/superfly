@@ -418,7 +418,11 @@
    Product chooser
    -------------------------------------------------------------------------- */
 
+/* min-width: 0 is not optional. A <fieldset> defaults to
+   min-width: min-content, so it refuses to shrink below its widest child and
+   pushes off the side of a phone screen - the parent's width is ignored. */
 .sfw-picker {
+  min-width: 0;
   margin: 0;
   padding: 0;
   border: 0;
@@ -484,6 +488,10 @@
   font-family: ui-monospace, Menlo, Consolas, monospace;
   font-size: 11px;
   letter-spacing: 0.04em;
+  /* Several SKUs share this badge; on a phone they must be free to wrap
+     rather than set a min-content width nothing can shrink below. */
+  white-space: normal;
+  line-height: 1.6;
 }
 
 /* The colour dropdown. A native <select> so it works with no JavaScript and
