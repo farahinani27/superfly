@@ -1,0 +1,96 @@
+<!-- wp:html -->
+<footer class="sf-pf">
+
+	<!-- the word, twice: dark underneath, lit on top. The light follows
+	     the cursor - see assets/js/footer.js -->
+	<svg class="sf-pf__word" viewBox="0 0 1200 300" preserveAspectRatio="xMidYMin slice" aria-hidden="true" focusable="false">
+		<defs>
+			<radialGradient id="sfGlow" gradientUnits="userSpaceOnUse" cx="600" cy="150" r="215">
+				<stop offset="0%"   stop-color="#ec1e79" stop-opacity=".90"></stop>
+				<stop offset="45%"  stop-color="#ec1e79" stop-opacity=".32"></stop>
+				<stop offset="100%" stop-color="#ec1e79" stop-opacity="0"></stop>
+			</radialGradient>
+		</defs>
+		<g class="sf-pf__word-set">
+			<text class="sf-pf__word-lo"   x="602" y="240" text-anchor="middle" textLength="1240" lengthAdjust="spacingAndGlyphs">SUPERFLY</text>
+			<text class="sf-pf__word-hi"   x="598" y="236" text-anchor="middle" textLength="1240" lengthAdjust="spacingAndGlyphs">SUPERFLY</text>
+			<text class="sf-pf__word-base" x="600" y="238" text-anchor="middle" textLength="1240" lengthAdjust="spacingAndGlyphs">SUPERFLY</text>
+			<text class="sf-pf__word-lit"  x="600" y="238" text-anchor="middle" textLength="1240" lengthAdjust="spacingAndGlyphs" fill="url(#sfGlow)">SUPERFLY</text>
+		</g>
+	</svg>
+
+	<div class="sf-pf__in">
+
+		<div class="sf-pf__top">
+
+			<div class="sf-pf__lead" id="sf-subscribe">
+				<h2 class="sf-pf__shout">Subscribe to our newsletter</h2>
+
+				<!-- posts to superfly_subscribe() in functions.php -->
+				<form class="sf-pf__form" method="post" action="/wp-admin/admin-post.php">
+					<input type="hidden" name="action" value="sf_subscribe">
+					<input type="hidden" name="sf_from" value="">
+					<!-- a field no person can see: anything that fills it is a bot -->
+					<p class="sf-pf__pot" aria-hidden="true"><label>Leave this empty<input type="text" name="sf_website" tabindex="-1" autocomplete="off"></label></p>
+
+					<label class="sf-pf__field">
+						<span class="screen-reader-text">Email address</span>
+						<input type="email" name="sf_email" placeholder="Email address" autocomplete="email" required>
+					</label>
+					<button class="sf-pf__signup" type="submit">Sign up</button>
+				</form>
+
+				<p class="sf-pf__note" data-sf-note hidden></p>
+
+				<p class="sf-pf__small">By entering your email and submitting this form, you agree to receive marketing emails from Superfly. We process your data in accordance with our <a href="/privacy-policy">Privacy Policy</a>. You can withdraw your consent at any time via the unsubscribe link in our emails.</p>
+			</div>
+
+			<nav class="sf-pf__nav" aria-label="Footer">
+
+				<div>
+					<p class="sf-pf__h">Service</p>
+					<ul class="sf-pf__list">
+						<li><a href="/faq">FAQ</a></li>
+						<li><a href="/suspensions-installation-guide">Suspension fitting</a></li>
+						<li><a href="/wheels-installation-guide">Wheel fitting</a></li>
+						<li><a href="/my-account/orders/">Order history</a></li>
+						<li><a href="/shop-by-bike">Shop by bike</a></li>
+						<li><a href="/shop-by-category">Shop by category</a></li>
+						<li><a href="/shop">All products</a></li>
+					</ul>
+				</div>
+
+				<div>
+					<p class="sf-pf__h">Legal</p>
+					<ul class="sf-pf__list">
+						<li><a href="/contact-us">Contact</a></li>
+						<li><a href="/terms-and-conditions">Terms and conditions</a></li>
+						<li><a href="/privacy-policy">Privacy policy</a></li>
+						<li><a href="/refund_returns">Return &amp; refund policy</a></li>
+						<li><a href="/about-us">About us</a></li>
+					</ul>
+				</div>
+
+			</nav>
+		</div>
+
+		<div class="sf-pf__bar">
+
+			<div class="sf-pf__badge">
+				<img src="https://superfly.durianbikers.com/wp-content/uploads/2026/09/superflymotos-logo.png" alt="Superfly">
+				<ul class="sf-pf__social">
+					<li><a href="https://www.facebook.com/SuperflyMotos/" target="_blank" rel="noopener" aria-label="Superfly on Facebook"><i class="fab fa-facebook-f" aria-hidden="true"></i></a></li>
+					<li><a href="https://www.instagram.com/superflymotos/" target="_blank" rel="noopener" aria-label="Superfly on Instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a></li>
+					<li><a href="https://www.youtube.com/superflymotos/" target="_blank" rel="noopener" aria-label="Superfly on YouTube"><i class="fab fa-youtube" aria-hidden="true"></i></a></li>
+				</ul>
+			</div>
+
+			<div class="sf-pf__legal">
+				<address class="sf-pf__addr">3, Jalan Tiong Nam Emas 1, Kawasan Perindustrian Tiong Nam, 81100 Johor Bahru <span>|</span> <a class="sf-pf__tel" href="tel:+6073507086">07-350 7086</a> <span>|</span> Mon&ndash;Sat, 9am&ndash;6pm</address>
+				<p>&copy; 2026 Superfly <span>|</span> All Rights Reserved</p>
+			</div>
+
+		</div>
+	</div>
+</footer>
+<!-- /wp:html -->

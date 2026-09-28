@@ -1,0 +1,325 @@
+/* =============================================================
+ * SUPERFLY — DEALERS & DISTRIBUTORS (home page, section 4)
+ * A quiet, centred band — this is a supporting section, not a hero.
+ * -------------------------------------------------------------
+ *              ▰▰ THE NETWORK
+ *         Ride anywhere, fitted properly.
+ *      one line about where Superfly is sold
+ *
+ *   ┌──────────┬───────────┬───────────┬─────────────┐
+ *   │ 01       │ 02        │ 03        │ 04          │  ← point at one and
+ *   │ MALAYSIA │ SINGAPORE │ INDONESIA │ PHILIPPINES │    it lifts; move the
+ *   │ Dealers  │ Distrib.  │ Distrib.  │ Distrib.    │    mouse and the line
+ *                                                         drawings light up
+ *   └──────────┴───────────┴───────────┴─────────────┘
+ *
+ *   Layout (HTML):  Pages → Home (Elementor HTML widget)
+ *   Movement:       assets/js/dealers.js
+ *
+ * To add a country: copy one <li> in the row.
+ *
+ * CONTENTS
+ *   1. Settings (edit me)
+ *   2. Section + the photo behind
+ *   3. Heading (centred)
+ *   4. The row of countries
+ *   5. Scroll-in
+ *   6. Phones + tablets
+ *   7. Reduce motion
+ * ============================================================= */
+
+
+/* -------------------------------------------------------------
+ * 1. SETTINGS (edit me)
+ * ------------------------------------------------------------- */
+.sf-dealers {
+	--sf-dealers-bg:      #0a0a0a;                  /* same dark as the rest of the home page */
+	--sf-dealers-bg-end:  #15151a;                  /* a touch lighter at the bottom, like section 2 */
+	--sf-dealers-fill:    100svh;                   /* the band fills the whole screen */
+	--sf-dealers-text:    #f5f5f5;
+	--sf-dealers-muted:   rgba(245, 245, 245, 0.58);
+	--sf-dealers-line:    rgba(245, 245, 245, 0.12);
+	--sf-dealers-accent:  #ec1e79;                  /* Superfly pink */
+	--sf-dealers-art:     1;                        /* how bright the line drawings are inside the torch (0 … 1) */
+	--sf-dealers-torch:   320px;                    /* how wide the torch is around the mouse */
+	--sf-dealers-art-lift: 3.4;                     /* the drawing is almost black in the original — this lifts it */
+	--sf-dealers-overlap: clamp(70px, 10vh, 140px); /* how far this band rides up over the section above */
+	--sf-dealers-font-title: "Archivo Black", "Arial Black", sans-serif;
+	--sf-dealers-font-body:  "Archivo", "Inter", sans-serif;
+	--sf-dealers-font-tech:  "Chakra Petch", "Archivo", sans-serif;
+}
+
+
+/* -------------------------------------------------------------
+ * 2. SECTION + THE LINE DRAWINGS
+ * ------------------------------------------------------------- */
+.sf-dealers {
+	position: relative;
+	isolation: isolate;
+	overflow: hidden;
+	box-sizing: border-box;
+	display: grid;
+	align-items: center;
+	min-height: var(--sf-dealers-fill);             /* so the band fills the screen properly */
+	/* rides up over the section above — dealers.js holds that section still,
+	   so this one slides straight up over it as you scroll */
+	z-index: 2;
+	margin-top: calc(-1 * var(--sf-dealers-overlap));
+	padding: calc(clamp(46px, 8vh, 88px) + var(--sf-dealers-overlap) / 2) clamp(20px, 5vw, 80px) clamp(46px, 8vh, 88px);
+	border-top: 1px solid rgba(245, 245, 245, 0.08);
+	box-shadow: 0 -30px 60px rgba(0, 0, 0, 0.75);   /* the shadow it casts on the section it covers */
+	background:
+		/* carbon-fibre weave — the same one as "Shop by category" (section 2) */
+		repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.025) 0 2px, transparent 2px 4px),
+		repeating-linear-gradient(-45deg, rgba(0, 0, 0, 0.35) 0 2px, transparent 2px 4px),
+		linear-gradient(180deg, var(--sf-dealers-bg) 0%, var(--sf-dealers-bg-end) 100%);
+	color: var(--sf-dealers-text);
+	font-family: var(--sf-dealers-font-body);
+	text-align: center;
+}
+
+/* The line drawings (shock + wheel, cut out of the dealer banner) cover the
+   whole section but stay hidden — dealers.js moves a "torch" with the mouse
+   and only what's inside it shows. Nothing shows until you point at it. */
+.sf-dealers__art {
+	position: absolute;
+	inset: 0;
+	z-index: -1;
+	background-image: url("../img/bg-art-tile.jpg");
+	background-repeat: repeat-x;
+	background-position: center;
+	background-size: auto 100%;
+	mix-blend-mode: screen;                         /* black stays black, only the drawn lines show */
+	filter: brightness(var(--sf-dealers-art-lift)) contrast(1.15);
+	opacity: 0;
+	transition: opacity 0.45s ease;
+	pointer-events: none;
+	-webkit-mask-image: radial-gradient(var(--sf-dealers-torch) circle at var(--sf-dealers-x, 50%) var(--sf-dealers-y, 50%), #000 0%, rgba(0, 0, 0, 0.55) 45%, transparent 72%);
+	mask-image: radial-gradient(var(--sf-dealers-torch) circle at var(--sf-dealers-x, 50%) var(--sf-dealers-y, 50%), #000 0%, rgba(0, 0, 0, 0.55) 45%, transparent 72%);
+}
+
+.sf-dealers.is-lit .sf-dealers__art {
+	opacity: var(--sf-dealers-art);
+}
+
+/* a soft wash right behind the words only, so they stay clean over the drawings */
+.sf-dealers__inner::before {
+	content: "";
+	position: absolute;
+	inset: -6% -8%;
+	z-index: -1;
+	background: radial-gradient(60% 60% at 50% 45%, rgba(10, 10, 10, 0.85), transparent 75%);
+	pointer-events: none;
+}
+
+.sf-dealers__inner {
+	position: relative;
+	max-width: 1080px;
+	margin-inline: auto;
+}
+
+
+/* -------------------------------------------------------------
+ * 3. HEADING (centred, deliberately small)
+ * ------------------------------------------------------------- */
+.sf-dealers__eyebrow {
+	display: block;
+	margin: 0 0 12px;
+	font-family: var(--sf-dealers-font-tech);
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: 0.24em;
+	text-transform: uppercase;
+	color: var(--sf-dealers-accent);
+}
+
+.sf-dealers__title {
+	margin: 0 0 12px;
+	color: var(--sf-dealers-text);                  /* the theme colours headings — override here */
+	font-family: var(--sf-dealers-font-title);
+	font-size: clamp(26px, 3.2vw, 48px);            /* grows with the band, still under the hero above */
+	font-weight: 400;
+	line-height: 1.05;
+	text-transform: uppercase;
+}
+
+.sf-dealers__title em {
+	font-style: normal;
+	color: var(--sf-dealers-accent);
+}
+
+.sf-dealers__intro {
+	max-width: 56ch;
+	margin: 0 auto clamp(34px, 6vh, 64px);
+	color: var(--sf-dealers-muted);
+	font-size: clamp(15px, 1.2vw, 18px);
+	line-height: 1.65;
+}
+
+
+/* -------------------------------------------------------------
+ * 4. THE ROW OF COUNTRIES
+ * ------------------------------------------------------------- */
+.sf-dealers__list {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 0;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	border-top: 1px solid var(--sf-dealers-line);
+	border-bottom: 1px solid var(--sf-dealers-line);
+}
+
+.sf-dealers__list li + li {
+	border-left: 1px solid var(--sf-dealers-line);
+}
+
+.sf-dealers__row {
+	display: grid;
+	justify-items: center;
+	gap: 6px;
+	width: 100%;
+	min-height: clamp(110px, 19vh, 200px);          /* the row of countries carries the full-screen band */
+	align-content: center;
+	padding: clamp(24px, 4.4vh, 44px) 12px;
+	border: 0;
+	background: none;
+	color: inherit;
+	font-family: inherit;
+	cursor: pointer;
+	transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.sf-dealers__row:hover,
+.sf-dealers__row:focus-visible,
+.sf-dealers__row.is-on {
+	background: rgba(236, 30, 121, 0.1);
+	transform: translateY(-2px);
+	outline: none;
+}
+
+.sf-dealers__num {
+	font-family: var(--sf-dealers-font-tech);
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.18em;
+	color: var(--sf-dealers-muted);
+	transition: color 0.3s ease;
+}
+
+.sf-dealers__row:hover .sf-dealers__num,
+.sf-dealers__row.is-on .sf-dealers__num {
+	color: var(--sf-dealers-accent);
+}
+
+.sf-dealers__name {
+	font-family: var(--sf-dealers-font-title);
+	font-size: clamp(17px, 1.9vw, 26px);
+	line-height: 1.1;
+	text-transform: uppercase;
+}
+
+.sf-dealers__role {
+	font-family: var(--sf-dealers-font-tech);
+	font-size: 10px;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: var(--sf-dealers-muted);
+}
+
+
+/* -------------------------------------------------------------
+ * 5. SCROLL-IN (dealers.js adds "is-in")
+ * ------------------------------------------------------------- */
+.sf-dealers.is-ready .sf-dealers__inner > *,
+.sf-dealers.is-ready .sf-dealers__list li {
+	opacity: 0;
+	transform: translateY(16px);
+}
+
+.sf-dealers.is-in .sf-dealers__inner > *,
+.sf-dealers.is-in .sf-dealers__list li {
+	opacity: 1;
+	transform: none;
+	transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.sf-dealers.is-in .sf-dealers__inner > :nth-child(2) { transition-delay: 0.06s; }
+.sf-dealers.is-in .sf-dealers__inner > :nth-child(3) { transition-delay: 0.12s; }
+.sf-dealers.is-in .sf-dealers__list li:nth-child(1) { transition-delay: 0.16s; }
+.sf-dealers.is-in .sf-dealers__list li:nth-child(2) { transition-delay: 0.22s; }
+.sf-dealers.is-in .sf-dealers__list li:nth-child(3) { transition-delay: 0.28s; }
+.sf-dealers.is-in .sf-dealers__list li:nth-child(4) { transition-delay: 0.34s; }
+.sf-dealers.is-in .sf-dealers__list li:nth-child(n+5) { transition-delay: 0.40s; }
+
+
+/* -------------------------------------------------------------
+ * 6. PHONES + TABLETS — two per row, then one
+ * ------------------------------------------------------------- */
+@media (max-width: 760px) {
+	.sf-dealers__list {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.sf-dealers__list li + li {
+		border-left: 0;
+	}
+
+	.sf-dealers__list li:nth-child(2n) {
+		border-left: 1px solid var(--sf-dealers-line);
+	}
+
+	.sf-dealers__list li:nth-child(n+3) {
+		border-top: 1px solid var(--sf-dealers-line);
+	}
+}
+
+@media (max-width: 420px) {
+	.sf-dealers__list {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.sf-dealers__list li:nth-child(2n) {
+		border-left: 0;
+	}
+
+	.sf-dealers__list li + li {
+		border-top: 1px solid var(--sf-dealers-line);
+	}
+}
+
+
+/* -------------------------------------------------------------
+ * 7. REDUCE MOTION — no drifting picture, no rising in
+ * ------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+	.sf-dealers__photos img,
+	.sf-dealers__row {
+		transition: none;
+	}
+}
+
+
+/* -------------------------------------------------------------
+ * 8. THE SECTION ABOVE IS HELD WHILE THIS ONE CLIMBS OVER IT
+ * -------------------------------------------------------------
+ * Section 3 (Project RP) stops at the top of the screen and stays
+ * there; this band, being a full screen tall and solid, slides up
+ * and buries it. That is the overlap you see when scrolling.
+ *
+ * The id below is the Elementor container holding section 3 on the
+ * home page (Pages > Home). If that section is ever rebuilt, give
+ * the new container the same id or this rule does nothing — the
+ * page still reads fine, the sections just sit end to end.
+ *
+ * Left out on phones and short screens: section 3 is taller than
+ * the screen there, so holding it would cut its bottom off.
+ * ------------------------------------------------------------- */
+@media (min-width: 1025px) and (min-height: 720px) {
+	.elementor-element-sfrp01 {
+		position: sticky;
+		top: 0;
+		z-index: 1;
+	}
+}

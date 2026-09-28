@@ -1,0 +1,749 @@
+/* =============================================================
+ * SUPERFLY — MY ACCOUNT
+ * WooCommerce's account pages, laid out the way design B was:
+ * the links as tabs across the top, the content full width under
+ * them, and a split login screen — form on the left, a photo on
+ * the right — instead of a bare form on black.
+ * -------------------------------------------------------------
+ *   MY ACCOUNT
+ *   Hello Syaz — not Syaz? Log out
+ *   ┌────────────────────────────────────────────────┐
+ *   │ DASHBOARD │ ORDERS │ ADDRESSES │ DETAILS │ … │
+ *   └────────────────────────────────────────────────┘
+ *     the dashboard's cards come from
+ *     woocommerce/myaccount/dashboard.php in this theme
+ *
+ *   Logged out:
+ *   ┌─────────────────────┬────────────────────────┐
+ *   │ LOG IN              │                        │
+ *   │ [ username ]        │        photo           │
+ *   │ [ password ]        │                        │
+ *   │ [ LOG IN ]          │                        │
+ *   └─────────────────────┴────────────────────────┘
+ *     the photo panel is added by superfly_login_art()
+ *     in functions.php
+ * ============================================================= */
+
+body.woocommerce-account {
+	--ac-bg:     #0a0a0a;
+	--ac-panel:  #131317;
+	--ac-text:   #f2f2f4;
+	--ac-muted:  rgba(242, 242, 244, 0.58);
+	--ac-faint:  rgba(242, 242, 244, 0.34);
+	--ac-line:   rgba(242, 242, 244, 0.12);
+	--ac-accent: #ec1e79;
+	--ac-title:  "Archivo Black", "Arial Black", sans-serif;
+	--ac-body:   "Archivo", "Inter", sans-serif;
+	--ac-tech:   "Chakra Petch", "Archivo", sans-serif;
+}
+
+/* The page title is off: the rail names the endpoint, and WordPress
+   printing it again left two headings stacked on the same page. It stays
+   in the markup for search engines and screen readers. */
+body.woocommerce-account h1.wp-block-post-title,
+body.woocommerce-account .entry-title {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	clip-path: inset(50%);
+	white-space: nowrap;
+	border: 0;
+}
+
+body.woocommerce-account .woocommerce {
+	color: var(--ac-text);
+	font-family: var(--ac-body);
+}
+
+
+/* -------------------------------------------------------------
+ * THE RAIL
+ * WooCommerce's own woocommerce-layout.css has
+ *   .woocommerce-account .woocommerce-MyAccount-navigation{float:left;width:30%}
+ * — two classes, so every layout rule here is written body-first to
+ * outrank it, or the plugin's 30/68 split comes back.
+ *
+ * Three things share the grid: the greeting (added by
+ * superfly_account_greeting() in functions.php), WooCommerce's nav,
+ * and the content. Each is placed explicitly — left to itself the
+ * greeting takes a column of its own and squeezes the content.
+ * ------------------------------------------------------------- */
+body.woocommerce-account .woocommerce {
+	display: grid;
+	grid-template-columns: 250px minmax(0, 1fr);
+	grid-template-rows: auto minmax(0, 1fr);
+	align-items: start;
+}
+
+/* The divider used to be the nav's own border-right, so it started
+   below the greeting and stopped at the last link. Drawn on the grid
+   it runs the full height of the account, top to bottom. */
+body.woocommerce-account.logged-in .woocommerce { position: relative; }
+
+body.woocommerce-account.logged-in .woocommerce::before {
+	content: "";
+	/* WooCommerce claims this pseudo-element as a clearfix:
+	   .woocommerce-account .woocommerce::before{content:" ";display:table}
+	   A table shrink-wraps its content, so without this the line is
+	   positioned correctly and then drawn zero pixels tall. */
+	display: block;
+	position: absolute;
+	top: 30px;                       /* level with the content — matches the block's padding-top */
+	bottom: 0;
+	left: 250px;                     /* the rail column */
+	width: 1px;
+	background: var(--ac-line);
+}
+
+body.woocommerce-account .sf-acc-who { grid-column: 1; grid-row: 1; }
+body.woocommerce-account .woocommerce-MyAccount-navigation { grid-column: 1; grid-row: 2; }
+body.woocommerce-account .woocommerce-MyAccount-content { grid-column: 2; grid-row: 1 / 3; }
+
+body.woocommerce-account .woocommerce-MyAccount-navigation {
+	float: none;
+	width: 100%;
+	/* border-box, or the 26px of padding and the divider line are added
+	   ON TOP of the 250px column and the line leans into the gutter */
+	box-sizing: border-box;
+	margin: 0;
+	padding-right: 26px;
+}
+
+body.woocommerce-account .woocommerce-MyAccount-navigation ul {
+	display: block;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	border: 0;
+}
+
+body.woocommerce-account .woocommerce-MyAccount-navigation li {
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+body.woocommerce-account .woocommerce-MyAccount-navigation li a {
+	display: grid;
+	grid-template-columns: 24px minmax(0, 1fr);
+	align-items: center;
+	gap: 14px;
+	padding: 14px 16px;
+	border: 0;
+	border-left: 2px solid transparent;
+	color: var(--ac-muted);
+	font-family: var(--ac-body);
+	font-size: 14.5px;
+	font-weight: 400;
+	letter-spacing: 0;
+	text-transform: none;
+	text-decoration: none;
+	transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+body.woocommerce-account .woocommerce-MyAccount-navigation li a:hover {
+	background: rgba(255, 255, 255, 0.03);
+	color: var(--ac-text);
+}
+
+body.woocommerce-account .woocommerce-MyAccount-navigation li.is-active a {
+	background: rgba(236, 30, 121, 0.1);
+	border-left-color: var(--ac-accent);
+	color: var(--ac-accent);
+	font-weight: 600;
+}
+
+body.woocommerce-account .woocommerce-MyAccount-navigation svg {
+	width: 19px;
+	height: 19px;
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 1.5;
+}
+
+/* log out, set apart at the foot of the rail */
+body.woocommerce-account .woocommerce-MyAccount-navigation-link--customer-logout {
+	margin-top: 18px;
+	padding-top: 18px;
+	border-top: 1px solid var(--ac-line);
+}
+
+/* ---- who is signed in ---- */
+.sf-acc-who {
+	display: grid;
+	grid-template-columns: 44px minmax(0, 1fr);
+	align-items: center;
+	gap: 14px;
+	padding: 0 16px 26px;
+}
+
+.sf-acc-who span.sf-acc-initial {
+	display: grid;
+	place-items: center;
+	width: 44px;
+	height: 44px;
+	border-radius: 50%;
+	border: 1px solid rgba(236, 30, 121, 0.5);
+	background: rgba(236, 30, 121, 0.12);
+	font-family: var(--ac-title);
+	font-size: 16px;
+	color: var(--ac-accent);
+}
+
+.sf-acc-who strong {
+	display: block;
+	font-size: 15px;
+	font-weight: 600;
+	color: var(--ac-text);
+}
+
+.sf-acc-who em {
+	display: block;
+	margin-top: 3px;
+	font-style: normal;
+	font-family: var(--ac-tech);
+	font-size: 10px;
+	letter-spacing: 0.2em;
+	text-transform: uppercase;
+	color: var(--ac-faint);
+}
+
+/* ---- the content ---- */
+body.woocommerce-account .woocommerce-MyAccount-content {
+	float: none;
+	width: 100%;
+	box-sizing: border-box;          /* same reason — see the rail above */
+	padding-left: 34px;
+}
+
+@media (max-width: 900px) {
+	body.woocommerce-account .woocommerce { grid-template-columns: minmax(0, 1fr); }
+
+	body.woocommerce-account .sf-acc-who,
+	body.woocommerce-account .woocommerce-MyAccount-navigation,
+	body.woocommerce-account .woocommerce-MyAccount-content {
+		grid-column: 1;
+		grid-row: auto;
+	}
+
+	body.woocommerce-account.logged-in .woocommerce::before { display: none; }
+
+	body.woocommerce-account .woocommerce-MyAccount-navigation {
+		padding: 0 0 20px;
+		margin-bottom: 24px;
+		border-bottom: 1px solid var(--ac-line);
+	}
+
+	body.woocommerce-account .woocommerce-MyAccount-content { padding-left: 0; }
+}
+
+body.woocommerce-account .woocommerce-MyAccount-content p {
+	color: var(--ac-muted);
+	line-height: 1.75;
+}
+
+body.woocommerce-account .woocommerce-MyAccount-content a {
+	color: var(--ac-accent);
+}
+
+
+/* -------------------------------------------------------------
+ * THE DASHBOARD CARDS (woocommerce/myaccount/dashboard.php)
+ * ------------------------------------------------------------- */
+.sf-acc__cards {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 14px;
+	margin-bottom: clamp(24px, 4vh, 40px);
+}
+
+.sf-acc__card {
+	display: block;
+	padding: 20px;
+	background: var(--ac-panel);
+	border: 1px solid var(--ac-line);
+	color: inherit;
+	text-decoration: none;
+	transition: border-color 0.25s ease, transform 0.25s ease;
+}
+
+.sf-acc__card:hover {
+	border-color: rgba(236, 30, 121, 0.55);
+	transform: translateY(-3px);
+}
+
+.sf-acc__card h3 {
+	margin: 0 0 10px;
+	font-family: var(--ac-tech);
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.2em;
+	text-transform: uppercase;
+	color: var(--ac-faint);
+}
+
+.sf-acc__card b {
+	font-family: var(--ac-tech);
+	font-size: 20px;
+	color: var(--ac-text);
+}
+
+.sf-acc__card p {
+	margin: 6px 0 0;
+	font-size: 13.5px;
+	line-height: 1.6;
+	color: var(--ac-muted);
+}
+
+.sf-acc__label {
+	margin: 0 0 12px;
+	font-family: var(--ac-tech);
+	font-size: 10.5px;
+	font-weight: 700;
+	letter-spacing: 0.22em;
+	text-transform: uppercase;
+	color: var(--ac-faint);
+}
+
+
+/* -------------------------------------------------------------
+ * ORDERS, ADDRESSES, DETAILS
+ * ------------------------------------------------------------- */
+.woocommerce-MyAccount-content table.shop_table,
+.woocommerce-MyAccount-content table.woocommerce-orders-table {
+	width: 100%;
+	border-collapse: collapse;
+	border: 0;
+}
+
+.woocommerce-MyAccount-content table th,
+.woocommerce-MyAccount-content table td {
+	padding: 13px 10px;
+	border: 0;
+	border-bottom: 1px solid var(--ac-line);
+	text-align: left;
+	color: var(--ac-muted);
+	font-size: 14px;
+}
+
+.woocommerce-MyAccount-content table th {
+	font-family: var(--ac-tech);
+	font-size: 10.5px;
+	font-weight: 700;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: var(--ac-faint);
+}
+
+.woocommerce-MyAccount-content .woocommerce-orders-table__cell-order-total {
+	font-family: var(--ac-tech);
+	font-weight: 700;
+	color: var(--ac-accent);
+}
+
+.woocommerce-MyAccount-content .woocommerce-Address {
+	padding: 20px;
+	background: var(--ac-panel);
+	border: 1px solid var(--ac-line);
+}
+
+.woocommerce-MyAccount-content .woocommerce-Address-title h2,
+.woocommerce-MyAccount-content h2,
+.woocommerce-MyAccount-content h3 {
+	font-family: var(--ac-title);
+	font-weight: 400;
+	font-size: clamp(15px, 1.7vw, 20px);
+	text-transform: uppercase;
+	color: var(--ac-text);
+}
+
+body.woocommerce-account form .form-row label {
+	font-family: var(--ac-tech);
+	font-size: 10.5px;
+	font-weight: 700;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: var(--ac-faint);
+}
+
+body.woocommerce-account form .form-row input.input-text,
+body.woocommerce-account form .form-row select {
+	width: 100%;
+	padding: 13px 15px;
+	background: rgba(255, 255, 255, 0.03);
+	border: 1px solid var(--ac-line);
+	color: var(--ac-text);
+	font-family: var(--ac-body);
+	font-size: 15px;
+}
+
+body.woocommerce-account form .form-row input.input-text:focus,
+body.woocommerce-account form .form-row select:focus {
+	border-color: var(--ac-accent);
+	outline: none;
+}
+
+body.woocommerce-account .button,
+body.woocommerce-account button.button,
+body.woocommerce-account input.button {
+	border-radius: 0;
+	background: var(--ac-accent);
+	border: 0;
+	color: #fff;
+	font-family: var(--ac-tech);
+	font-size: 12px;
+	font-weight: 700;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+}
+
+
+/* -------------------------------------------------------------
+ * THE LOGIN SCREEN — form left, photo right
+ * The wrapper and the photo come from superfly_login_art().
+ * ------------------------------------------------------------- */
+.sf-login {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+	min-height: 520px;
+	border: 1px solid var(--ac-line);
+	margin-bottom: 40px;
+}
+
+.sf-login__form {
+	padding: clamp(26px, 4vw, 52px);
+	background: var(--ac-panel);
+}
+
+.sf-login__form h2 {
+	margin: 0 0 20px;
+	font-family: var(--ac-title);
+	font-weight: 400;
+	font-size: clamp(20px, 2.4vw, 30px);
+	text-transform: uppercase;
+	color: var(--ac-text);
+}
+
+.sf-login__form .woocommerce-form-login__rememberme {
+	display: inline-flex;
+	align-items: center;
+	gap: 9px;
+	font-family: var(--ac-body);
+	font-size: 13px;
+	letter-spacing: 0;
+	text-transform: none;
+	color: var(--ac-muted);
+}
+
+.sf-login__form .woocommerce-form-login__submit {
+	margin-top: 8px;
+}
+
+.sf-login__form .lost_password a {
+	color: var(--ac-faint);
+	font-size: 13px;
+}
+
+.sf-login__form .lost_password a:hover {
+	color: var(--ac-accent);
+}
+
+.sf-login__art {
+	position: relative;
+	overflow: hidden;
+	margin: 0;
+	background: #000;
+}
+
+.sf-login__art img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	opacity: 0.72;
+}
+
+.sf-login__art figcaption {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	padding: 22px;
+	background: linear-gradient(180deg, transparent, rgba(10, 10, 10, 0.9));
+	font-family: var(--ac-tech);
+	font-size: 11px;
+	letter-spacing: 0.2em;
+	text-transform: uppercase;
+	color: var(--ac-muted);
+}
+
+
+/* -------------------------------------------------------------
+ * PHONES
+ * ------------------------------------------------------------- */
+@media (max-width: 900px) {
+	.sf-acc__cards { grid-template-columns: minmax(0, 1fr); }
+
+	.sf-login { grid-template-columns: minmax(0, 1fr); }
+
+	.sf-login__art { min-height: 200px; order: -1; }
+
+	.woocommerce-MyAccount-navigation li.woocommerce-MyAccount-navigation-link--customer-logout {
+		margin-left: 0;
+	}
+
+	.woocommerce-MyAccount-navigation li a { padding: 12px 14px; font-size: 10px; }
+}
+
+
+/* =============================================================
+ * ACCOUNT DETAILS (the edit-account form)
+ * The layout from the reference: names side by side, a
+ * "Password & security" card that folds open, and Reset beside
+ * Save on a row that spans the form. The card, the icon and the
+ * Reset button are added by assets/js/account.js — WooCommerce's
+ * own fields, names and nonce are left alone.
+ * ============================================================= */
+body.woocommerce-account .woocommerce-EditAccountForm {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 0 26px;
+	max-width: 900px;
+}
+
+/* WooCommerce gives these rows `width: 47%; float: left` so they sit side by
+   side in a normal form. Inside this grid each one already has its own
+   column, so 47% made the fields half the width of their column. */
+body.woocommerce-account .woocommerce-EditAccountForm .form-row-first,
+body.woocommerce-account .woocommerce-EditAccountForm .form-row-last,
+body.woocommerce-account .woocommerce-EditAccountForm .form-row-wide {
+	width: 100%;
+	float: none;
+}
+
+body.woocommerce-account .woocommerce-EditAccountForm .form-row-first { grid-column: 1; }
+body.woocommerce-account .woocommerce-EditAccountForm .form-row-last { grid-column: 2; }
+
+body.woocommerce-account .woocommerce-EditAccountForm .form-row-wide,
+body.woocommerce-account .woocommerce-EditAccountForm fieldset,
+body.woocommerce-account .woocommerce-EditAccountForm .sf-acc-actions {
+	grid-column: 1 / -1;
+}
+
+body.woocommerce-account .woocommerce-EditAccountForm .woocommerce-form-row {
+	margin: 0 0 22px;
+}
+
+body.woocommerce-account .woocommerce-EditAccountForm .clear { display: none; }
+
+body.woocommerce-account .woocommerce-EditAccountForm input[type="text"],
+body.woocommerce-account .woocommerce-EditAccountForm input[type="email"],
+body.woocommerce-account .woocommerce-EditAccountForm input[type="password"] {
+	box-sizing: border-box;
+	width: 100%;
+	padding: 16px 18px;
+	background: #17171c;
+	font-size: 15px;
+}
+
+body.woocommerce-account .woocommerce-EditAccountForm input::placeholder {
+	color: rgba(242, 242, 244, 0.3);
+}
+
+body.woocommerce-account .woocommerce-EditAccountForm input:focus {
+	background: #1b1b21;
+}
+
+body.woocommerce-account .woocommerce-EditAccountForm em {
+	display: block;
+	margin-top: 9px;
+	font-style: normal;
+	font-size: 12.5px;
+	color: var(--ac-faint);
+}
+
+/* ---- the password card ---- */
+body.woocommerce-account .woocommerce-EditAccountForm fieldset {
+	margin: 6px 0 0;
+	padding: 0;
+	border: 0;
+}
+
+body.woocommerce-account .woocommerce-EditAccountForm legend { display: none; }
+
+.sf-acc-card {
+	display: grid;
+	grid-template-columns: 28px minmax(0, 1fr) 28px;
+	align-items: center;
+	gap: 16px;
+	width: 100%;
+	padding: 22px 24px;
+	background: none;
+	border: 1px solid var(--ac-line);
+	color: var(--ac-text);
+	text-align: left;
+	cursor: pointer;
+	transition: border-color 0.2s ease;
+}
+
+.sf-acc-card:hover { border-color: rgba(236, 30, 121, 0.5); }
+
+.sf-acc-card svg {
+	width: 22px;
+	height: 22px;
+	fill: none;
+	stroke: var(--ac-muted);
+	stroke-width: 1.4;
+}
+
+.sf-acc-card:hover svg { stroke: var(--ac-accent); }
+
+.sf-acc-card strong {
+	display: block;
+	margin-bottom: 6px;
+	font-family: var(--ac-title);
+	font-weight: 400;
+	font-size: 15px;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+}
+
+.sf-acc-card em {
+	display: block;
+	margin: 0;
+	font-style: normal;
+	font-size: 13px;
+	color: var(--ac-faint);
+}
+
+.sf-acc-card i {
+	justify-self: end;
+	font-style: normal;
+	font-family: var(--ac-tech);
+	font-size: 20px;
+	line-height: 1;
+	color: var(--ac-muted);
+}
+
+.sf-acc-card.is-open i { color: var(--ac-accent); }
+
+.sf-acc-fold {
+	display: none;
+	margin-top: -1px;
+	padding: 24px;
+	border: 1px solid var(--ac-line);
+	border-top: 0;
+}
+
+.sf-acc-fold.is-open { display: block; }
+
+.sf-acc-fold .woocommerce-form-row:last-child { margin-bottom: 0; }
+
+/* ---- the actions row ---- */
+.sf-acc-actions {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 18px;
+	margin-top: 30px;
+	padding-top: 24px;
+	border-top: 1px solid var(--ac-line);
+}
+
+.sf-acc-note {
+	margin: 0;
+	font-size: 12.5px;
+	white-space: nowrap;
+	color: var(--ac-faint);
+}
+
+.sf-acc-actions .nonce,
+.sf-acc-actions input[type="hidden"] { display: none; }
+
+.sf-acc-buttons { display: flex; gap: 12px; }
+
+.sf-acc-reset {
+	padding: 16px 26px;
+	background: none;
+	border: 1px solid var(--ac-line);
+	color: var(--ac-text);
+	font-family: var(--ac-tech);
+	font-size: 12px;
+	font-weight: 700;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	cursor: pointer;
+	transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.sf-acc-reset:hover {
+	border-color: var(--ac-accent);
+	color: var(--ac-accent);
+}
+
+body.woocommerce-account .woocommerce-EditAccountForm .woocommerce-Button {
+	display: inline-flex;
+	align-items: center;
+	gap: 12px;
+	padding: 16px 30px;
+}
+
+body.woocommerce-account .woocommerce-EditAccountForm .woocommerce-Button::after {
+	content: "\2197";
+	font-size: 14px;
+}
+
+@media (max-width: 720px) {
+	body.woocommerce-account .woocommerce-EditAccountForm {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	body.woocommerce-account .woocommerce-EditAccountForm .form-row-first,
+	body.woocommerce-account .woocommerce-EditAccountForm .form-row-last {
+		grid-column: 1;
+	}
+
+	.sf-acc-actions { flex-direction: column; align-items: stretch; }
+	.sf-acc-buttons { flex-direction: column-reverse; }
+	.sf-acc-reset,
+	body.woocommerce-account .woocommerce-EditAccountForm .woocommerce-Button {
+		width: 100%;
+		justify-content: center;
+	}
+}
+
+
+/* -------------------------------------------------------------
+ * THE GAP ABOVE THE ACCOUNT
+ * Twenty Twenty-Four's page template puts two spacer blocks
+ * (104px + 40px) above the content to stand the page title off
+ * the header. The title is hidden here, so they were holding up
+ * nothing and left 182px of empty page. Only on account pages —
+ * every other page keeps its spacing.
+ * ------------------------------------------------------------- */
+body.woocommerce-account .wp-block-spacer {
+	display: none;
+}
+
+/* ...and 30px put back by hand. Padding, not margin: a margin here
+   collapses into <main>'s own and only part of it would show. */
+body.woocommerce-account .woocommerce {
+	padding-top: 30px;
+}
+
+
+/* -------------------------------------------------------------
+ * THE SIGN-IN PAGE IS NOT THE ACCOUNT
+ * /my-account/ carries body.woocommerce-account whether or not
+ * anyone is signed in, so the rail grid above was also being
+ * applied to the login page — which has no rail. The login card
+ * landed in the 250px column and was squeezed to a sliver.
+ * WordPress adds .logged-in only for signed-in visitors, so this
+ * hands the login page its normal flow back.
+ * ------------------------------------------------------------- */
+body.woocommerce-account:not(.logged-in) .woocommerce {
+	display: block;
+}

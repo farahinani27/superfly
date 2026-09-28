@@ -1,0 +1,176 @@
+/* =============================================================
+ * SUPERFLY — PAGE NOT FOUND
+ * One calm column: what happened, where to go next, and how to
+ * reach a person. No illustration, and pink used once — on the
+ * status line and the primary button — so the page reads as a
+ * notice rather than a feature.
+ *
+ * Markup: templates/404.html (this theme). Nothing here is shared
+ * with another page, so the class names say what they are rather
+ * than carrying a prefix.
+ * ============================================================= */
+
+.not-found {
+	--text:   #f2f2f4;
+	--muted:  rgba(242, 242, 244, 0.68);
+	--faint:  rgba(242, 242, 244, 0.40);
+	--line:   rgba(242, 242, 244, 0.12);
+	--accent: #ec1e79;
+	--title:  "Archivo Black", "Arial Black", sans-serif;
+	--body:   "Archivo", "Inter", sans-serif;
+	--label:  "Chakra Petch", "Archivo", sans-serif;
+
+	color: var(--text);
+	font-family: var(--body);
+
+	/* the page behind is plain, so this fills the screen even when there
+	   is little on it */
+	min-height: 78svh;
+	display: flex;
+	align-items: center;
+}
+
+/* ---- the carbon weave ----
+ * On the whole page rather than on the block of text. The navbar floats
+ * over the page background, so a weave that started at the section would
+ * leave a plain strip across the top and another above the footer.
+ * Same recipe as Shop by Bike and the loading screen.
+ * WordPress puts .error404 on the body of a missing page. */
+body.error404 {
+	background-color: #101014;
+	background-image:
+		repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.025) 0 2px, transparent 2px 4px),
+		repeating-linear-gradient(-45deg, rgba(0, 0, 0, 0.35) 0 2px, transparent 2px 4px);
+	background-attachment: fixed;   /* one continuous weave, however tall the page */
+}
+
+.not-found *,
+.not-found *::before,
+.not-found *::after {
+	box-sizing: border-box;
+}
+
+/* ---- the column ---- */
+.not-found-inner {
+	width: 100%;
+	max-width: 660px;
+	margin-inline: auto;
+	padding: clamp(50px, 8vw, 110px) clamp(20px, 4vw, 40px);
+	text-align: center;
+}
+
+/* ---- what happened ---- */
+.status-label {
+	margin: 0 0 18px;
+	font-family: var(--label);
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.22em;
+	text-transform: uppercase;
+	color: var(--accent);
+}
+
+.not-found-heading {
+	margin: 0 0 16px;
+	font-family: var(--title);
+	font-weight: 400;
+	font-size: clamp(24px, 3vw, 38px);
+	line-height: 1.15;
+	letter-spacing: -0.005em;
+	color: var(--text);
+}
+
+.not-found-text {
+	margin: 0 auto 32px;
+	max-width: 54ch;
+	font-size: clamp(14px, 1.1vw, 16px);
+	line-height: 1.75;
+	color: var(--muted);
+}
+
+/* ---- where to go next ---- */
+.button-row {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 12px;
+}
+
+.not-found .button-primary,
+.not-found .button-secondary {
+	display: inline-flex;
+	align-items: center;
+	padding: 15px 26px;
+	text-decoration: none;
+	font-family: var(--label);
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	transition: filter 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.not-found .button-primary {
+	background: var(--accent);
+	border: 1px solid var(--accent);
+	color: #fff;
+}
+
+.not-found .button-primary:hover,
+.not-found .button-primary:focus-visible {
+	filter: brightness(1.12);
+	color: #fff;
+}
+
+.not-found .button-secondary {
+	background: none;
+	border: 1px solid var(--line);
+	color: var(--muted);
+}
+
+.not-found .button-secondary:hover,
+.not-found .button-secondary:focus-visible {
+	border-color: var(--accent);
+	color: var(--accent);
+}
+
+/* ---- and how to reach a person ---- */
+.support-block {
+	margin-top: clamp(38px, 5vw, 56px);
+	padding-top: 26px;
+	border-top: 1px solid var(--line);
+}
+
+.support-line {
+	margin: 0;
+	font-size: 13.5px;
+	line-height: 1.8;
+	color: var(--faint);
+}
+
+.not-found .support-line a {
+	color: var(--muted);
+	text-decoration: none;
+	border-bottom: 1px solid var(--line);
+	transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.not-found .support-line a:hover,
+.not-found .support-line a:focus-visible {
+	color: var(--accent);
+	border-bottom-color: var(--accent);
+}
+
+/* ---- phones ---- */
+@media (max-width: 520px) {
+	.button-row { flex-direction: column; }
+
+	.not-found .button-primary,
+	.not-found .button-secondary { justify-content: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.not-found .button-primary,
+	.not-found .button-secondary,
+	.not-found .support-line a { transition: none; }
+}

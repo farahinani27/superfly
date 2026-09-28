@@ -1,0 +1,613 @@
+/* =============================================================
+ * SUPERFLY — HOME HERO (first section of the home page)
+ * -------------------------------------------------------------
+ *   ┌────────────────────────────────────────────────────────┐
+ *   │   (tilted collage of Superfly photos, drifting)        │
+ *   │                                                        │
+ *   │  — SUPERFLY MOTOS · EST. SEPANG                         │
+ *   │  RIDE.                                                 │
+ *   │  RACE.                                                 │
+ *   │  RESEARCH.   (white + pink stripe, slanted)            │
+ *   │  Technical parts for scooters …                        │
+ *   │  [ Shop parts → ]  [ Find my bike ]                    │
+ *   │ ╱ 🏁 Designed at Sepang ╱ 🏍 Moto2 partner ╱ 📍 Made in MY ╱│
+ *   └────────────────────────────────────────────────────────┘
+ *
+ * Before it appears: the site-wide loading screen (race start
+ * lights, assets/css/preloader.css); the hero arrives as it wipes away.
+ * Movement: assets/js/hero.js
+ *
+ * CONTENTS
+ *   1. Settings (edit me)
+ *   2. Section + collage background
+ *   2b. Photo hover (mouse only)
+ *   3. Headline block (eyebrow, words, intro text, buttons)
+ *   4. Highlights strip
+ *   5. Scroll cue
+ *   6. (Start lights — moved to preloader.css)
+ *   7. Responsive (tablets + phones)
+ *   7b. Fit the screen (computers)
+ *   8. Reduce motion
+ * ============================================================= */
+
+
+/* -------------------------------------------------------------
+ * 1. SETTINGS (edit me)
+ * ------------------------------------------------------------- */
+.sf-hero {
+	--sf-hero-bg:         #0a0a0a;                  /* background behind everything */
+	--sf-hero-text:       #f5f5f5;
+	--sf-hero-muted:      rgba(245, 245, 245, 0.62);
+	--sf-hero-accent:     #ec1e79;                  /* Superfly pink — used like a racing livery stripe: small and sharp */
+	--sf-hero-metal:      #9aa0aa;                  /* gunmetal / silver — icons */
+	--sf-hero-metal-line: rgba(154, 160, 170, 0.45);/* gunmetal outlines */
+	--sf-hero-line:       rgba(245, 245, 245, 0.18);/* thin borders */
+	--sf-hero-photo:      0.45;                     /* how bright the collage photos are (0 black … 1 full) */
+	--sf-hero-photo-hover: 0.7;                     /* how bright a photo gets when pointed at */
+	--sf-hero-tilt:       -12deg;                   /* collage angle */
+	--sf-hero-drift:      90s;                      /* one full drift of a collage row (bigger = slower) */
+	--sf-hero-under:      96px;                     /* navbar height the hero slides under (hero.js measures the real one) */
+	--sf-hero-slant:      -8deg;                    /* lean of the big words + strip — the "speed" angle */
+	--sf-hero-font-title: "Archivo Black", "Arial Black", sans-serif;
+	--sf-hero-font-body:  "Archivo", "Inter", sans-serif;
+	--sf-hero-font-tech:  "Chakra Petch", "Archivo", sans-serif;
+}
+
+
+/* -------------------------------------------------------------
+ * 2. SECTION + COLLAGE BACKGROUND
+ * ------------------------------------------------------------- */
+
+/* Dark page behind the floating navbar on the home page, so no
+   white shows around the bar (the theme's page colour is white) */
+body:has(.sf-hero) {
+	background-color: #0a0a0a;
+}
+
+.sf-hero {
+	position: relative;
+	isolation: isolate;
+	overflow: hidden;
+	box-sizing: border-box;            /* padding counts inside the screen height */
+	min-height: 100svh;
+	padding: calc(var(--sf-hero-under) + 44px) clamp(20px, 5vw, 80px) 40px;
+	background: var(--sf-hero-bg);
+	color: var(--sf-hero-text);
+	font-family: var(--sf-hero-font-body);
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	grid-template-rows: 1fr auto;
+	align-items: center;
+}
+
+/* The collage: rows of photos, tilted, each drifting sideways */
+.sf-hero__collage {
+	position: absolute;
+	inset: -30% -20%;
+	z-index: -2;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	gap: 22px;
+	transform: rotate(var(--sf-hero-tilt)) scale(1.05);
+	pointer-events: none;
+}
+
+.sf-hero__track {
+	display: flex;
+	gap: 22px;
+	width: max-content;
+	animation: sf-hero-drift var(--sf-hero-drift) linear infinite;
+}
+
+/* every second row drifts the other way */
+.sf-hero__row:nth-child(even) .sf-hero__track {
+	animation-direction: reverse;
+}
+
+.sf-hero__track img {
+	display: block;
+	width: 420px;
+	height: 250px;
+	object-fit: cover;
+	border-radius: 6px;
+	filter: grayscale(0.25) contrast(1.05) brightness(var(--sf-hero-photo));   /* each photo dimmed on its own, so one can light up on hover */
+}
+
+/* Slide up under the floating navbar. Written as ".wp-site-blocks .sf-hero"
+   (stronger than plain ".sf-hero") because WordPress sets margin-top: 0
+   on everything inside the page's main area, which would otherwise win. */
+.wp-site-blocks .sf-hero,
+.sf-hero {
+	margin-top: calc(-1 * var(--sf-hero-under));
+}
+
+@keyframes sf-hero-drift {
+	from { transform: translateX(0); }
+	to   { transform: translateX(-50%); }   /* each track holds its photos twice, so -50% loops seamlessly */
+}
+
+/* Extra shade behind the text only (left side + the strip at the
+   bottom), so the words stay easy to read. The right side has none:
+   the photos there are only dimmed by their own brightness. */
+.sf-hero__shade {
+	position: absolute;
+	inset: 0;
+	z-index: -1;
+	pointer-events: none;              /* the mouse passes through to the photos */
+	background:
+		linear-gradient(90deg, rgba(10, 10, 10, 0.9) 0%, rgba(10, 10, 10, 0.55) 40%, rgba(10, 10, 10, 0) 68%),
+		linear-gradient(to top, rgba(10, 10, 10, 0.85), transparent 35%);
+}
+
+/* -------------------------------------------------------------
+ * 2b. PHOTO HOVER (computers with a mouse only)
+ * Point at a photo in the collage and it lights up: from dim to
+ * brighter (--sf-hero-photo-hover) in full colour, and grows a little. Nothing else changes —
+ * the other photos stay as they are. Pure CSS, no JavaScript.
+ * This works because each photo is dimmed on its own (section 2),
+ * not by one big dark layer on top.
+ * Phones and tablets have no hover, so nothing changes there.
+ * ------------------------------------------------------------- */
+@media (hover: hover) and (pointer: fine) {
+	/* the photos can be pointed at (the collage box can't, so the gaps
+	   between photos don't count as hovering) */
+	.sf-hero__track img {
+		position: relative;
+		pointer-events: auto;
+		transition:
+			filter 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+			transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+			box-shadow 0.6s ease;
+	}
+
+	.sf-hero__track img:hover {
+		z-index: 1;                                     /* on top of its neighbours while grown */
+		transform: scale(1.06);
+		filter: brightness(var(--sf-hero-photo-hover)); /* brighter + full colour, but not glaring */
+		box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);   /* soft shadow so it lifts off the wall */
+	}
+}
+
+
+/* -------------------------------------------------------------
+ * 3. HEADLINE BLOCK
+ * ------------------------------------------------------------- */
+.sf-hero__content {
+	grid-column: 1;
+	grid-row: 1;
+	align-self: start;                 /* always a fixed gap under the navbar; on tall screens the spare
+	                                      space goes below the buttons, where the photos show through */
+	max-width: 720px;
+}
+
+/* "— SUPERFLY MOTOS · EST. SEPANG" */
+.sf-hero__eyebrow {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	margin: 0 0 22px;
+	font-family: var(--sf-hero-font-tech);
+	font-size: 13px;
+	font-weight: 600;
+	letter-spacing: 0.22em;
+	text-transform: uppercase;
+	color: var(--sf-hero-accent);
+}
+
+.sf-hero__eyebrow::before {
+	content: "";
+	width: 42px;
+	height: 2px;
+	background: currentColor;
+}
+
+/* RIDE. / RACE. / RESEARCH. — leaning forward like it's moving */
+.sf-hero__headline {
+	margin: 0;
+	color: var(--sf-hero-text);        /* the theme makes headings dark — override it here */
+	font-family: var(--sf-hero-font-title);
+	font-size: clamp(44px, 6vw, 96px);
+	font-weight: 400;
+	line-height: 0.92;
+	letter-spacing: -0.01em;
+	text-transform: uppercase;
+}
+
+.sf-hero__word {
+	display: block;
+	width: fit-content;
+	transform: skewX(var(--sf-hero-slant));
+}
+
+/* RESEARCH. — white, with a pink livery stripe underneath */
+.sf-hero__word--accent {
+	position: relative;
+	color: var(--sf-hero-text);
+}
+
+.sf-hero__word--accent::after {
+	content: "";
+	position: absolute;
+	left: 0.04em;
+	right: 0.3em;                      /* stop before the full stop */
+	bottom: -0.02em;
+	height: 0.1em;
+	background: var(--sf-hero-accent);
+}
+
+/* The short intro under the headline */
+.sf-hero__text {
+	max-width: 520px;
+	margin: 28px 0 32px;
+	font-size: clamp(15px, 1.2vw, 18px);
+	line-height: 1.6;
+	color: var(--sf-hero-muted);
+}
+
+/* Buttons */
+.sf-hero__buttons {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 14px;
+}
+
+/* Slanted ends like a racing number board. The slanted shape is a
+   layer drawn behind the text (::before, leaned with skewX), so its
+   outline shows on all four sides. */
+.sf-hero__button {
+	position: relative;
+	isolation: isolate;
+	display: inline-flex;
+	align-items: center;
+	gap: 12px;
+	padding: 15px 28px;
+	color: #ffffff;
+	font-family: var(--sf-hero-font-tech);
+	font-size: 14px;
+	font-weight: 700;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	text-decoration: none;
+	white-space: nowrap;
+}
+
+.sf-hero__button::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	z-index: -1;
+	border: 1px solid var(--sf-hero-accent);
+	background: var(--sf-hero-accent);
+	transform: skewX(-14deg);
+	transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+/* SHOP PARTS — white with dark text; turns pink on hover */
+.sf-hero__button--primary {
+	color: var(--sf-hero-bg);
+	transition: color 0.25s ease;
+}
+
+.sf-hero__button--primary::before {
+	border-color: var(--sf-hero-text);
+	background: var(--sf-hero-text);
+}
+
+.sf-hero__button--primary:hover {
+	color: #ffffff;
+}
+
+.sf-hero__button--primary:hover::before {
+	border-color: var(--sf-hero-accent);
+	background: var(--sf-hero-accent);
+}
+
+/* FIND MY BIKE — gunmetal outline + icon */
+.sf-hero__button--ghost::before {
+	border-color: var(--sf-hero-metal-line);
+	background: rgba(255, 255, 255, 0.04);
+}
+
+.sf-hero__button--ghost:hover::before {
+	background: rgba(255, 255, 255, 0.1);
+}
+
+.sf-hero__button--ghost i {
+	color: var(--sf-hero-metal);
+}
+
+.sf-hero__button i {
+	transition: transform 0.25s ease;
+}
+
+.sf-hero__button:hover i {
+	transform: translateX(4px);
+}
+
+
+/* -------------------------------------------------------------
+ * 4. HIGHLIGHTS STRIP
+ *   ╱ 🏁 Designed at Sepang ╱ 🏍 Moto2 rider partner ╱ 📍 Made in Malaysia ╱
+ * ------------------------------------------------------------- */
+.sf-hero__highlights {
+	grid-column: 1;
+	grid-row: 2;
+	display: flex;
+	flex-wrap: wrap;
+	margin: 40px 0 0;
+	padding: 0;
+	list-style: none;
+	border-top: 1px solid var(--sf-hero-line);
+}
+
+.sf-hero__highlights li {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	padding: 20px 34px 4px 0;
+	margin-right: 34px;
+	font-family: var(--sf-hero-font-tech);
+	font-size: 14px;
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	position: relative;
+}
+
+/* the slanted dividers between highlights */
+.sf-hero__highlights li + li::before {
+	content: "";
+	position: absolute;
+	left: -34px;
+	top: 18px;
+	bottom: 0;
+	width: 2px;
+	background: var(--sf-hero-accent);
+	transform: skewX(var(--sf-hero-slant));
+}
+
+.sf-hero__highlights li + li {
+	padding-left: 0;
+}
+
+.sf-hero__highlights i {
+	display: grid;
+	place-items: center;
+	width: 38px;
+	height: 38px;
+	border: 1px solid var(--sf-hero-metal-line);
+	border-radius: 50%;
+	font-size: 15px;
+	color: var(--sf-hero-metal);   /* silver icon; the slanted dividers stay pink */
+}
+
+/* Copies made by hero.js for the phone scrolling strip — not needed here */
+.sf-hero__highlights .sf-hero__highlight-copy {
+	display: none;
+}
+
+.sf-hero__highlights small {
+	display: block;
+	font-family: var(--sf-hero-font-body);
+	font-size: 12px;
+	font-weight: 400;
+	letter-spacing: 0;
+	text-transform: none;
+	color: var(--sf-hero-muted);
+}
+
+
+/* -------------------------------------------------------------
+ * 5. SCROLL CUE (bottom right)
+ * ------------------------------------------------------------- */
+.sf-hero__scroll {
+	position: absolute;
+	right: clamp(20px, 5vw, 80px);
+	bottom: 34px;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	font-family: var(--sf-hero-font-tech);
+	font-size: 11px;
+	letter-spacing: 0.24em;
+	text-transform: uppercase;
+	color: var(--sf-hero-muted);
+}
+
+.sf-hero__scroll::after {
+	content: "";
+	width: 1px;
+	height: 38px;
+	background: linear-gradient(to bottom, var(--sf-hero-accent) 50%, transparent 50%) 0 0 / 1px 200%;
+	animation: sf-hero-scroll 1.6s ease-in-out infinite;
+}
+
+@keyframes sf-hero-scroll {
+	from { background-position: 0 100%; }
+	to   { background-position: 0 -100%; }
+}
+
+
+/* -------------------------------------------------------------
+ * 6. START-LIGHTS PRELOADER — moved to assets/css/preloader.css
+ * (it now shows on every page, not just here)
+ * ------------------------------------------------------------- */
+
+
+/* -------------------------------------------------------------
+ * 7. RESPONSIVE
+ * ------------------------------------------------------------- */
+@media (max-width: 1024px) {
+	.sf-hero {
+		row-gap: 40px;
+		padding-top: calc(var(--sf-hero-under) + 34px);
+	}
+
+	.sf-hero__highlights {
+		margin-top: 0;
+	}
+
+	.sf-hero__scroll {
+		display: none;
+	}
+}
+
+@media (max-width: 640px) {
+	.sf-hero__track img {
+		width: 260px;
+		height: 160px;
+	}
+
+	/* Shade runs top → bottom on phones: dark behind the text at the
+	   top, lighter lower down so the drifting photos show through
+	   (on wide screens it runs left → right instead) */
+	.sf-hero__shade {
+		background:
+			linear-gradient(to bottom,
+				rgba(10, 10, 10, 0.87) 0%,
+				rgba(10, 10, 10, 0.69) 50%,
+				rgba(10, 10, 10, 0) 78%,
+				rgba(10, 10, 10, 0.2) 100%);
+	}
+
+	/* Buttons: full width, equal, one above the other — easy to tap.
+	   6px in from each side so the slanted ends stay on screen. */
+	.sf-hero__buttons {
+		flex-direction: column;
+		gap: 12px;
+		padding-inline: 6px;
+	}
+
+	.sf-hero__button {
+		justify-content: center;
+	}
+
+	/* Highlights become one slim strip scrolling sideways, edge to edge:
+	     🏁 DESIGNED AT SEPANG ╱ 🏍 MOTO2 PARTNER ╱ 📍 MADE IN MALAYSIA ╱ …
+	   (hero.js adds a copy of the 3 items so the loop is seamless) */
+	.sf-hero__highlights {
+		flex-wrap: nowrap;
+		width: max-content;
+		margin: 0 -20px;                 /* reach the screen edges */
+		padding: 12px 0;
+		border-top: 1px solid var(--sf-hero-line);
+		border-bottom: 1px solid var(--sf-hero-line);
+		animation: sf-hero-drift 16s linear infinite;
+	}
+
+	.sf-hero__highlights .sf-hero__highlight-copy {
+		display: flex;
+	}
+
+	.sf-hero__highlights li {
+		gap: 8px;
+		margin: 0;
+		padding: 0 18px 0 20px;
+		font-size: 12px;
+		letter-spacing: 0.08em;
+		white-space: nowrap;
+	}
+
+	/* slanted pink divider after every item */
+	.sf-hero__highlights li + li::before {
+		display: none;
+	}
+
+	.sf-hero__highlights li::after {
+		content: "";
+		width: 2px;
+		height: 18px;
+		margin-left: 18px;
+		background: var(--sf-hero-accent);
+		transform: skewX(var(--sf-hero-slant));
+	}
+
+	.sf-hero__highlights small {
+		display: none;
+	}
+
+	.sf-hero__highlights i {
+		width: 28px;
+		height: 28px;
+		font-size: 12px;
+	}
+}
+
+
+/* -------------------------------------------------------------
+ * 7b. FIT THE SCREEN (computers only — wider than 1024px)
+ * On computers the whole hero — headline, text, buttons and the
+ * highlights strip — should fit on one screen, on a big monitor or
+ * a short laptop screen. So sizes follow the screen's HEIGHT as well
+ * as its width: min(… vw, … svh) picks whichever is smaller.
+ *   vw  = 1% of the screen width
+ *   svh = 1% of the screen height
+ * Each size also has a smallest and largest value (clamp), so text
+ * never gets too tiny or too huge. Tablets and phones: section 7.
+ * ------------------------------------------------------------- */
+@media (min-width: 1025px) {
+	/* Rows: headline block / gap / highlights strip. The gap between
+	   the buttons and the strip grows with the screen but never more
+	   than 12% of the screen height; any extra height goes below the
+	   strip, where only the drifting photos show. */
+	.sf-hero {
+		grid-template-rows: auto minmax(min(40px, 3svh), calc(12svh + 20px)) auto;
+		align-content: start;
+		/* gap under the navbar: grows on taller screens (10% of the height
+		   minus 30px), never less than the short-screen gap */
+		padding-top: calc(var(--sf-hero-under) + max(min(44px, 4svh) + 38px, 10svh - 5px));
+		padding-bottom: min(40px, 3.5svh);
+	}
+
+	.sf-hero__eyebrow {
+		margin-bottom: min(22px, 2.2svh);
+		font-size: 12px;
+	}
+
+	.sf-hero__headline {
+		font-size: clamp(40px, min(5vw, 9svh), 84px);
+	}
+
+	.sf-hero__text {
+		max-width: 500px;
+		margin: min(24px, 2.6svh) 0 min(28px, 3svh);
+		font-size: clamp(14px, min(1.05vw, 1.9svh), 17px);
+	}
+
+	.sf-hero__button {
+		padding: min(14px, 1.5svh) 26px;
+		font-size: 13px;
+	}
+
+	.sf-hero__highlights {
+		grid-row: 3;
+		margin-top: 0;
+	}
+
+	.sf-hero__highlights li {
+		padding-top: min(20px, 2svh);
+	}
+}
+
+
+/* Short computer screens (700px tall or less, e.g. 1366 × 657 laptops):
+   a tighter gap between the buttons and the highlights strip */
+@media (min-width: 1025px) and (max-height: 700px) {
+	.sf-hero {
+		grid-template-rows: auto minmax(min(40px, 3svh), calc(7svh + 20px)) auto;
+	}
+}
+
+
+/* -------------------------------------------------------------
+ * 8. REDUCE MOTION — calm version for people who ask for it
+ * ------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+	.sf-hero *,
+	.sf-hero *::before,
+	.sf-hero *::after {
+		animation: none !important;
+		transition: none !important;
+	}
+}

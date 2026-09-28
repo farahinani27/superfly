@@ -1,0 +1,95 @@
+{
+	"$schema": "https://schemas.wp.org/wp/6.5/theme.json",
+	"version": 2,
+	"customTemplates": [
+		{
+			"name": "page-full-width",
+			"postTypes": [
+				"page"
+			],
+			"title": "Full Width (no title)"
+		},
+		{
+			"name": "page-no-title",
+			"postTypes": [
+				"page"
+			],
+			"title": "Page No Title"
+		},
+		{
+			"name": "page-with-sidebar",
+			"postTypes": [
+				"page"
+			],
+			"title": "Page with Sidebar"
+		},
+		{
+			"name": "page-wide",
+			"postTypes": [
+				"page"
+			],
+			"title": "Page with Wide Image"
+		},
+		{
+			"name": "single-with-sidebar",
+			"postTypes": [
+				"post"
+			],
+			"title": "Single with Sidebar"
+		}
+	],
+	"settings": {
+		"color": {
+			"palette": [
+				{
+					"slug": "base",
+					"color": "#0a0a0a",
+					"name": "Base"
+				},
+				{
+					"slug": "contrast",
+					"color": "#f2f2f4",
+					"name": "Contrast"
+				},
+				{
+					"slug": "accent-1",
+					"color": "#ec1e79",
+					"name": "Superfly pink"
+				},
+				{
+					"slug": "accent-2",
+					"color": "#131317",
+					"name": "Panel"
+				},
+				{
+					"slug": "accent-3",
+					"color": "#15151a",
+					"name": "Panel light"
+				},
+				{
+					"slug": "accent-4",
+					"color": "rgba(242,242,244,0.58)",
+					"name": "Muted"
+				},
+				{
+					"slug": "accent-5",
+					"color": "rgba(242,242,244,0.12)",
+					"name": "Line"
+				}
+			]
+		}
+	},
+	"styles": {
+		"color": {
+			"background": "var(--wp--preset--color--base)",
+			"text": "var(--wp--preset--color--contrast)"
+		},
+		"elements": {
+			"link": {
+				"color": {
+					"text": "var(--wp--preset--color--accent-1)"
+				}
+			}
+		}
+	}
+}

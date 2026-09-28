@@ -1,0 +1,387 @@
+/* =============================================================
+ * SUPERFLY — FOOTER
+ * The shop's statement and address on the left, two link columns
+ * hard against the right, and the word SUPERFLY across the bottom
+ * with a light that follows the cursor.
+ *
+ * The light: the word is drawn TWICE in one <svg> (parts/footer.html),
+ * once in near-black and once filled with a radial gradient whose
+ * centre is moved to the pointer by assets/js/footer.js — so only the
+ * letters catch it and the glow reads as light on metal.
+ * -------------------------------------------------------------
+ *  BUILT IN JOHOR BAHRU,                    SERVICE      LEGAL
+ *  FITTED ON BIKES EVERYWHERE               FAQ          Contact
+ *  Rims, suspension and brakes …            Fitting …    Terms …
+ *  WORKSHOP        TALK TO US
+ *  3 Jalan Tiong … 07-350 7086
+ *  ─────────────────────────────────────────────────────────────
+ *  [logo] f ig yt                    © 2026 Superfly · SST line
+ *  S U P E R F L Y  ← the word, bleeding off both edges
+ * ============================================================= */
+
+/* The block theme leaves a gap above the footer (its own block spacing),
+   which showed as a strip of page background between the last section and
+   this one. Close it, and let the footer start straight out of the section
+   above instead of drawing another line across the page. */
+.wp-site-blocks > footer,
+footer.wp-block-template-part {
+	margin-top: 0;
+	margin-block-start: 0;
+}
+
+.sf-pf {
+	--pf-bg:     #0a0a0b;
+	--pf-text:   #f2f2f4;
+	--pf-muted:  rgba(242, 242, 244, 0.78);
+	--pf-faint:  rgba(242, 242, 244, 0.42);
+	--pf-line:   rgba(242, 242, 244, 0.16);
+	--pf-link:   #878787;            /* the footer links, a shade below the body text */
+	--pf-accent: #ec1e79;
+	--pf-title:  "Archivo Black", "Arial Black", sans-serif;
+	--pf-body:   "Archivo", "Inter", sans-serif;
+	--pf-tech:   "Chakra Petch", "Archivo", sans-serif;
+	--pf-mono:   "Space Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+	position: relative;
+	overflow: hidden;                /* the word is cut by the footer */
+	box-sizing: border-box;
+	background: var(--pf-bg);
+	border-top: 1px solid var(--pf-line);
+	color: var(--pf-text);
+	font-family: var(--pf-body);
+	isolation: isolate;
+}
+
+.sf-pf *,
+.sf-pf *::before,
+.sf-pf *::after {
+	box-sizing: border-box;
+}
+
+/* ---- the word ---- */
+/* taller than the room it is given and pinned low, so the letters bleed
+   off both sides and are cut along the bottom */
+.sf-pf__word {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: clamp(-150px, -10vw, -60px);   /* dropped, so it clears the text above */
+	width: 100%;
+	height: clamp(220px, 27vw, 430px);
+	z-index: 0;
+	pointer-events: none;            /* the light is driven by the footer */
+}
+
+.sf-pf__word text {
+	font-family: var(--pf-title);
+	font-size: 250px;
+}
+
+/* the emboss: the word is drawn three times - a dark edge below, a light
+   edge above, the face over both. The two edges are blurred, so instead
+   of a hard second outline they read as light falling on a rounded edge.
+   Only the edges are blurred and neither of them ever changes, so the
+   blur is painted once and kept; the face and the moving light above it
+   stay sharp and cost nothing to redraw. */
+.sf-pf__word-lo {                             /* the shadow, nudged down-right */
+	fill: #000000;
+	opacity: 0.7;
+	filter: blur(3px);
+}
+
+.sf-pf__word-hi {                             /* the highlight, nudged up-left */
+	fill: #23232a;
+	filter: blur(3px);
+}
+
+.sf-pf__word-base { fill: #141418; }          /* the face, just off the background */
+
+/* the lit copy is hidden until the pointer is over the word itself —
+   moving across the sign-up or the links lights nothing */
+.sf-pf__word-lit {
+	opacity: 0;
+	transition: opacity 0.35s ease;
+}
+
+.sf-pf.is-lit .sf-pf__word-lit { opacity: 1; }
+
+.sf-pf__in {
+	position: relative;
+	z-index: 1;
+	max-width: 1800px;
+	margin-inline: auto;
+	padding: clamp(48px, 6vw, 84px) clamp(20px, 3.4vw, 62px) clamp(26px, 3vw, 40px);
+}
+
+.sf-pf__top {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: clamp(40px, 6vw, 120px);
+	padding-bottom: 100px;
+}
+
+/* ---- the statement ---- */
+.sf-pf__lead { max-width: 760px; }
+
+.sf-pf__shout {
+	margin: 0 0 32px;                /* the line that sat here is gone */
+	max-width: 34ch;                 /* two lines at most, like the reference */
+	font-family: var(--pf-title);
+	font-weight: 400;
+	font-size: clamp(20px, 1.6vw, 30px);
+	line-height: 1.08;
+	letter-spacing: -0.005em;
+	text-transform: uppercase;
+	color: var(--pf-text);
+}
+
+/* ---- the sign-up ---- */
+.sf-pf__form {
+	display: flex;
+	align-items: stretch;
+	gap: clamp(14px, 1.6vw, 26px);
+	max-width: 620px;
+}
+
+.sf-pf__field {
+	display: flex;
+	flex: 1;
+}
+
+.sf-pf__field input {
+	width: 100%;
+	padding: 20px;
+	background: none;
+	border: 1px solid var(--pf-line);
+	font-family: var(--pf-body);
+    font-size: clamp(13.5px, 0.98vw, 14.5px);
+    font-weight: 400;
+    font-style: normal;
+    letter-spacing: normal;
+    line-height: 1.25;
+	transition: border-color 0.2s ease;
+}
+
+.sf-pf__field input::placeholder { color: var(--pf-muted); }
+.sf-pf__field input:focus { border-color: var(--pf-accent); outline: none; }
+
+.sf-pf__signup {
+	padding: 20px 30px;
+	min-width: 150px;
+	background: var(--pf-accent);
+	border: 0;
+	color: #fff;
+	font-family: var(--pf-body);
+	font-size: 12px;
+	font-weight: 700;
+	text-transform: uppercase;
+	cursor: pointer;
+	transition: filter 0.2s ease;
+}
+
+.sf-pf__signup:hover { filter: brightness(1.12); }
+
+/* the field's label is for screen readers only. WordPress normally
+   defines this class, but it is spelled out here so the word "Email
+   address" can never appear above the box if that style is missing. */
+.sf-pf .screen-reader-text {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+	border: 0;
+}
+
+/* the honeypot: out of sight for a person, still fillable by a bot */
+.sf-pf__pot {
+	position: absolute;
+	left: -9999px;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+}
+
+/* what happens after you press Sign up */
+.sf-pf__note {
+	margin: 18px 0 0;
+	padding: 12px 16px;
+	border-left: 2px solid var(--pf-accent);
+	background: rgba(236, 30, 121, 0.08);
+	font-family: var(--pf-mono);
+	font-size: 12.5px;
+	line-height: 1.6;
+	color: var(--pf-text);
+}
+
+.sf-pf__note[hidden] { display: none; }
+
+.sf-pf__small {
+    margin: 26px 0 0;
+    max-width: 66ch;
+    font-family: var(--pf-body);
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: var(--pf-link);
+	line-height: 2em;
+}
+
+.sf-pf__small a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.sf-pf__small a:hover { color: var(--pf-accent); }
+
+/* ---- the two columns ---- */
+.sf-pf__nav {
+	display: flex;
+	flex: none;
+	gap: clamp(40px, 5vw, 96px);
+}
+
+.sf-pf__nav > div { min-width: 150px; }
+
+.sf-pf__h {
+	margin: 0 0 20px;
+	font-family: var(--pf-mono);
+	font-size: 12px;
+	font-weight: 700;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--pf-accent);
+}
+
+.sf-pf__list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.sf-pf__list li { margin: 0 0 9px; }         /* 9 + an 18px line = 27px apart */
+
+.sf-pf__list a {
+	color: var(--pf-link);
+	text-decoration: none;
+	font-size: clamp(13.5px, 0.98vw, 14.5px);
+	line-height: 1.25;
+	transition: color 0.2s ease;
+}
+
+.sf-pf__list a:hover,
+.sf-pf__list a:focus-visible { color: var(--pf-text); }
+
+/* ---- the bar, on top of the word ---- */
+.sf-pf__bar {
+	display: flex;
+	align-items: flex-end;
+	justify-content: space-between;
+	gap: 30px;
+}
+
+.sf-pf__badge {
+	display: flex;
+	align-items: center;
+	gap: clamp(18px, 2vw, 34px);
+}
+
+.sf-pf__badge img {
+	width: clamp(120px, 10vw, 150px);
+	height: auto;
+}
+
+.sf-pf__social {
+	display: flex;
+	gap: 16px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.sf-pf__social a {
+	color: var(--pf-text);
+	text-decoration: none;
+	font-size: 17px;
+	transition: color 0.2s ease;
+}
+
+.sf-pf__social a:hover { color: var(--pf-accent); }
+
+.sf-pf__legal {
+	text-align: right;
+	font-size: 13.5px;
+	line-height: 1.6;
+	color: #878787 ;
+}
+
+.sf-pf__legal p { margin: 0; }
+.sf-pf__legal span { color: var(--pf-faint); }
+
+.sf-pf__addr {
+	margin: 0 0 4px;
+	font-style: normal;
+    color: #878787;
+}
+
+.sf-pf__tel {
+	color: #878787;  
+	text-decoration: none;
+	transition: color 0.2s ease;
+}
+
+.sf-pf__tel:hover { color: var(--pf-accent); }
+
+/* ---- the one piece of movement: it settles in as you reach it ---- */
+.sf-pf.is-ready .sf-pf__top > *,
+.sf-pf.is-ready .sf-pf__bar {
+	opacity: 0;
+	transform: translateY(10px);
+}
+
+.sf-pf.is-in .sf-pf__top > *,
+.sf-pf.is-in .sf-pf__bar {
+	opacity: 1;
+	transform: none;
+	transition: opacity 0.45s ease, transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.sf-pf.is-in .sf-pf__top > :nth-child(2) { transition-delay: 0.06s; }
+.sf-pf.is-in .sf-pf__bar { transition-delay: 0.12s; }
+
+/* ---- phones + tablets ---- */
+@media (max-width: 1100px) {
+	.sf-pf__top {
+		flex-direction: column;
+		gap: 52px;
+		padding-bottom: 40px;
+	}
+
+	.sf-pf__nav { width: 100%; justify-content: flex-start; }
+	.sf-pf__shout { max-width: none; }
+}
+
+@media (max-width: 640px) {
+	.sf-pf__form { flex-direction: column; }
+	.sf-pf__signup { width: 100%; }
+
+	.sf-pf__bar { flex-direction: column; align-items: flex-start; gap: 22px; }
+	.sf-pf__legal { text-align: left; }
+	.sf-pf__nav { flex-direction: column; gap: 34px; }
+}
+
+/* no pointer to follow: leave the word softly lit rather than dark */
+@media (hover: none) {
+	.sf-pf__word-lit { opacity: 0.5; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.sf-pf__word-lit { transition: none; }
+
+	.sf-pf.is-ready .sf-pf__top > *,
+	.sf-pf.is-ready .sf-pf__bar { opacity: 1; transform: none; }
+}

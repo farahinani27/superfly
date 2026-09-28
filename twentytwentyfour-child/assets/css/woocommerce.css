@@ -1,0 +1,934 @@
+/* =============================================================
+ * SUPERFLY — SHOP PAGES
+ * The shop, the category pages, the product pages, the cart and
+ * the checkout are drawn by WooCommerce with Twenty Twenty-Four's
+ * own look — white background, serif headings. This makes them
+ * match the rest of the site: dark, carbon, pink.
+ * -------------------------------------------------------------
+ * Nothing here changes what anything does; it is all colour,
+ * type and spacing. The markup is WooCommerce's own.
+ *
+ * CONTENTS
+ *   1. Settings
+ *   2. The page itself
+ *   3. Headings and the toolbar above the grid
+ *   4. The product grid
+ *   5. One product
+ *   6. Tabs and related products
+ *   7. Notices, cart and checkout
+ *   8. Phones
+ * ============================================================= */
+
+
+/* -------------------------------------------------------------
+ * 1. SETTINGS
+ * ------------------------------------------------------------- */
+.woocommerce,
+.woocommerce-page,
+body.woocommerce,
+body.woocommerce-page {
+	--wc-bg:     #0a0a0a;
+	--wc-panel:  #131317;
+	--wc-text:   #f2f2f4;
+	--wc-muted:  rgba(242, 242, 244, 0.58);
+	--wc-faint:  rgba(242, 242, 244, 0.34);
+	--wc-line:   rgba(242, 242, 244, 0.12);
+	--wc-accent: #ec1e79;
+	--wc-title:  "Archivo Black", "Arial Black", sans-serif;
+	--wc-body:   "Archivo", "Inter", sans-serif;
+	--wc-tech:   "Chakra Petch", "Archivo", sans-serif;
+	--wc-carbon:
+		repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.025) 0 2px, transparent 2px 4px),
+		repeating-linear-gradient(-45deg, rgba(0, 0, 0, 0.35) 0 2px, transparent 2px 4px);
+}
+
+
+/* -------------------------------------------------------------
+ * 2. THE PAGE ITSELF
+ * ------------------------------------------------------------- */
+body.woocommerce,
+body.woocommerce-page {
+	background: var(--wc-carbon), var(--wc-bg);
+	color: var(--wc-text);
+	font-family: var(--wc-body);
+}
+
+body.woocommerce .wp-site-blocks,
+body.woocommerce-page .wp-site-blocks {
+	background: transparent;
+}
+
+body.woocommerce a,
+body.woocommerce-page a {
+	color: var(--wc-text);
+}
+
+body.woocommerce a:hover,
+body.woocommerce-page a:hover {
+	color: var(--wc-accent);
+}
+
+
+/* -------------------------------------------------------------
+ * 3. HEADINGS + THE TOOLBAR ABOVE THE GRID
+ * ------------------------------------------------------------- */
+.woocommerce-products-header__title,
+.wp-block-query-title,
+.woocommerce-products-header h1,
+body.woocommerce h1.entry-title {
+	margin: 0 0 6px;
+	font-family: var(--wc-title);
+	font-weight: 400;
+	font-size: clamp(30px, 4.4vw, 60px);
+	line-height: 1.02;
+	text-transform: uppercase;
+	color: var(--wc-text);
+}
+
+.term-description {
+	max-width: 62ch;
+	color: var(--wc-muted);
+	font-size: 15px;
+}
+
+.woocommerce-result-count {
+	margin: 0;
+	font-family: var(--wc-tech);
+	font-size: 11px;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: var(--wc-faint);
+}
+
+.woocommerce-ordering select,
+.woocommerce select,
+.woocommerce-page select {
+	padding: 10px 14px;
+	background: var(--wc-panel);
+	border: 1px solid var(--wc-line);
+	color: var(--wc-text);
+	font-family: var(--wc-tech);
+	font-size: 12px;
+	letter-spacing: 0.08em;
+}
+
+.woocommerce-ordering select:focus,
+.woocommerce select:focus {
+	border-color: var(--wc-accent);
+	outline: none;
+}
+
+
+/* -------------------------------------------------------------
+ * 4. THE PRODUCT GRID
+ * ------------------------------------------------------------- */
+.woocommerce ul.products li.product,
+.woocommerce-page ul.products li.product {
+	position: relative;
+	padding: 0 0 18px;
+	background: var(--wc-panel);
+	border: 1px solid var(--wc-line);
+	transition: border-color 0.25s ease, transform 0.25s ease;
+}
+
+.woocommerce ul.products li.product:hover {
+	border-color: rgba(236, 30, 121, 0.55);
+	transform: translateY(-3px);
+}
+
+.woocommerce ul.products li.product a img {
+	margin: 0 0 14px;
+	background: #fff;            /* the product photos are cut out on white */
+	aspect-ratio: 1 / 1;
+	object-fit: cover;
+}
+
+.woocommerce ul.products li.product .woocommerce-loop-product__title {
+	padding: 0 16px;
+	font-family: var(--wc-body);
+	font-size: 14.5px;
+	font-weight: 600;
+	line-height: 1.35;
+	color: var(--wc-text);
+}
+
+.woocommerce ul.products li.product .price {
+	display: block;
+	padding: 0 16px;
+	margin-top: 6px;
+	font-family: var(--wc-tech);
+	font-size: 16px;
+	font-weight: 700;
+	color: var(--wc-accent);
+}
+
+.woocommerce ul.products li.product .price del {
+	color: var(--wc-faint);
+	font-weight: 500;
+}
+
+.woocommerce ul.products li.product .price ins {
+	text-decoration: none;
+}
+
+.woocommerce ul.products li.product .button,
+.woocommerce ul.products li.product .added_to_cart {
+	display: inline-block;
+	margin: 14px 16px 0;
+	padding: 11px 18px;
+	background: transparent;
+	border: 1px solid var(--wc-line);
+	border-radius: 0;
+	color: var(--wc-text);
+	font-family: var(--wc-tech);
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.woocommerce ul.products li.product .button:hover,
+.woocommerce ul.products li.product .added_to_cart:hover {
+	background: var(--wc-accent);
+	border-color: var(--wc-accent);
+	color: #fff;
+}
+
+.woocommerce span.onsale,
+.woocommerce ul.products li.product .onsale {
+	top: 0;
+	right: 0;
+	left: auto;
+	min-width: 0;
+	min-height: 0;
+	padding: 6px 12px;
+	border-radius: 0;
+	background: var(--wc-accent);
+	color: #fff;
+	font-family: var(--wc-tech);
+	font-size: 10px;
+	font-weight: 700;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	line-height: 1.4;
+}
+
+/* pagination */
+.woocommerce nav.woocommerce-pagination ul {
+	border: 0;
+	gap: 8px;
+	display: flex;
+}
+
+.woocommerce nav.woocommerce-pagination ul li {
+	border: 0;
+}
+
+.woocommerce nav.woocommerce-pagination ul li a,
+.woocommerce nav.woocommerce-pagination ul li span {
+	padding: 10px 15px;
+	background: var(--wc-panel);
+	border: 1px solid var(--wc-line);
+	color: var(--wc-text);
+	font-family: var(--wc-tech);
+	font-size: 12px;
+}
+
+.woocommerce nav.woocommerce-pagination ul li span.current {
+	background: var(--wc-accent);
+	border-color: var(--wc-accent);
+	color: #fff;
+}
+
+
+/* -------------------------------------------------------------
+ * 5. ONE PRODUCT
+ * ------------------------------------------------------------- */
+.woocommerce div.product .product_title {
+	font-family: var(--wc-title);
+	font-weight: 400;
+	font-size: clamp(22px, 2.6vw, 38px);
+	line-height: 1.06;
+	text-transform: uppercase;
+	color: var(--wc-text);
+}
+
+.woocommerce div.product p.price,
+.woocommerce div.product span.price {
+	margin: 10px 0 18px;
+	font-family: var(--wc-tech);
+	font-size: clamp(22px, 2.4vw, 32px);
+	font-weight: 700;
+	color: var(--wc-accent);
+}
+
+.woocommerce div.product .woocommerce-product-details__short-description,
+.woocommerce div.product .woocommerce-product-details__short-description p {
+	color: var(--wc-muted);
+	font-size: 15px;
+	line-height: 1.7;
+}
+
+.woocommerce div.product .stock {
+	font-family: var(--wc-tech);
+	font-size: 12px;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: #3ddc84;
+}
+
+.woocommerce div.product .out-of-stock {
+	color: var(--wc-faint);
+}
+
+/* the gallery */
+.woocommerce div.product div.images img {
+	background: #fff;
+	border: 1px solid var(--wc-line);
+}
+
+.woocommerce div.product div.images .flex-control-thumbs li img {
+	opacity: 0.55;
+	transition: opacity 0.2s ease, border-color 0.2s ease;
+}
+
+.woocommerce div.product div.images .flex-control-thumbs li img:hover,
+.woocommerce div.product div.images .flex-control-thumbs li img.flex-active {
+	opacity: 1;
+	border-color: var(--wc-accent);
+}
+
+/* the fitment picker — the most important control on the page */
+.woocommerce div.product form.cart .variations {
+	margin-bottom: 18px;
+	border-top: 1px solid var(--wc-line);
+	border-bottom: 1px solid var(--wc-line);
+}
+
+.woocommerce div.product form.cart .variations th,
+.woocommerce div.product form.cart .variations td {
+	padding: 14px 0;
+	vertical-align: middle;
+}
+
+.woocommerce div.product form.cart .variations label {
+	font-family: var(--wc-tech);
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.2em;
+	text-transform: uppercase;
+	color: var(--wc-faint);
+}
+
+.woocommerce div.product form.cart .variations select {
+	min-width: 240px;
+	padding: 12px 14px;
+	background: var(--wc-panel);
+	border: 1px solid var(--wc-line);
+	color: var(--wc-text);
+	font-family: var(--wc-body);
+	font-size: 14px;
+}
+
+.woocommerce div.product form.cart .reset_variations {
+	font-family: var(--wc-tech);
+	font-size: 11px;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: var(--wc-faint);
+}
+
+.woocommerce div.product .woocommerce-variation-price {
+	margin-bottom: 14px;
+}
+
+/* quantity + add to cart */
+.woocommerce .quantity .qty,
+.woocommerce div.product form.cart .quantity .qty {
+	height: 50px;
+	width: 84px;
+	padding: 0 10px;
+	background: var(--wc-panel);
+	border: 1px solid var(--wc-line);
+	color: var(--wc-text);
+	font-family: var(--wc-tech);
+	font-size: 15px;
+	text-align: center;
+}
+
+.woocommerce div.product form.cart .button,
+.woocommerce button.button.alt,
+.woocommerce a.button.alt,
+.woocommerce #respond input#submit.alt {
+	height: 50px;
+	padding: 0 30px;
+	border: 0;
+	border-radius: 0;
+	background: var(--wc-accent);
+	color: #fff;
+	font-family: var(--wc-tech);
+	font-size: 13px;
+	font-weight: 700;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	transition: filter 0.2s ease, transform 0.2s ease;
+}
+
+.woocommerce div.product form.cart .button:hover,
+.woocommerce button.button.alt:hover,
+.woocommerce a.button.alt:hover {
+	background: var(--wc-accent);
+	filter: brightness(1.12);
+	transform: translateY(-1px);
+}
+
+/* plain buttons (continue shopping, update cart …) */
+.woocommerce .button,
+.woocommerce a.button,
+.woocommerce button.button,
+.woocommerce input.button {
+	border-radius: 0;
+	background: transparent;
+	border: 1px solid var(--wc-line);
+	color: var(--wc-text);
+	font-family: var(--wc-tech);
+	font-size: 12px;
+	font-weight: 700;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+}
+
+.woocommerce .button:hover,
+.woocommerce a.button:hover,
+.woocommerce button.button:hover,
+.woocommerce input.button:hover {
+	background: var(--wc-accent);
+	border-color: var(--wc-accent);
+	color: #fff;
+}
+
+.woocommerce div.product .product_meta {
+	margin-top: 22px;
+	padding-top: 16px;
+	border-top: 1px solid var(--wc-line);
+	font-family: var(--wc-tech);
+	font-size: 11px;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: var(--wc-faint);
+}
+
+.woocommerce div.product .product_meta a {
+	color: var(--wc-muted);
+}
+
+
+/* -------------------------------------------------------------
+ * 6. TABS + RELATED
+ * ------------------------------------------------------------- */
+.woocommerce div.product .woocommerce-tabs ul.tabs {
+	padding: 0;
+	margin: 0 0 24px;
+	border-bottom: 1px solid var(--wc-line);
+}
+
+.woocommerce div.product .woocommerce-tabs ul.tabs::before {
+	border: 0;
+}
+
+.woocommerce div.product .woocommerce-tabs ul.tabs li {
+	margin: 0 4px 0 0;
+	padding: 0;
+	border: 0;
+	border-radius: 0;
+	background: transparent;
+}
+
+.woocommerce div.product .woocommerce-tabs ul.tabs li::before,
+.woocommerce div.product .woocommerce-tabs ul.tabs li::after {
+	display: none;
+}
+
+.woocommerce div.product .woocommerce-tabs ul.tabs li a {
+	display: block;
+	padding: 13px 20px;
+	border: 1px solid transparent;
+	border-bottom: 0;
+	font-family: var(--wc-tech);
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: var(--wc-faint);
+}
+
+.woocommerce div.product .woocommerce-tabs ul.tabs li.active a {
+	background: var(--wc-panel);
+	border-color: var(--wc-line);
+	color: var(--wc-accent);
+}
+
+.woocommerce div.product .woocommerce-tabs .panel {
+	color: var(--wc-muted);
+	font-size: 15px;
+	line-height: 1.75;
+}
+
+.woocommerce div.product .woocommerce-tabs .panel h2 {
+	font-family: var(--wc-title);
+	font-weight: 400;
+	font-size: 18px;
+	text-transform: uppercase;
+	color: var(--wc-text);
+}
+
+.woocommerce table.shop_attributes th,
+.woocommerce table.shop_attributes td {
+	border-bottom: 1px solid var(--wc-line);
+	color: var(--wc-muted);
+}
+
+.woocommerce table.shop_attributes th {
+	font-family: var(--wc-tech);
+	font-size: 11px;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	color: var(--wc-faint);
+}
+
+.related.products > h2,
+.upsells.products > h2,
+.cross-sells > h2 {
+	margin-bottom: 20px;
+	font-family: var(--wc-title);
+	font-weight: 400;
+	font-size: clamp(17px, 2vw, 24px);
+	text-transform: uppercase;
+	color: var(--wc-text);
+}
+
+
+/* -------------------------------------------------------------
+ * 7. NOTICES, CART, CHECKOUT
+ * Colour only — the fields keep their own behaviour.
+ * ------------------------------------------------------------- */
+.woocommerce-message,
+.woocommerce-info,
+.woocommerce-error,
+.woocommerce-noreviews,
+p.no-comments {
+	background: var(--wc-panel);
+	border-top-color: var(--wc-accent);
+	color: var(--wc-text);
+}
+
+.woocommerce-message::before,
+.woocommerce-info::before {
+	color: var(--wc-accent);
+}
+
+.woocommerce table.shop_table,
+.woocommerce table.shop_table td,
+.woocommerce table.shop_table th,
+.woocommerce-cart table.cart td,
+.woocommerce-checkout table.shop_table td {
+	border-color: var(--wc-line);
+	color: var(--wc-text);
+}
+
+.woocommerce table.shop_table thead th {
+	font-family: var(--wc-tech);
+	font-size: 11px;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	color: var(--wc-faint);
+}
+
+.woocommerce-cart .cart-collaterals .cart_totals > h2,
+.woocommerce-checkout h3 {
+	font-family: var(--wc-title);
+	font-weight: 400;
+	text-transform: uppercase;
+	color: var(--wc-text);
+}
+
+/* form fields: dark, but still obviously fields */
+.woocommerce form .form-row input.input-text,
+.woocommerce form .form-row textarea,
+.woocommerce form .form-row select,
+.woocommerce .select2-container .select2-selection--single {
+	padding: 12px 14px;
+	background: var(--wc-panel);
+	border: 1px solid var(--wc-line);
+	color: var(--wc-text);
+	font-family: var(--wc-body);
+	font-size: 15px;
+}
+
+.woocommerce form .form-row label {
+	color: var(--wc-muted);
+	font-size: 13px;
+}
+
+.woocommerce form .form-row input.input-text:focus,
+.woocommerce form .form-row textarea:focus,
+.woocommerce form .form-row select:focus {
+	border-color: var(--wc-accent);
+	outline: none;
+}
+
+.woocommerce .select2-container--default .select2-selection--single .select2-selection__rendered {
+	color: var(--wc-text);
+	line-height: 26px;
+}
+
+
+/* -------------------------------------------------------------
+ * 8. PHONES
+ * ------------------------------------------------------------- */
+@media (max-width: 600px) {
+	.woocommerce div.product form.cart .variations select {
+		min-width: 0;
+		width: 100%;
+	}
+
+	.woocommerce div.product form.cart .button {
+		width: 100%;
+		margin-top: 12px;
+	}
+}
+
+
+/* =============================================================
+ * 9. THE BLOCK MARKUP
+ * WooCommerce 11 draws the shop, the category pages and the
+ * product page with blocks, not the classic markup above:
+ * li.wc-block-product instead of li.product, .wp-block-post-title
+ * instead of .woocommerce-loop-product__title, and so on. The
+ * classic rules stay because ShopEngine and some widgets still
+ * output the old markup.
+ * ============================================================= */
+
+/* ---- the cards ---- */
+li.wc-block-product {
+	position: relative;
+	padding-bottom: 18px;
+	background: var(--wc-panel);
+	border: 1px solid var(--wc-line);
+	transition: border-color 0.25s ease, transform 0.25s ease;
+}
+
+li.wc-block-product:hover {
+	border-color: rgba(236, 30, 121, 0.55);
+	transform: translateY(-3px);
+}
+
+li.wc-block-product .wc-block-components-product-image {
+	margin: 0 0 14px;
+}
+
+li.wc-block-product .wc-block-components-product-image img {
+	background: #fff;            /* the photos are cut out on white */
+	width: 100%;
+}
+
+li.wc-block-product .wp-block-post-title {
+	margin: 0;
+	padding: 0 16px;
+	font-family: var(--wc-body);
+	font-size: 14.5px;
+	font-weight: 600;
+	line-height: 1.4;
+}
+
+li.wc-block-product .wp-block-post-title a {
+	color: var(--wc-text);
+	text-decoration: none;
+}
+
+li.wc-block-product .wp-block-post-title a:hover {
+	color: var(--wc-accent);
+}
+
+li.wc-block-product .wc-block-components-product-price,
+.wc-block-components-product-price {
+	padding: 0 16px;
+	font-family: var(--wc-tech);
+	font-weight: 700;
+	color: var(--wc-accent);
+}
+
+li.wc-block-product .wc-block-components-product-price del {
+	color: var(--wc-faint);
+	font-weight: 500;
+}
+
+/* add to cart inside a card */
+li.wc-block-product .wp-block-button__link,
+li.wc-block-product .wc-block-components-product-button .wp-block-button__link {
+	margin: 0 16px;
+	padding: 11px 18px;
+	border: 1px solid var(--wc-line);
+	border-radius: 0;
+	background: transparent;
+	color: var(--wc-text);
+	font-family: var(--wc-tech);
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+li.wc-block-product .wp-block-button__link:hover {
+	background: var(--wc-accent);
+	border-color: var(--wc-accent);
+	color: #fff;
+}
+
+/* the wishlist heart ShopEngine adds to each card */
+li.wc-block-product .shopengine-wishlist {
+	color: var(--wc-faint);
+}
+
+li.wc-block-product .shopengine-wishlist:hover {
+	color: var(--wc-accent);
+}
+
+/* ---- the bar above the grid ---- */
+.wc-block-product-results-count,
+.wc-block-catalog-sorting {
+	font-family: var(--wc-tech);
+	font-size: 11px;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	color: var(--wc-faint);
+}
+
+.wc-block-catalog-sorting select,
+.wc-block-components-sort-select__select {
+	padding: 10px 14px;
+	background: var(--wc-panel);
+	border: 1px solid var(--wc-line);
+	color: var(--wc-text);
+	font-family: var(--wc-tech);
+	font-size: 12px;
+}
+
+.wc-block-components-sale-badge,
+.wc-block-components-product-badge {
+	border-radius: 0;
+	background: var(--wc-accent);
+	border-color: var(--wc-accent);
+	color: #fff;
+	font-family: var(--wc-tech);
+	font-size: 10px;
+	font-weight: 700;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+}
+
+/* ---- one product, block version ---- */
+.wp-block-woocommerce-product-image-gallery img {
+	background: #fff;
+	border: 1px solid var(--wc-line);
+}
+
+body.single-product .wp-block-post-title {
+	font-family: var(--wc-title);
+	font-weight: 400;
+	font-size: clamp(22px, 2.6vw, 38px);
+	line-height: 1.06;
+	text-transform: uppercase;
+	color: var(--wc-text);
+}
+
+body.single-product .wp-block-woocommerce-product-price .wc-block-components-product-price {
+	padding: 0;
+	font-size: clamp(22px, 2.4vw, 32px);
+}
+
+.wc-block-add-to-cart-form .quantity input,
+.wc-block-components-quantity-selector input {
+	background: var(--wc-panel);
+	border: 1px solid var(--wc-line);
+	color: var(--wc-text);
+	font-family: var(--wc-tech);
+}
+
+/* only the real add-to-cart button — not every button in the form
+   (ShopEngine puts its wishlist button in here too) */
+.wc-block-add-to-cart-form .single_add_to_cart_button,
+.wc-block-add-to-cart-form button[type="submit"] {
+	border-radius: 0;
+	background: var(--wc-accent);
+	border: 0;
+	color: #fff;
+	font-family: var(--wc-tech);
+	font-size: 13px;
+	font-weight: 700;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+}
+
+.wp-block-woocommerce-product-details,
+.wp-block-woocommerce-product-details p,
+.wc-block-components-product-details {
+	color: var(--wc-muted);
+}
+
+.wp-block-woocommerce-product-details h2,
+.wp-block-woocommerce-product-details h3 {
+	font-family: var(--wc-title);
+	font-weight: 400;
+	text-transform: uppercase;
+	color: var(--wc-text);
+}
+
+/* the mini cart drawer */
+.wc-block-mini-cart__drawer,
+.wc-block-components-drawer {
+	background: var(--wc-panel);
+	color: var(--wc-text);
+}
+
+
+/* ShopEngine's wishlist button: a quiet outline, not a pink slab */
+.shopengine_add_to_list_action,
+.shopengine-wishlist,
+button.shopengine-wishlist {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	width: fit-content;                  /* it stretches to the column otherwise */
+	padding: 8px 14px;
+	background: transparent;
+	border: 1px solid var(--wc-line);
+	border-radius: 0;
+	color: var(--wc-faint);
+	font-family: var(--wc-tech);
+	font-size: 11px;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.shopengine_add_to_list_action:hover,
+.shopengine-wishlist:hover {
+	background: transparent;
+	border-color: var(--wc-accent);
+	color: var(--wc-accent);
+}
+
+/* the tabs again, without the div.product the block markup does not have */
+.woocommerce-tabs ul.tabs li a,
+.wc-tabs li a {
+	font-family: var(--wc-tech);
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: var(--wc-faint);
+}
+
+.woocommerce-tabs ul.tabs li.active a,
+.wc-tabs li.active a {
+	color: var(--wc-accent);
+}
+
+
+/* =============================================================
+ * 10. PAGE TITLES
+ * The shop and the category pages printed their name in huge type
+ * ("OTHER", "SUSPENSIONS") right under a breadcrumb that already
+ * says it. Take it off the page — but keep it in the markup, so
+ * search engines and screen readers still get the heading.
+ * My account keeps its visible title; you asked for that one.
+ * The product title is .wp-block-post-title on a single product
+ * and is left alone — that is the product's name, not a page title.
+ * ============================================================= */
+body.woocommerce h1.wp-block-query-title,
+body.woocommerce-page h1.wp-block-query-title,
+body.woocommerce h1.woocommerce-products-header__title,
+body.woocommerce-cart h1.wp-block-post-title,
+body.woocommerce-checkout h1.wp-block-post-title {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	clip-path: inset(50%);
+	white-space: nowrap;
+	border: 0;
+}
+
+
+/* =============================================================
+ * 11. "NO RESULTS FOUND"
+ * WooCommerce's own empty-category block, kept exactly as it is —
+ * same markup, same words, same two links. Plain: a short pink
+ * dash, the message, the line underneath. No box, no animation.
+ *
+ * Shows wherever a listing comes back empty: a category with no
+ * products, a search with no hits, filters that match nothing.
+ * ============================================================= */
+.wp-block-woocommerce-product-collection-no-results {
+	/* the page has nothing else on it, so give the message room to sit in
+	   rather than leaving it stranded under the breadcrumb */
+	display: grid;
+	align-content: center;
+	min-height: 40svh;
+	padding: clamp(56px, 9vh, 96px) 0;
+	text-align: center;
+}
+
+/* the dash above the message */
+.wp-block-woocommerce-product-collection-no-results > .wp-block-group::before {
+	content: "";
+	display: block;
+	width: 28px;
+	height: 2px;
+	margin: 0 auto 20px;
+	background: var(--wc-accent);
+}
+
+.wp-block-woocommerce-product-collection-no-results p {
+	margin: 0;
+}
+
+.wp-block-woocommerce-product-collection-no-results p:first-of-type strong {
+	display: block;
+	font-family: var(--wc-title);
+	font-weight: 400;
+	font-size: clamp(18px, 2.2vw, 26px);
+	line-height: 1.1;
+	text-transform: uppercase;
+	color: var(--wc-text);
+}
+
+.wp-block-woocommerce-product-collection-no-results p:last-of-type {
+	margin-top: 12px;
+	font-size: 14px;
+	line-height: 1.7;
+	color: var(--wc-muted);
+}
+
+/* body-first: section 2 sets `body.woocommerce a` and would otherwise
+   win, leaving these links white */
+body.woocommerce .wp-block-woocommerce-product-collection-no-results a,
+body.woocommerce-page .wp-block-woocommerce-product-collection-no-results a,
+.wp-block-woocommerce-product-collection-no-results a {
+	color: var(--wc-accent);
+	text-decoration: none;
+	border-bottom: 1px solid rgba(236, 30, 121, 0.45);
+	transition: border-color 0.2s ease;
+}
+
+body.woocommerce .wp-block-woocommerce-product-collection-no-results a:hover,
+body.woocommerce-page .wp-block-woocommerce-product-collection-no-results a:hover {
+	color: var(--wc-accent);
+	border-bottom-color: var(--wc-accent);
+}

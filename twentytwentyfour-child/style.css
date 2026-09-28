@@ -1,0 +1,38 @@
+/*
+	Theme Name:		Twenty Twenty-Four Child
+	Description:	Superfly child theme of Twenty Twenty-Four (superfly.durianbikers.com)
+	Author:			Durian Bikers
+	Template:		twentytwentyfour
+	Version:		1.0.0
+	Text Domain:	twentytwentyfour-child
+*/
+
+
+/*------------------------------------------------------------*/ 
+/*                          HEADER STYLE                         */
+/*------------------------------------------------------------*/ 
+
+
+/*------------------------------------------------------------*/
+/*                      THE FOCUS OUTLINE                      */
+/*------------------------------------------------------------*/
+/* Twenty Twenty-Four draws a 2px outline round ANYTHING focused:
+ *   :where(.wp-site-blocks *:focus){outline-width:2px;outline-style:solid}
+ * It has no colour of its own, so it takes the element's text colour —
+ * which is why a pink link or button gets a pink box round it. And it
+ * uses :focus, so it appears on a plain mouse click, not only when
+ * someone is moving through the page with the keyboard.
+ *
+ * This takes it off the click and leaves it for the keyboard. The ring
+ * is not removed outright: without it, anyone navigating by Tab has no
+ * way to tell where they are on the page. */
+.wp-site-blocks *:focus:not(:focus-visible) {
+	outline: none;
+}
+
+/* and when it is a keyboard, make it Superfly's pink with a little air,
+   rather than whatever colour the text happens to be */
+.wp-site-blocks *:focus-visible {
+	outline: 2px solid #ec1e79;
+	outline-offset: 2px;
+}

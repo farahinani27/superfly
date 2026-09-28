@@ -1,0 +1,49 @@
+/* =============================================================
+ * SUPERFLY — THE SCROLLBAR
+ * Windows draws a grey bar with an arrow at each end, which sits
+ * badly on a black page. This makes it a pink rail: a faint
+ * track, a solid Superfly-pink thumb, no arrows.
+ * -------------------------------------------------------------
+ * Chrome, Edge and Safari read the ::-webkit-scrollbar rules.
+ * Firefox only accepts a width and two colours, so it gets the
+ * same idea in the two properties it understands.
+ * Phones are untouched: iOS and Android overlay their own bar
+ * while scrolling and hide it afterwards.
+ * ============================================================= */
+
+html {
+	scrollbar-width: thin;
+	scrollbar-color: #ec1e79 rgba(255, 255, 255, 0.04);
+}
+
+/* the bar itself */
+::-webkit-scrollbar {
+	width: 10px;
+	height: 10px;                       /* for anything that scrolls sideways */
+}
+
+::-webkit-scrollbar-track {
+	background: rgba(255, 255, 255, 0.04);
+}
+
+::-webkit-scrollbar-thumb {
+	background: #ec1e79;
+	border: 0;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: #ff3b90;
+}
+
+/* where the two bars meet in a corner */
+::-webkit-scrollbar-corner {
+	background: rgba(255, 255, 255, 0.04);
+}
+
+/* the arrow buttons at each end — the thing that looks most like
+   Windows rather than Superfly */
+::-webkit-scrollbar-button {
+	display: none;
+	width: 0;
+	height: 0;
+}

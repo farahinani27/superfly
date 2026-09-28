@@ -1,0 +1,591 @@
+/* =============================================================
+ * SUPERFLY — PROJECT RP: LIVERY (third home section)
+ * -------------------------------------------------------------
+ *   // NEW · PROJECT RP            ╱███████████████████████
+ *   RADIAL BRAKE                  ╱█  film, muted, looping   → runs off
+ *   MASTER PUMP.                 ▌╱██      ( ▶ SOUND )          the edge
+ *   01 ▬▬ 02 ── 03 ── 04 ──         ▌╱███   ← pink circle follows
+ *   14·16·19 MM   (one at a time,  ▌╱████     the mouse
+ *   huge, changing by itself)    ▌╱██████████████████████████
+ *                                 ↑ pink livery stripe, text running up it
+ *   [ SHOP PROJECT RP → ]
+ * No boxes: the film is cut on the same slant as the hero and runs
+ * off the right edge of the screen; the specs show one at a time,
+ * huge, like a pit board.
+ * Movement: assets/js/rp-livery.js
+ *
+ * CONTENTS
+ *   1. Settings (edit me)
+ *   2. Section + layout
+ *   3. Words
+ *   4. Pit board (one spec at a time)
+ *   5. Buttons
+ *   6. The film (slanted, off the edge)
+ *   7. Livery stripe + ticker
+ *   8. "Sound" cursor
+ *   9. Video pop-up (with sound)
+ *  10. Tablets + phones
+ *  11. Reduce motion
+ * ============================================================= */
+
+
+/* -------------------------------------------------------------
+ * 1. SETTINGS (edit me)
+ * ------------------------------------------------------------- */
+.sf-livery,
+.sf-livery-modal {
+	--sf-livery-bg:         #0a0a0a;
+	--sf-livery-text:       #f5f5f5;
+	--sf-livery-muted:      rgba(245, 245, 245, 0.55);
+	--sf-livery-line:       rgba(245, 245, 245, 0.14);
+	--sf-livery-accent:     #ec1e79;                  /* Superfly pink */
+	--sf-livery-film-h:     clamp(420px, 72svh, 720px); /* height of the film */
+	--sf-livery-slant:      0.2126;                   /* tan(12°): how much the film's left edge leans */
+	--sf-livery-stripe:     26px;                     /* width of the pink livery stripe */
+	--sf-livery-font-title: "Archivo Black", "Arial Black", sans-serif;
+	--sf-livery-font-body:  "Archivo", "Inter", sans-serif;
+	--sf-livery-font-tech:  "Chakra Petch", "Archivo", sans-serif;
+}
+
+
+/* -------------------------------------------------------------
+ * 2. SECTION + LAYOUT — words left, film right (off the edge)
+ * ------------------------------------------------------------- */
+.sf-livery {
+	position: relative;
+	display: grid;
+	grid-template-columns: minmax(0, 44%) minmax(0, 1fr);
+	align-items: center;
+	min-height: calc(var(--sf-livery-film-h) + 2 * clamp(56px, 7vw, 110px));
+	padding: clamp(56px, 7vw, 110px) 0 clamp(56px, 7vw, 110px) clamp(20px, 5vw, 80px);
+	box-sizing: border-box;
+	overflow: hidden;
+	background: var(--sf-livery-bg);
+	color: var(--sf-livery-text);
+	font-family: var(--sf-livery-font-body);
+}
+
+
+/* -------------------------------------------------------------
+ * 3. WORDS
+ * ------------------------------------------------------------- */
+.sf-livery__text {
+	position: relative;
+	z-index: 2;
+	padding-right: clamp(16px, 3vw, 48px);
+}
+
+.sf-livery__eyebrow {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin: 0 0 16px;
+	font-family: var(--sf-livery-font-tech);
+	font-size: 12px;
+	font-weight: 600;
+	letter-spacing: 0.22em;
+	text-transform: uppercase;
+	color: var(--sf-livery-accent);
+}
+
+.sf-livery__eyebrow::before {          /* the // livery stripes */
+	content: "";
+	width: 18px;
+	height: 12px;
+	background: linear-gradient(90deg, currentColor 0 4px, transparent 4px 8px, currentColor 8px 12px, transparent 12px);
+	transform: skewX(-20deg);
+}
+
+.sf-livery__title {
+	margin: 0 0 clamp(24px, 3vw, 40px);
+	color: var(--sf-livery-text);      /* override the theme's heading colour */
+	font-family: var(--sf-livery-font-title);
+	font-size: clamp(30px, 3.4vw, 54px);
+	font-weight: 400;
+	line-height: 0.98;
+	text-transform: uppercase;
+	transform: skewX(-8deg);
+	transform-origin: left bottom;
+}
+
+
+/* -------------------------------------------------------------
+ * 4. PIT BOARD — one spec at a time, huge, changing by itself
+ *    Tabs on top with a pink countdown bar; the big value's letters
+ *    fly in/out (rp-livery.js). Hover pauses, a tab click jumps.
+ * ------------------------------------------------------------- */
+.sf-livery__board {
+	margin: 0 0 clamp(26px, 3vw, 40px);
+}
+
+.sf-livery__tabs {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 10px;
+	margin-bottom: clamp(18px, 2.4vw, 30px);
+}
+
+.sf-livery__tab {
+	position: relative;
+	display: flex;
+	align-items: baseline;
+	gap: 6px;
+	padding: 0 0 12px;
+	border: 0;
+	background: none;
+	color: var(--sf-livery-muted);
+	font-family: var(--sf-livery-font-tech);
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.16em;
+	text-align: left;
+	text-transform: uppercase;
+	white-space: nowrap;
+	cursor: pointer;
+	transition: color 0.3s ease;
+}
+
+.sf-livery__tab span {
+	color: var(--sf-livery-accent);
+}
+
+.sf-livery__tab.is-active,
+.sf-livery__tab:hover {
+	color: var(--sf-livery-text);
+}
+
+.sf-livery__tab:focus-visible {
+	outline: 2px solid var(--sf-livery-accent);
+	outline-offset: 4px;
+}
+
+/* the track under each tab + the pink countdown fill (--sf-livery-p, 0 … 1) */
+.sf-livery__tab-bar {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 3px;
+	background: var(--sf-livery-line);
+	transform: skewX(-20deg);
+	overflow: hidden;
+}
+
+.sf-livery__tab-bar::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background: var(--sf-livery-accent);
+	transform-origin: left;
+	transform: scaleX(var(--sf-livery-p, 0));
+	box-shadow: 0 0 10px rgba(236, 30, 121, 0.7);
+}
+
+/* the stage: all slides sit on top of each other */
+.sf-livery__slides {
+	display: grid;
+	min-height: clamp(130px, 13vw, 200px);
+}
+
+.sf-livery__slide {
+	grid-area: 1 / 1;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+	gap: 12px;
+	overflow: hidden;                  /* the letters fly in from below the edge */
+	padding: 0.08em 0 4px;
+}
+
+.sf-livery__slide[hidden] {
+	display: flex;                     /* kept in place for the swap animation … */
+	visibility: hidden;                /* … but invisible when not current */
+}
+
+.sf-livery__big {
+	display: block;
+	font-family: var(--sf-livery-font-title);
+	font-size: clamp(48px, 6.4vw, 104px);
+	font-weight: 400;
+	line-height: 0.9;
+	letter-spacing: -0.01em;
+	text-transform: uppercase;
+	white-space: nowrap;
+	transform: skewX(-8deg);
+	transform-origin: left bottom;
+}
+
+/* the separators (/ and ·) in pink, the unit small */
+.sf-livery__big em {
+	font-style: normal;
+	color: var(--sf-livery-accent);
+	margin: 0 0.06em;
+}
+
+.sf-livery__big small {
+	margin-left: 0.15em;
+	font-family: var(--sf-livery-font-tech);
+	font-size: 0.26em;
+	font-weight: 700;
+	letter-spacing: 0.14em;
+	color: var(--sf-livery-muted);
+}
+
+/* each letter is wrapped by rp-livery.js so it can fly in on its own */
+.sf-livery__char {
+	display: inline-block;
+	will-change: transform;
+}
+
+.sf-livery__slide .sf-livery__note {
+	font-size: 14px;
+	color: var(--sf-livery-muted);
+}
+
+
+/* -------------------------------------------------------------
+ * 5. BUTTONS
+ * ------------------------------------------------------------- */
+.sf-livery__buttons {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 14px;
+}
+
+.sf-livery__button {
+	position: relative;
+	isolation: isolate;
+	display: inline-flex;
+	align-items: center;
+	gap: 12px;
+	padding: 14px 26px;
+	border: 0;
+	background: none;
+	color: var(--sf-livery-text);
+	font-family: var(--sf-livery-font-tech);
+	font-size: 13px;
+	font-weight: 700;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	text-decoration: none;
+	white-space: nowrap;
+	cursor: pointer;
+	transition: color 0.25s ease;
+}
+
+.sf-livery__button::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	z-index: -1;
+	border: 1px solid rgba(154, 160, 170, 0.45);
+	background: rgba(255, 255, 255, 0.04);
+	transform: skewX(-14deg);
+	transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+.sf-livery__button--primary {
+	color: var(--sf-livery-bg);
+}
+
+.sf-livery__button--primary::before {
+	border-color: var(--sf-livery-text);
+	background: var(--sf-livery-text);
+}
+
+.sf-livery__button--primary:hover {
+	color: #ffffff;
+}
+
+.sf-livery__button--primary:hover::before,
+.sf-livery__button--ghost:hover::before {
+	border-color: var(--sf-livery-accent);
+	background: var(--sf-livery-accent);
+}
+
+.sf-livery__button:focus-visible {
+	outline: 2px solid var(--sf-livery-accent);
+	outline-offset: 4px;
+}
+
+/* on computers the film itself is the sound button (the pink cursor),
+   so this button is only shown on touch screens */
+@media (hover: hover) and (pointer: fine) {
+	.sf-livery__sound-btn {
+		display: none;
+	}
+}
+
+
+/* -------------------------------------------------------------
+ * 6. THE FILM — its left edge leans 12°, it runs off the right edge
+ * ------------------------------------------------------------- */
+.sf-livery__film {
+	position: relative;
+	z-index: 1;
+	height: var(--sf-livery-film-h);
+	margin-left: calc(var(--sf-livery-film-h) * var(--sf-livery-slant) * -0.6);   /* tuck under the words a little */
+	outline: none;
+}
+
+.sf-livery__film-inner {
+	position: absolute;
+	inset: 0;
+	overflow: hidden;
+	background: #000000;
+	container-type: size;              /* lets the film size itself (cqw / cqh below) */
+	clip-path: polygon(calc(var(--sf-livery-film-h) * var(--sf-livery-slant)) 0, 100% 0, 100% 100%, 0 100%);
+}
+
+.sf-livery__poster,
+.sf-livery__video {
+	position: absolute;
+	inset: -40px 0;                    /* extra height for the slow drift (rp-livery.js) */
+	width: 100%;
+	height: calc(100% + 80px);
+}
+
+.sf-livery__poster {
+	object-fit: cover;
+}
+
+.sf-livery__video {
+	opacity: 0;
+	transition: opacity 0.8s ease;
+	pointer-events: none;
+	overflow: hidden;
+}
+
+.sf-livery__video.is-playing {
+	opacity: 1;
+}
+
+/* the player covers the film area like a background photo, zoomed in
+   so YouTube's own title bar and buttons sit outside the visible area */
+.sf-livery__video iframe {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: max(100cqw, 177.78cqh);
+	height: max(56.25cqw, 100cqh);
+	border: 0;
+	transform: translate(-50%, -50%) scale(1.25);
+}
+
+@media (max-width: 900px) {
+	.sf-livery__video iframe {
+		transform: translate(-50%, -50%) scale(1.5);   /* YouTube's buttons are relatively bigger on small screens */
+	}
+}
+
+/* soft dark fade on the left of the film, under the stripe */
+.sf-livery__film-inner::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(90deg, rgba(10, 10, 10, 0.55) 0%, transparent 30%);
+	pointer-events: none;
+}
+
+.sf-livery__film:focus-visible .sf-livery__film-inner {
+	outline: 2px solid var(--sf-livery-accent);
+	outline-offset: -2px;
+}
+
+
+/* -------------------------------------------------------------
+ * 7. LIVERY STRIPE + TICKER — a pink band along the slanted edge,
+ *    with "PROJECT RP · RADIAL MASTER PUMP ·" running up it
+ * ------------------------------------------------------------- */
+.sf-livery__stripe {
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	z-index: 2;
+	width: var(--sf-livery-stripe);
+	height: 100%;
+	overflow: hidden;
+	background: var(--sf-livery-accent);
+	transform: skewX(-12deg);          /* leans with the film's edge */
+	transform-origin: left bottom;
+	pointer-events: none;
+}
+
+.sf-livery__ticker {
+	position: absolute;
+	left: 50%;
+	top: 0;
+	writing-mode: vertical-rl;
+	transform: translateX(-50%) rotate(180deg);   /* reads bottom → top */
+	white-space: nowrap;
+	font-family: var(--sf-livery-font-tech);
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.22em;
+	text-transform: uppercase;
+	color: #ffffff;
+	animation: sf-livery-ticker 18s linear infinite;
+}
+
+@keyframes sf-livery-ticker {
+	from { translate: 0 0; }
+	to   { translate: 0 50%; }         /* the text is written twice, so 50% loops seamlessly */
+}
+
+
+/* -------------------------------------------------------------
+ * 8. "SOUND" CURSOR — follows the mouse over the film (rp-livery.js)
+ * ------------------------------------------------------------- */
+.sf-livery__cursor {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 3;
+	display: grid;
+	place-items: center;
+	align-content: center;
+	gap: 4px;
+	width: 96px;
+	height: 96px;
+	margin: -48px 0 0 -48px;           /* centred on the mouse */
+	border-radius: 50%;
+	background: var(--sf-livery-accent);
+	color: #ffffff;
+	font-family: var(--sf-livery-font-tech);
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	box-shadow: 0 10px 30px rgba(236, 30, 121, 0.45);
+	pointer-events: none;
+	opacity: 0;
+	scale: 0.4;
+	transition: opacity 0.25s ease, scale 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sf-livery__cursor i {
+	font-size: 16px;
+}
+
+.sf-livery__film.is-hovered .sf-livery__cursor {
+	opacity: 1;
+	scale: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+	.sf-livery__film {
+		cursor: none;                  /* the pink circle is the cursor here */
+	}
+}
+
+@media (hover: none), (pointer: coarse) {
+	.sf-livery__cursor {
+		display: none;
+	}
+}
+
+
+/* -------------------------------------------------------------
+ * 9. VIDEO POP-UP (with sound)
+ * ------------------------------------------------------------- */
+.sf-livery-modal {
+	position: fixed;
+	inset: 0;
+	z-index: 1100;
+	display: grid;
+	place-items: center;
+	padding: 20px;
+	background: rgba(8, 8, 10, 0.94);
+	opacity: 0;
+	transition: opacity 0.3s ease;
+}
+
+.sf-livery-modal.is-open {
+	opacity: 1;
+}
+
+.sf-livery-modal__frame {
+	position: relative;
+	width: min(1200px, 100%);
+	aspect-ratio: 16 / 9;
+	background: #000000;
+}
+
+.sf-livery-modal__frame iframe {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	border: 0;
+}
+
+.sf-livery-modal__close {
+	position: absolute;
+	top: 18px;
+	right: 18px;
+	display: grid;
+	place-items: center;
+	width: 44px;
+	height: 44px;
+	border: 1px solid rgba(245, 245, 245, 0.3);
+	border-radius: 50%;
+	background: transparent;
+	color: var(--sf-livery-text);
+	font-size: 18px;
+	cursor: pointer;
+}
+
+.sf-livery-modal__close:hover {
+	background: var(--sf-livery-accent);
+	border-color: var(--sf-livery-accent);
+}
+
+
+/* -------------------------------------------------------------
+ * 10. TABLETS + PHONES — film on top (full width), words below
+ * ------------------------------------------------------------- */
+@media (max-width: 900px) {
+	.sf-livery {
+		--sf-livery-film-h: 56vw;
+		grid-template-columns: minmax(0, 1fr);
+		row-gap: 36px;
+		min-height: 0;
+		padding-right: clamp(20px, 5vw, 80px);
+	}
+
+	.sf-livery__film {
+		order: -1;
+		margin-left: 0;
+		margin-right: calc(-1 * clamp(20px, 5vw, 80px));   /* still runs off the right edge */
+	}
+
+	.sf-livery__text {
+		padding-right: 0;
+	}
+}
+
+@media (max-width: 480px) {
+	.sf-livery__tabs {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		row-gap: 14px;
+	}
+
+	.sf-livery__buttons {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.sf-livery__button {
+		justify-content: center;
+	}
+}
+
+
+/* -------------------------------------------------------------
+ * 11. REDUCE MOTION
+ * ------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+	.sf-livery__ticker {
+		animation: none;
+	}
+}

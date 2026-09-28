@@ -1,0 +1,335 @@
+/* =============================================================
+ * SUPERFLY — SHOP BY CATEGORY (second section of the home page)
+ * "Pit wall" look: dark carbon-fibre, carrying straight on from the
+ * hero, with each banner on a white plate.
+ * -------------------------------------------------------------
+ *   // SHOP BY CATEGORY
+ *   BUILT ON TRACK.                              View all parts →
+ *   MADE FOR YOUR STREET.
+ *   ┌──────────┐   ┌──────────┐   ┌──────────┐
+ *   │  WHEELS  │   │  SUPER   │   │  BRAKE   │   ← your banners on white
+ *   │   (rim)  │   │  SHOCKS  │   │ (caliper)│     plates; the product breaks
+ *   └──────────┘   └──────────┘   └──────────┘     out onto the white
+ *   01 Sport rims   02 Super shocks  03 Calipers
+ *   ▬▬▬ pink stripe (grows on hover)          P A R T S  (huge, faint)
+ *
+ * Movement: assets/js/categories.js
+ *
+ * CONTENTS
+ *   1. Settings (edit me)
+ *   2. Section + carbon background + big "PARTS"
+ *   3. Heading row
+ *   4. Cards (white plates)
+ *   5. Hover (computers with a mouse)
+ *   6. Responsive
+ *   7. Reduce motion
+ * ============================================================= */
+
+
+/* -------------------------------------------------------------
+ * 1. SETTINGS (edit me)
+ * ------------------------------------------------------------- */
+.sf-cats {
+	--sf-cats-bg:         #0a0a0a;                  /* same dark as the hero */
+	--sf-cats-bg-end:     #15151a;                  /* a touch lighter at the bottom */
+	--sf-cats-text:       #f5f5f5;
+	--sf-cats-muted:      rgba(245, 245, 245, 0.6);
+	--sf-cats-line:       rgba(245, 245, 245, 0.14);/* thin lines (the stripe track) */
+	--sf-cats-plate:      #ffffff;                  /* the plate behind each banner */
+	--sf-cats-accent:     #ec1e79;                  /* Superfly pink */
+	--sf-cats-font-title: "Archivo Black", "Arial Black", sans-serif;
+	--sf-cats-font-body:  "Archivo", "Inter", sans-serif;
+	--sf-cats-font-tech:  "Chakra Petch", "Archivo", sans-serif;
+}
+
+
+/* -------------------------------------------------------------
+ * 2. SECTION + CARBON BACKGROUND + BIG "PARTS"
+ * ------------------------------------------------------------- */
+.sf-cats {
+	position: relative;
+	isolation: isolate;
+	overflow: hidden;                  /* the big "PARTS" is cut off at the edges */
+	box-sizing: border-box;
+	padding: clamp(64px, 8vw, 120px) clamp(20px, 5vw, 80px) clamp(56px, 7vw, 110px);
+	border-top: 1px solid rgba(245, 245, 245, 0.08);
+	background:
+		/* carbon-fibre weave: two tiny diagonal patterns crossing */
+		repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.025) 0 2px, transparent 2px 4px),
+		repeating-linear-gradient(-45deg, rgba(0, 0, 0, 0.35) 0 2px, transparent 2px 4px),
+		linear-gradient(180deg, var(--sf-cats-bg) 0%, var(--sf-cats-bg-end) 100%);
+	color: var(--sf-cats-text);
+	font-family: var(--sf-cats-font-body);
+}
+
+.sf-cats__head,
+.sf-cats__grid {
+	position: relative;
+	z-index: 1;                        /* above the big "PARTS" */
+}
+
+/* Huge, faint outlined word behind the cards */
+.sf-cats__bgword {
+	position: absolute;
+	right: -2vw;
+	bottom: -4vw;
+	z-index: 0;
+	font-family: var(--sf-cats-font-title);
+	font-size: clamp(140px, 22vw, 360px);
+	line-height: 0.8;
+	text-transform: uppercase;
+	color: transparent;
+	-webkit-text-stroke: 1px rgba(245, 245, 245, 0.07);
+	transform: skewX(-8deg);
+	pointer-events: none;
+	user-select: none;
+}
+
+
+/* -------------------------------------------------------------
+ * 3. HEADING ROW
+ * ------------------------------------------------------------- */
+.sf-cats__head {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-end;
+	justify-content: space-between;
+	gap: 18px 40px;
+	margin-bottom: clamp(28px, 4vw, 52px);
+}
+
+/* "// SHOP BY CATEGORY" — two slanted pink stripes before the words */
+.sf-cats__eyebrow {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin: 0 0 14px;
+	font-family: var(--sf-cats-font-tech);
+	font-size: 12px;
+	font-weight: 600;
+	letter-spacing: 0.22em;
+	text-transform: uppercase;
+	color: var(--sf-cats-accent);
+}
+
+.sf-cats__eyebrow::before {
+	content: "";
+	width: 18px;
+	height: 12px;
+	background: linear-gradient(90deg, currentColor 0 4px, transparent 4px 8px, currentColor 8px 12px, transparent 12px);
+	transform: skewX(-20deg);
+}
+
+.sf-cats__title {
+	margin: 0;
+	color: var(--sf-cats-text);        /* the theme makes headings its own colour — override it here */
+	font-family: var(--sf-cats-font-title);
+	font-size: clamp(30px, 3.6vw, 54px);
+	font-weight: 400;
+	line-height: 0.98;
+	letter-spacing: -0.01em;
+	text-transform: uppercase;
+	transform: skewX(-8deg);           /* same forward lean as the hero words */
+	transform-origin: left bottom;
+}
+
+/* "View all parts →" */
+.sf-cats__all {
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	padding-bottom: 4px;
+	border-bottom: 2px solid var(--sf-cats-text);
+	color: var(--sf-cats-text);
+	font-family: var(--sf-cats-font-tech);
+	font-size: 13px;
+	font-weight: 700;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	text-decoration: none;
+	transition: color 0.25s ease, border-color 0.25s ease;
+}
+
+.sf-cats__all:hover {
+	color: var(--sf-cats-accent);
+	border-color: var(--sf-cats-accent);
+}
+
+.sf-cats__all i {
+	transition: translate 0.25s ease;
+}
+
+.sf-cats__all:hover i {
+	translate: 4px 0;
+}
+
+
+/* -------------------------------------------------------------
+ * 4. CARDS
+ * ------------------------------------------------------------- */
+.sf-cats__grid {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: clamp(16px, 2vw, 28px);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.sf-cat {
+	margin: 0;
+}
+
+.sf-cat__link {
+	display: block;
+	position: relative;
+	color: inherit;
+	text-decoration: none;
+	perspective: 900px;                /* depth for the 3D tilt (categories.js) */
+}
+
+/* The banner, on a white plate: the white strip at the bottom of
+   each banner blends into the plate, so the product pops out */
+.sf-cat__media {
+	display: block;
+	overflow: hidden;
+	padding: 10px 10px 0;
+	background: var(--sf-cats-plate);
+	border-radius: 6px;
+	box-shadow: 0 24px 50px rgba(0, 0, 0, 0.45);
+	transform-style: preserve-3d;
+	will-change: transform;
+}
+
+.sf-cat__media img {
+	display: block;
+	width: 100%;
+	height: auto;
+	aspect-ratio: 640 / 400;
+	object-fit: cover;
+	border-radius: 3px 3px 0 0;
+	transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Number · short description · "Shop … →" */
+.sf-cat__meta {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	align-items: baseline;
+	gap: 4px 14px;
+	padding: 16px 2px 14px;
+}
+
+.sf-cat__num {
+	grid-row: span 2;
+	font-family: var(--sf-cats-font-title);
+	font-size: 30px;
+	line-height: 1;
+	color: transparent;
+	-webkit-text-stroke: 1px var(--sf-cats-text);   /* outlined race number */
+	transform: skewX(-8deg);
+}
+
+.sf-cat__desc {
+	font-size: 14px;
+	color: var(--sf-cats-muted);
+}
+
+.sf-cat__cta {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	font-family: var(--sf-cats-font-tech);
+	font-size: 13px;
+	font-weight: 700;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--sf-cats-text);
+	transition: color 0.25s ease;
+}
+
+.sf-cat__cta i {
+	transition: translate 0.25s ease;
+}
+
+/* The livery stripe under each card: thin grey line with a short
+   pink slanted piece at the start; the pink grows on hover */
+.sf-cat__stripe {
+	display: block;
+	position: relative;
+	height: 3px;
+	background: var(--sf-cats-line);
+}
+
+.sf-cat__stripe::after {
+	content: "";
+	position: absolute;
+	inset: 0 auto 0 0;
+	width: 100%;
+	background: var(--sf-cats-accent);
+	transform: scaleX(0.14) skewX(-30deg);
+	transform-origin: left;
+	transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Keyboard focus: a clear outline round the whole card */
+.sf-cat__link:focus-visible {
+	outline: 2px solid var(--sf-cats-accent);
+	outline-offset: 6px;
+	border-radius: 4px;
+}
+
+
+/* -------------------------------------------------------------
+ * 5. HOVER (computers with a mouse)
+ * The 3D tilt that follows the mouse is in categories.js.
+ * ------------------------------------------------------------- */
+@media (hover: hover) and (pointer: fine) {
+	.sf-cat__link:hover .sf-cat__media img {
+		transform: scale(1.04);
+	}
+
+	.sf-cat__link:hover .sf-cat__stripe::after {
+		transform: scaleX(1) skewX(-30deg);
+	}
+
+	.sf-cat__link:hover .sf-cat__cta {
+		color: var(--sf-cats-accent);
+	}
+
+	.sf-cat__link:hover .sf-cat__cta i {
+		translate: 5px 0;
+	}
+}
+
+
+/* -------------------------------------------------------------
+ * 6. RESPONSIVE
+ * ------------------------------------------------------------- */
+@media (max-width: 900px) {
+	.sf-cats__grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+@media (max-width: 560px) {
+	.sf-cats__grid {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.sf-cats__head {
+		align-items: flex-start;
+	}
+}
+
+
+/* -------------------------------------------------------------
+ * 7. REDUCE MOTION
+ * ------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+	.sf-cats *,
+	.sf-cats *::before,
+	.sf-cats *::after {
+		transition: none !important;
+	}
+}

@@ -1,0 +1,305 @@
+/* =============================================================
+ * SUPERFLY — LOADING SCREEN + PAGE CHANGE (every page but home)
+ * -------------------------------------------------------------
+ *
+ *   click a link              the box lands               the new page is ready
+ *   ██████████████🏍          ████████████████████        ████████████→→
+ *   ███████████🏍←bike         ███ ⌈ SHOP ⌉ ███████        ███████████→→→
+ *   ████████                  ████████████████████        ████████→→→→→
+ *   (a box of bands, pulled   (the page's name in         (the bands slide off
+ *    across by the bike)       the middle)                  to the right, new
+ *                                                            page underneath)
+ *
+ * Click a link in the navbar: a big bike rides across, pulling a box
+ * of bands over the page (their front edge is stepped); the bike is
+ * gone off the right edge and the name of the page you picked shows
+ * in the middle as it lands. The new page opens under the same box,
+ * and as soon as it's there the bands slide off to the right — no
+ * loading bar, no waiting.
+ *
+ * Opening a page straight away (typed address, bookmark, refresh)
+ * shows the same box with that page's own name (from WordPress).
+ *
+ *   Layout:    added to every page by functions.php (wp_body_open);
+ *              on the home page the home intro takes the loading part
+ *   Movement:  assets/js/preloader.js
+ *
+ * The bike is cut straight out of the logo file: the logo is used as
+ * a background, sized and shifted so only the bike shows.
+ *
+ * Only whole pieces slide (transform) — nothing is redrawn while it
+ * moves, which keeps it smooth.
+ *
+ * CONTENTS
+ *   1. Settings (edit me)
+ *   2. Cover + the bands
+ *   3. Page name in brackets
+ *   4. The bike + speed streaks
+ *   5. States (parked / page change)
+ *   6. Safety net (never stuck)
+ *   7. Reduce motion
+ * ============================================================= */
+
+
+/* -------------------------------------------------------------
+ * 1. SETTINGS (edit me)
+ * The carbon weave itself is drawn on the bands (section 2).
+ * For a pink box with a black bike instead: --sf-lights-box #ec1e79
+ * (and remove the weave), --sf-lights-ink #0a0a0a, --sf-lights-bracket
+ * #f5f5f5, and give the bike filter: brightness(0) (section 4).
+ * ------------------------------------------------------------- */
+.sf-lights {
+	--sf-lights-box:     #16161a;                   /* the box — dark carbon, same as the home intro */
+	--sf-lights-ink:     #f5f5f5;                   /* page name */
+	--sf-lights-accent:  #ec1e79;                   /* Superfly pink: the brackets */
+	--sf-lights-bracket: var(--sf-lights-accent);   /* the [ ] around the name */
+	--sf-lights-name:    clamp(30px, 4.6vw, 64px);  /* size of the page name */
+	--sf-lights-bike:    clamp(170px, 19vw, 300px); /* width of the bike */
+	--sf-lights-font:    "Archivo Black", "Arial Black", sans-serif;
+
+	/* where the bike is in the logo file (500 × 500 px): from x 106, y 78,
+	   312 wide, 197 tall — only this part of the logo is shown (clear of
+	   the "SUPERFLY" lettering) */
+	--sf-bike-x: 106;
+	--sf-bike-y: 78;
+	--sf-bike-w: 312;
+	--sf-bike-h: 197;
+}
+
+
+/* -------------------------------------------------------------
+ * 2. COVER + THE BANDS
+ * The cover itself is see-through; the six bands stacked inside it
+ * make the box. preloader.js slides them one after another, which
+ * gives the stepped edge.
+ * ------------------------------------------------------------- */
+
+/* Always keep room for the scrollbar. Otherwise the new page starts
+   without one (its content hasn't arrived yet), is a scrollbar wider
+   for a moment, and the name in the middle jumps sideways when the
+   scrollbar comes back. */
+html {
+	scrollbar-gutter: stable;
+}
+
+.sf-lights {
+	position: fixed;
+	inset: 0;
+	z-index: 1000;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 22px;
+	padding: 0 16px;
+	font-family: var(--sf-lights-font);
+	overflow: hidden;
+}
+
+.sf-lights__bands {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	flex-direction: column;
+}
+
+.sf-lights__band {
+	position: relative;
+	flex: 1;
+	margin-bottom: -1px;                            /* no hairline gaps between bands */
+	background:
+		/* carbon-fibre weave, the same as the home intro's logo panel */
+		repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.03) 0 2px, transparent 2px 4px),
+		repeating-linear-gradient(-45deg, rgba(0, 0, 0, 0.35) 0 2px, transparent 2px 4px),
+		var(--sf-lights-box);
+	will-change: transform;
+}
+
+
+/* -------------------------------------------------------------
+ * 3. PAGE NAME IN BRACKETS   ⌈ SHOP ⌉
+ * The brackets lean forward like the rest of the site (8°).
+ * ------------------------------------------------------------- */
+.sf-lights__label {
+	position: relative;                             /* above the bands */
+	display: inline-flex;
+	align-items: center;
+	gap: 0.42em;
+	max-width: 92vw;
+	font-size: var(--sf-lights-name);
+	line-height: 1;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--sf-lights-ink);
+}
+
+.sf-lights__label-text {
+	text-align: center;
+	overflow-wrap: anywhere;
+}
+
+.sf-lights__label::before,
+.sf-lights__label::after {
+	content: "";
+	flex: none;
+	align-self: stretch;
+	width: 0.26em;
+	min-height: 1.05em;
+	border: 0.085em solid var(--sf-lights-bracket);
+	transform: skewX(-8deg);
+}
+
+.sf-lights__label::before { border-right: 0; }   /* [ */
+.sf-lights__label::after  { border-left: 0; }    /* ] */
+
+
+/* -------------------------------------------------------------
+ * 4. THE BIKE + SPEED STREAKS
+ * It rides just in front of the middle band, pulling it — so it is
+ * exactly where the box's edge is, and has left the screen by the
+ * time the box covers the page. Only shows while it pulls.
+ * ------------------------------------------------------------- */
+.sf-lights__rider {
+	position: absolute;
+	top: 0;                            /* on the band's top edge = the middle of the screen */
+	left: 100%;                        /* just in front of the band */
+	width: var(--sf-lights-bike);
+	aspect-ratio: var(--sf-bike-w) / var(--sf-bike-h);
+	margin-left: -8px;                 /* the back wheel overlaps the band a touch */
+	transform: translateY(-58%);
+	visibility: hidden;
+}
+
+.sf-lights.is-pulling .sf-lights__rider {
+	visibility: visible;
+}
+
+.sf-lights__bike {
+	position: absolute;
+	inset: 0;
+	background-image: var(--sf-bike-img);
+	background-repeat: no-repeat;
+	/* scale the whole logo so the bike part is exactly this box, then
+	   shift it so only the bike shows */
+	background-size: calc(var(--sf-lights-bike) * 500 / var(--sf-bike-w)) auto;
+	background-position:
+		calc(var(--sf-lights-bike) * var(--sf-bike-x) / var(--sf-bike-w) * -1)
+		calc(var(--sf-lights-bike) * var(--sf-bike-y) / var(--sf-bike-w) * -1);
+	/* cut off the bottom-left corner: the "S" of the SUPERFLY lettering
+	   in the logo reaches in there */
+	clip-path: polygon(0 0, 100% 0, 100% 100%, 14% 100%, 0 86%);
+	filter: drop-shadow(0 8px 16px rgba(236, 30, 121, 0.35));   /* soft pink glow on the dark box */
+	transform-origin: 30% 100%;
+	animation: sf-bike-ride 0.32s ease-in-out infinite alternate;
+}
+
+/* a small bob, like riding over the road */
+@keyframes sf-bike-ride {
+	from { transform: translateY(0) rotate(0deg); }
+	to   { transform: translateY(-3px) rotate(-1.5deg); }
+}
+
+/* speed streaks trailing behind the bike, over the band */
+.sf-lights__speed {
+	position: absolute;
+	right: 92%;
+	bottom: 24%;
+	width: calc(var(--sf-lights-bike) * 0.7);
+	height: 44%;
+	background:
+		linear-gradient(90deg, transparent, rgba(236, 30, 121, 0.85)) 0 12% / 100% 3px no-repeat,
+		linear-gradient(90deg, transparent, rgba(245, 245, 245, 0.6)) 30% 50% / 70% 3px no-repeat,
+		linear-gradient(90deg, transparent, rgba(236, 30, 121, 0.65)) 60% 88% / 50% 3px no-repeat;
+	animation: sf-bike-streaks 0.22s linear infinite;
+}
+
+@keyframes sf-bike-streaks {
+	from { transform: translateX(12px); opacity: 1; }
+	to   { transform: translateX(-12px); opacity: 0.55; }
+}
+
+
+/* -------------------------------------------------------------
+ * 5. STATES (set by preloader.js)
+ *   is-parked    the page is showing: the box waits, hidden, for
+ *                the next page change
+ *   is-leaving   a page change has started
+ *   is-pulling   the bike is on screen
+ * ------------------------------------------------------------- */
+.sf-lights.is-parked {
+	visibility: hidden;
+	pointer-events: none;
+	animation: none;
+}
+
+.sf-lights.is-parked .sf-lights__band {
+	transform: translateX(-101%);
+}
+
+.sf-lights.is-parked .sf-lights__bike,
+.sf-lights.is-parked .sf-lights__speed {
+	animation: none;                  /* nothing moves while it's hidden */
+}
+
+.sf-lights.is-leaving {
+	visibility: visible;
+	animation: none;
+}
+
+
+/* -------------------------------------------------------------
+ * 6. SAFETY NET (never stuck)
+ * If preloader.js can't run, the box hides itself after 6 seconds
+ * anyway. Normally the script moves it away long before that.
+ * ------------------------------------------------------------- */
+.sf-lights {
+	animation: sf-lights-safety 0.3s ease 6s forwards;
+}
+
+@keyframes sf-lights-safety {
+	to {
+		opacity: 0;
+		visibility: hidden;
+	}
+}
+
+
+/* -------------------------------------------------------------
+ * 7. REDUCE MOTION — no loading screen, pages change straight away
+ * ------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+	.sf-lights {
+		display: none;
+	}
+}
+
+
+/* -------------------------------------------------------------
+ * CARBON ONLY (every page but Home)
+ * The same panel, with nothing on it: no bike, no page name. It
+ * covers the moment the page opens and then clears.
+ * ------------------------------------------------------------- */
+.sf-lights--plain .sf-lights__label,
+.sf-lights--plain .sf-lights__rider {
+	display: none;
+}
+
+/* One continuous weave instead of six.
+ * The panel is built from six bands so they can slide off one at a time on
+ * Home. Each band was painting its own carbon, and a repeating pattern
+ * starts again at the top of every box — so the weave broke into six
+ * strips with a visible seam between them.
+ *
+ * A plain panel never slides its bands, so here the weave goes on the
+ * panel itself and the bands are left clear. Home is untouched: its bands
+ * keep their own carbon, because they have to carry it as they move. */
+.sf-lights--plain {
+	background:
+		repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.03) 0 2px, transparent 2px 4px),
+		repeating-linear-gradient(-45deg, rgba(0, 0, 0, 0.35) 0 2px, transparent 2px 4px),
+		var(--sf-lights-box);
+}
+
+.sf-lights--plain .sf-lights__band {
+	background: none;
+}

@@ -1,0 +1,1102 @@
+/* =============================================================
+ * SUPERFLY — GLASS NAVBAR
+ * -------------------------------------------------------------
+ * A floating, pill-shaped header with a frosted-glass effect.
+ *
+ *   ┌────────────────────────────────────────────────────────┐
+ *   │ [LOGO]  ( HOME  SHOP BY CATEGORIES ⌄ … )  │ 🔍 MYR 🛒 👤 │
+ *   └────────────────────────────────────────────────────────┘
+ *     1                        2                         3
+ *
+ *   1. .sf-navbar__logo     Superfly logo — left end
+ *   2. .sf-navbar__menu     Navigation menu, inside its own darker pill — middle
+ *   3. .sf-navbar__actions  Search, currency, cart + login, after a thin divider — right end
+ *
+ * The HTML structure lives in: parts/header.html
+ * The interactive effects (spotlight, sliding highlight, mega
+ * menu, scroll reaction, currency, search) are switched on by
+ * assets/js/navbar.js. Without it the navbar still works, plainly.
+ *
+ *   .sf-navbar-wrap            outer spacing
+ *   └─ .sf-navbar              the glass pill
+ *      ├─ .sf-navbar__logo       logo image (WordPress Site Logo)
+ *      ├─ .sf-navbar__menu       menu (edit links: Appearance → Editor → Navigation)
+ *      └─ .sf-navbar__actions    search, currency, cart, login
+ *
+ * HOW TO CUSTOMISE
+ *   Colours, blur and sizes are all in the SETTINGS block below.
+ *   Change a value there — you never need to touch the rest.
+ *
+ * CONTENTS
+ *   1. Settings (edit me)
+ *   2. Header position (floating + sticky)
+ *   3. Glass bar
+ *   4. Logo
+ *   5. Menu
+ *        (+ sliding highlight)
+ *   6. Mobile menu (turned off for now)
+ *   7. Search, currency, cart + login
+ *   8. Mega menu
+ *   9. Responsive
+ *  10. Accessibility
+ * ============================================================= */
+
+
+/* -------------------------------------------------------------
+ * 1. SETTINGS (edit me)
+ * ------------------------------------------------------------- */
+:root {
+	/* Glass bar */
+	--sf-navbar-glass:        rgba(255, 255, 255, 0.06); /* frosted tint at the top of the page — last number = how milky the glass is (0 clear … 1 solid) */
+	--sf-navbar-glass-scrolled: rgba(20, 20, 24, 0.55); /* after scrolling down: a little darker so text stays readable over light pages */
+	--sf-navbar-glass-other:  rgba(20, 20, 24, 0.85); /* every page except home, from the top: those pages are light, so the glass is darker to look like the home navbar over its dark hero */
+	--sf-navbar-blur:         20px;                    /* how blurry the content behind the bar looks */
+	--sf-navbar-sheen:        rgba(255, 255, 255, 0.10); /* the light catching the top of the glass */
+	--sf-navbar-border:       rgba(255, 255, 255, 0.18);
+	--sf-navbar-shadow:       0 10px 30px rgba(0, 0, 0, 0.18);
+
+	/* Text + icons */
+	--sf-navbar-text:         #ffffff;
+	--sf-navbar-font:         var(--wp--preset--font-family--body, system-ui, sans-serif);
+	--sf-navbar-focus:        rgba(255, 255, 255, 0.7); /* outline when moving with the Tab key */
+
+	/* Menu pill */
+	--sf-navbar-menu-bg:      rgba(255, 255, 255, 0.06);  /* the darker pill around the menu links */
+	--sf-navbar-link-hover:   rgba(255, 255, 255, 0.14);  /* white glass highlight on hover + current page */
+	--sf-navbar-slide-speed:  0.45s;                      /* how fast the highlight glides between links */
+
+	/* Dropdown + mega menu */
+	--sf-navbar-dropdown-bg:  rgba(12, 12, 15, 0.9);      /* dropdown / mega menu panel colour */
+	--sf-navbar-accent:       #e44094;                    /* Superfly pink (from the logo): icons, arrows, highlights */
+	--sf-mega-list-width:     280px;                      /* width of the mega menu list */
+
+	/* Effects */
+	--sf-spotlight:           0.14;                       /* brightness of the light that follows the mouse (0 = off) */
+	--sf-spotlight-color:     205 210 220;                /* its colour, as red green blue (205 210 220 = cool silver) */
+	--sf-spotlight-size:      180px;                      /* how big that light is */
+
+	/* Size + spacing */
+	--sf-navbar-logo-height:  48px;                       /* height of the logo in the bar */
+	--sf-navbar-search-width: 320px;                      /* search box width if it can't be measured (normally it fills the menu's space) */
+	--sf-navbar-max-width:    1120px;                     /* widest the bar can get */
+	--sf-navbar-top-gap:      16px;                       /* space above the bar */
+	--sf-navbar-radius:       999px;                      /* 999px = fully rounded ends */
+}
+
+
+/* -------------------------------------------------------------
+ * 2. HEADER POSITION (floating + sticky)
+ * The header stays at the top while the page scrolls underneath
+ * it — that is what makes the glass effect visible.
+ * ------------------------------------------------------------- */
+header.wp-block-template-part {
+	position: sticky;
+	top: var(--wp-admin--admin-bar--height, 0px);  /* sit below the WP admin bar when logged in */
+	z-index: 100;
+	background: transparent;
+}
+
+.sf-navbar-wrap {
+	position: relative;                             /* the mega menu panel is placed inside it */
+	padding: var(--sf-navbar-top-gap) 16px 0;       /* gap above the bar + side margins on phones */
+	pointer-events: none;                           /* page stays clickable beside the bar (re-enabled on .sf-navbar) */
+}
+
+
+/* -------------------------------------------------------------
+ * 3. GLASS BAR
+ * Logo, menu and icons are spread out: logo at the left end,
+ * icons at the right end, menu in between.
+ *
+ * The frosted background is drawn on a ::before layer instead of
+ * the bar itself. Reason: `backdrop-filter` on the bar would trap
+ * the full-screen mobile menu inside the bar's small box.
+ * ------------------------------------------------------------- */
+.sf-navbar {
+	position: relative;
+	isolation: isolate;               /* keeps the ::before layer behind the content */
+	max-width: var(--sf-navbar-max-width);
+	margin-inline: auto;
+	padding: 8px 24px;
+	gap: 16px;
+	flex-wrap: nowrap;                /* always one line */
+	justify-content: space-between;   /* logo ← left end · icons → right end */
+	color: var(--sf-navbar-text);
+	font-family: var(--sf-navbar-font);
+	pointer-events: auto;
+	transition: --sf-spot-strength 0.3s ease;   /* spotlight fades in/out */
+}
+
+/* The glass + the spotlight on it.
+   Spotlight: a soft circle of light at the mouse position
+   (--sf-spot-x / -y come from navbar.js). */
+.sf-navbar::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	z-index: -1;
+	border-radius: var(--sf-navbar-radius);
+	background-color: var(--sf-navbar-glass);
+	background-image:
+		radial-gradient(
+			var(--sf-spotlight-size) circle at var(--sf-spot-x, 50%) var(--sf-spot-y, 50%),
+			rgb(var(--sf-spotlight-color) / calc(var(--sf-spot-strength) * var(--sf-spotlight))),
+			transparent 70%
+		),
+		/* sheen: light across the top of the glass, fading out downwards */
+		linear-gradient(180deg, var(--sf-navbar-sheen) 0%, rgba(255, 255, 255, 0.02) 55%, transparent 100%);
+	border: 1px solid var(--sf-navbar-border);
+	box-shadow: var(--sf-navbar-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+	-webkit-backdrop-filter: blur(var(--sf-navbar-blur)) saturate(180%);
+	backdrop-filter: blur(var(--sf-navbar-blur)) saturate(180%);
+	transition: background-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* The rim: the bar's edge lights up near the mouse, like light
+   catching the edge of real glass (only the 1px border is visible) */
+.sf-navbar::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	z-index: -1;
+	padding: 1px;
+	border-radius: var(--sf-navbar-radius);
+	background: radial-gradient(
+		calc(var(--sf-spotlight-size) * 0.8) circle at var(--sf-spot-x, 50%) var(--sf-spot-y, 50%),
+		rgb(var(--sf-spotlight-color) / calc(var(--sf-spot-strength) * var(--sf-spotlight) * 4)),
+		transparent 70%
+	);
+	-webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+	-webkit-mask-composite: xor;
+	mask-composite: exclude;
+	pointer-events: none;
+}
+
+/* Spotlight + rim fade in while the mouse is on the bar */
+@property --sf-spot-strength {
+	syntax: "<number>";
+	inherits: true;
+	initial-value: 0;
+}
+
+.sf-navbar--js:hover {
+	--sf-spot-strength: 1;
+}
+
+/* After scrolling down: more solid (navbar.js adds `is-scrolled`) */
+.sf-navbar.is-scrolled::before {
+	background-color: var(--sf-navbar-glass-scrolled);
+	box-shadow: 0 14px 40px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+/* Every page except home: the page behind the bar is light, so nearly clear
+   glass would leave the white menu text invisible — start with dark glass.
+   (The home page's hero is dark, so it keeps the clear glass.) */
+body:not(.home) .sf-navbar::before {
+	background-color: var(--sf-navbar-glass-other);
+}
+
+
+/* -------------------------------------------------------------
+ * 4. LOGO
+ * The Superfly logo image (WordPress "Site Logo" — change it in
+ * Appearance → Editor → Header → click the logo → Replace).
+ *
+ * The logo file is a square with empty space above and below the
+ * artwork. Showing it in a 3:2 box with `object-fit: cover` trims
+ * that empty space, so the artwork fills the height of the bar.
+ * ------------------------------------------------------------- */
+.sf-navbar__logo {
+	flex: none;
+	margin: 0;
+	line-height: 0;
+}
+
+.sf-navbar .sf-navbar__logo .custom-logo {
+	display: block;
+	width: auto;
+	height: var(--sf-navbar-logo-height);
+	aspect-ratio: 3 / 2;
+	object-fit: cover;
+	transition: transform 0.4s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+/* Small lift on hover */
+.sf-navbar .sf-navbar__logo a:hover .custom-logo {
+	transform: scale(1.06) rotate(-2deg);
+}
+
+
+/* -------------------------------------------------------------
+ * 5. MENU
+ * Desktop + tablet. On phones the menu is a ☰ that does nothing yet (section 6).
+ * ------------------------------------------------------------- */
+.sf-navbar__menu {
+	color: var(--sf-navbar-text);
+}
+
+/* The darker pill around the links */
+.sf-navbar__menu .wp-block-navigation__responsive-container:not(.is-menu-open) .wp-block-navigation__container {
+	position: relative;                /* the sliding highlight is placed inside it */
+	isolation: isolate;                /* keeps the highlight behind the link text */
+	flex-wrap: nowrap;                 /* links always on one line */
+	gap: 4px;
+	padding: 4px;
+	border-radius: var(--sf-navbar-radius);
+	background: var(--sf-navbar-menu-bg);
+}
+
+/* When the menu is WordPress's automatic "page list", the items sit
+   in an extra <ul class="wp-block-page-list"> inside the menu. Treat
+   that layer as if it isn't there, so the items line up in the pill
+   like a normal menu. (Rules below say "…__container or page-list".) */
+.sf-navbar__menu .wp-block-navigation__container > .wp-block-page-list {
+	display: contents;
+}
+
+/* WordPress makes each item copy the pill colour — undo that */
+.sf-navbar__menu .wp-block-navigation__responsive-container:not(.is-menu-open) .wp-block-navigation-item {
+	background: transparent;
+}
+
+/* Each link */
+.sf-navbar__menu .wp-block-navigation__responsive-container:not(.is-menu-open) .wp-block-navigation-item__content {
+	display: block;
+	padding: 8px 16px;
+	border-radius: var(--sf-navbar-radius);
+	font-size: 15px;
+	line-height: 1.2;
+	color: var(--sf-navbar-text);
+	text-decoration: none;
+	transition: background-color 0.2s ease;
+}
+
+/* Top-level links in bold, spaced capitals:  HOME  SHOP BY BIKE …
+   (dropdown items keep normal case) */
+.sf-navbar__menu .wp-block-navigation__responsive-container:not(.is-menu-open) :is(.wp-block-navigation__container, .wp-block-page-list) > li > .wp-block-navigation-item__content {
+	padding-inline: 14px;
+	font-size: 13px;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	white-space: nowrap;
+}
+
+/* Hover + the page you are currently on
+   (plain version — used only if navbar.js doesn't load) */
+.sf-navbar__menu .wp-block-navigation__responsive-container:not(.is-menu-open) .wp-block-navigation-item__content:hover,
+.sf-navbar__menu .wp-block-navigation__responsive-container:not(.is-menu-open) .wp-block-navigation-item__content[aria-current="page"] {
+	background: var(--sf-navbar-link-hover);
+}
+
+/* --- Sliding highlight -----------------------------------------
+ * One pill that glides to the link under the mouse and rests on
+ * the page you are on. navbar.js creates it and tells it where to
+ * go (--sf-highlight-x / --sf-highlight-width); CSS does the moving.
+ * --------------------------------------------------------------- */
+.sf-navbar__highlight {
+	position: absolute;
+	top: 4px;
+	bottom: 4px;
+	left: 0;
+	z-index: -1;                       /* behind the link text */
+	width: var(--sf-highlight-width, 0);
+	transform: translateX(var(--sf-highlight-x, 0));
+	border-radius: var(--sf-navbar-radius);
+	background: var(--sf-navbar-link-hover);
+	opacity: 0;
+	pointer-events: none;
+	transition:
+		transform var(--sf-navbar-slide-speed) cubic-bezier(0.3, 1.25, 0.5, 1),  /* slight springy overshoot */
+		width     var(--sf-navbar-slide-speed) cubic-bezier(0.3, 1.25, 0.5, 1),
+		opacity   0.2s ease;
+}
+
+.sf-navbar__highlight.is-instant {
+	transition: none;                  /* first placement on page load: no slide */
+}
+
+/* While the sliding highlight is on, top-level links don't light
+   up by themselves (dropdown links still do) */
+.sf-navbar--sliding .sf-navbar__menu .wp-block-navigation__responsive-container:not(.is-menu-open) :is(.wp-block-navigation__container, .wp-block-page-list) > li > .wp-block-navigation-item__content,
+.sf-navbar--sliding .sf-navbar__menu .wp-block-navigation__responsive-container:not(.is-menu-open) :is(.wp-block-navigation__container, .wp-block-page-list) > .has-child:hover,
+.sf-navbar--sliding .sf-navbar__menu .wp-block-navigation__responsive-container:not(.is-menu-open) :is(.wp-block-navigation__container, .wp-block-page-list) > .has-child:focus-within {
+	background: transparent;
+}
+
+/* --- Dropdown (sub menu) ---------------------------------------
+ * Shown when a menu item has pages under it, e.g.
+ *   Sample Page ⌄  →  Helmets / Jackets / Gloves
+ * Add sub pages by setting Page → Parent.
+ *
+ * Normally the mega menu (section 8) replaces this dropdown. These
+ * styles are the fallback, used only if navbar.js doesn't load.
+ * --------------------------------------------------------------- */
+
+/* An item with a dropdown is "link + ⌄ arrow". The hover pill goes
+   around both, so the arrow sits inside the highlight too. */
+.sf-navbar__menu .wp-block-navigation__responsive-container:not(.is-menu-open) :is(.wp-block-navigation__container, .wp-block-page-list) > .has-child {
+	padding-right: 14px;               /* room for the arrow inside the pill */
+	border-radius: var(--sf-navbar-radius);
+	transition: background-color 0.2s ease;
+}
+
+.sf-navbar__menu .wp-block-navigation__responsive-container:not(.is-menu-open) :is(.wp-block-navigation__container, .wp-block-page-list) > .has-child:hover,
+.sf-navbar__menu .wp-block-navigation__responsive-container:not(.is-menu-open) :is(.wp-block-navigation__container, .wp-block-page-list) > .has-child:focus-within {
+	background: var(--sf-navbar-link-hover);
+}
+
+.sf-navbar__menu .wp-block-navigation__responsive-container:not(.is-menu-open) .has-child > .wp-block-navigation-item__content {
+	padding-right: 6px;                /* pull the arrow closer to the text */
+}
+
+.sf-navbar__menu .wp-block-navigation__responsive-container:not(.is-menu-open) .has-child > .wp-block-navigation-item__content:hover {
+	background: transparent;           /* the pill is on the whole item instead */
+}
+
+/* The small ⌄ arrow next to the item — flips up when open.
+   WordPress draws it; we swap its drawing for Font Awesome's
+   chevron-down (see "Font Awesome icons" in section 7). */
+.sf-navbar__menu .wp-block-navigation__submenu-icon {
+	width: auto;
+	height: auto;
+	margin: 0;
+	padding: 0;
+	color: var(--sf-navbar-text);
+	background: transparent;           /* WordPress makes it copy the pill colour — that showed as a box */
+	transition: transform 0.2s ease;
+}
+
+.sf-navbar__menu .has-child:hover > .wp-block-navigation__submenu-icon,
+.sf-navbar__menu .wp-block-navigation__submenu-icon[aria-expanded="true"] {
+	transform: rotate(180deg);
+}
+
+/* The dropdown panel: dark glass, like the bar */
+.sf-navbar__menu .wp-block-navigation__responsive-container:not(.is-menu-open) .wp-block-navigation__submenu-container {
+	top: 100%;
+	margin-top: 12px;                  /* small gap under the bar */
+	min-width: 280px;
+	padding: 8px;
+	border: 1px solid var(--sf-navbar-border);
+	border-radius: 20px;
+	background: var(--sf-navbar-dropdown-bg);
+	box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+	-webkit-backdrop-filter: blur(var(--sf-navbar-blur)) saturate(160%);
+	backdrop-filter: blur(var(--sf-navbar-blur)) saturate(160%);
+	color: var(--sf-navbar-text);
+	transform: translateY(-8px) scale(0.97);   /* starts slightly higher + smaller… */
+	transform-origin: 32px top;
+	transition: opacity 0.25s ease, transform 0.3s cubic-bezier(0.3, 1.3, 0.5, 1);
+}
+
+.sf-navbar__menu .has-child:hover > .wp-block-navigation__submenu-container,
+.sf-navbar__menu .has-child:focus-within > .wp-block-navigation__submenu-container {
+	transform: none;                   /* …and pops into place */
+}
+
+/* Invisible bridge over the 12px gap, so the dropdown doesn't
+   close while the mouse moves from the item down to it */
+.sf-navbar__menu .wp-block-navigation__submenu-container::before {
+	content: "";
+	position: absolute;
+	top: -13px;
+	left: 0;
+	right: 0;
+	height: 13px;
+}
+
+/* Each row:   ▎ Helmets                      →
+   thin accent bar + arrow appear on hover */
+.sf-navbar__menu .wp-block-navigation__responsive-container:not(.is-menu-open) .wp-block-navigation__submenu-container .wp-block-navigation-item__content {
+	position: relative;
+	display: flex;
+	align-items: center;
+	padding: 11px 14px;
+	border-radius: 10px;
+	font-size: 15px;
+	font-weight: 500;
+	color: rgba(255, 255, 255, 0.78);
+	transition: background-color 0.2s ease, color 0.2s ease, padding-left 0.25s ease;
+}
+
+.sf-navbar__menu .wp-block-navigation__responsive-container:not(.is-menu-open) .wp-block-navigation__submenu-container .wp-block-navigation-item__content:hover {
+	padding-left: 20px;                /* text nudges right to make room for the bar */
+	background: rgba(255, 255, 255, 0.06);
+	color: var(--sf-navbar-text);
+}
+
+/* The thin accent bar on the left */
+.sf-navbar__menu .wp-block-navigation__submenu-container .wp-block-navigation-item__content::before {
+	content: "";
+	position: absolute;
+	top: 30%;
+	bottom: 30%;
+	left: 8px;
+	width: 2px;
+	border-radius: 2px;
+	background: var(--sf-navbar-accent);
+	transform: scaleY(0);
+	transition: transform 0.25s ease;
+}
+
+.sf-navbar__menu .wp-block-navigation__submenu-container .wp-block-navigation-item__content:hover::before {
+	transform: scaleY(1);
+}
+
+/* The thin → arrow on the right */
+.sf-navbar__menu .wp-block-navigation__submenu-container .wp-block-navigation-item__content::after {
+	content: "→";
+	margin-left: auto;
+	padding-left: 24px;
+	opacity: 0;
+	transform: translateX(-6px);
+	transition: opacity 0.2s ease, transform 0.25s ease;
+}
+
+.sf-navbar__menu .wp-block-navigation__submenu-container .wp-block-navigation-item__content:hover::after {
+	opacity: 0.7;
+	transform: none;
+}
+
+/* Dropdown links fade + slide in one after another (up to 8) */
+@keyframes sf-dropdown-item-in {
+	from { opacity: 0; transform: translateY(-6px); }
+	to   { opacity: 1; transform: none; }
+}
+
+/* (written as separate lines, not the `animation:` shorthand —
+    the shorthand would wipe out the delays below) */
+.sf-navbar__menu .has-child:hover > .wp-block-navigation__submenu-container > li,
+.sf-navbar__menu .has-child:focus-within > .wp-block-navigation__submenu-container > li {
+	animation-name: sf-dropdown-item-in;
+	animation-duration: 0.3s;
+	animation-timing-function: ease;
+	animation-fill-mode: both;
+}
+
+.sf-navbar__menu .wp-block-navigation__submenu-container > li:nth-child(2) { animation-delay: 0.05s; }
+.sf-navbar__menu .wp-block-navigation__submenu-container > li:nth-child(3) { animation-delay: 0.10s; }
+.sf-navbar__menu .wp-block-navigation__submenu-container > li:nth-child(4) { animation-delay: 0.15s; }
+.sf-navbar__menu .wp-block-navigation__submenu-container > li:nth-child(5) { animation-delay: 0.20s; }
+.sf-navbar__menu .wp-block-navigation__submenu-container > li:nth-child(6) { animation-delay: 0.25s; }
+.sf-navbar__menu .wp-block-navigation__submenu-container > li:nth-child(7) { animation-delay: 0.30s; }
+.sf-navbar__menu .wp-block-navigation__submenu-container > li:nth-child(8) { animation-delay: 0.35s; }
+
+
+/* -------------------------------------------------------------
+ * 6. MOBILE MENU — turned off for now
+ * On phones WordPress replaces the links with a ☰ button.
+ * The ☰ is shown, but tapping it does nothing until the mobile
+ * menu is designed.
+ * To make the ☰ work again: delete this rule.
+ * ------------------------------------------------------------- */
+.sf-navbar .sf-navbar__menu .wp-block-navigation__responsive-container-open {
+	color: var(--sf-navbar-text);
+	pointer-events: none;              /* ignore clicks + taps */
+}
+
+
+/* -------------------------------------------------------------
+ * 7. SEARCH, CURRENCY, CART + LOGIN
+ *   │ 🔍  MYR ▾  🛒  👤
+ * Sit at the right end of the bar. The thin vertical line
+ * before them is the divider.
+ * ------------------------------------------------------------- */
+.sf-navbar__actions {
+	gap: 14px;
+	padding-left: 16px;
+	border-left: 1px solid var(--sf-navbar-border);
+}
+
+.sf-navbar__actions .wp-block-woocommerce-customer-account a,
+.sf-navbar__actions .wc-block-mini-cart__button {
+	display: flex;
+	padding: 0;
+	color: var(--sf-navbar-text);
+}
+
+/* --- Font Awesome icons -------------------------------------------
+ * WordPress + WooCommerce draw their own icons (SVG). We hide those
+ * and show Font Awesome 5 icons in their place, so every icon in the
+ * navbar comes from one set. The \f… codes are Font Awesome's own
+ * icon codes (look them up on fontawesome.com/v5).
+ * --------------------------------------------------------------- */
+.sf-navbar .wp-block-search__button svg,
+.sf-navbar .wc-block-mini-cart__icon,
+.sf-navbar .wc-block-customer-account__account-icon,
+.sf-navbar__menu .wp-block-navigation__submenu-icon svg,
+.sf-navbar__menu .wp-block-navigation__responsive-container-open svg {
+	display: none;
+}
+
+.sf-navbar .wp-block-search__button::before,
+.sf-navbar .wc-block-mini-cart__quantity-badge::before,
+.sf-navbar .wp-block-woocommerce-customer-account a::before,
+.sf-navbar__menu .wp-block-navigation__submenu-icon::before,
+.sf-navbar__menu .wp-block-navigation__responsive-container-open::before {
+	font-family: "Font Awesome 5 Free";
+	font-weight: 900;                  /* 900 = solid icons */
+	font-size: 17px;
+	line-height: 1;
+	-webkit-font-smoothing: antialiased;
+}
+
+.sf-navbar .wp-block-search__button::before                 { content: "\f002"; }   /* fa-search */
+.sf-navbar .wc-block-mini-cart__quantity-badge::before      { content: "\f07a"; }   /* fa-shopping-cart */
+.sf-navbar .wp-block-woocommerce-customer-account a::before { content: "\f007"; font-weight: 400; }   /* fa-user (outline) */
+.sf-navbar__menu .wp-block-navigation__responsive-container-open::before { content: "\f0c9"; font-size: 20px; }   /* fa-bars (☰) */
+.sf-navbar__menu .wp-block-navigation__submenu-icon::before { content: "\f078"; font-size: 9px; }   /* fa-chevron-down (⌄) */
+
+/* The cart's little count bubble stays pinned to the cart icon */
+.sf-navbar .wc-block-mini-cart__quantity-badge {
+	position: relative;
+	display: flex;
+}
+
+/* --- Search ------------------------------------------------------
+ * WordPress's Search block, "icon only": the 🔍 opens a search box
+ * that slides out to its left. It searches products only.
+ * --------------------------------------------------------------- */
+.sf-navbar__search {
+	margin: 0;
+}
+
+/* The "Search products" label is for screen readers only — keep it
+   invisible even if WordPress's own screen-reader style isn't loaded */
+.sf-navbar__search .wp-block-search__label {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+}
+
+.sf-navbar__search .wp-block-search__inside-wrapper {
+	align-items: center;
+	padding: 0;
+	border: 0;
+	background: transparent;
+}
+
+/* The 🔍 button */
+.sf-navbar .sf-navbar__search .wp-block-search__button {
+	display: flex;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: transparent;
+	color: var(--sf-navbar-text);
+}
+
+/* --- Search takes over the menu ----------------------------------
+ *   closed:  [logo]  HOME  SHOP BY …  INSTALLATION GUIDE  │ 🔍 MYR 🛒 👤
+ *   open:    [logo]  [ Search products…              ✕ ]  │ 🔍 MYR 🛒 👤
+ * Clicking 🔍: navbar.js adds `is-searching` to the bar and measures
+ * the free space (--sf-search-width). The menu fades out and the
+ * search box grows from the 🔍 leftwards into that space.
+ * ✕, Escape or clicking elsewhere closes it; the menu fades back in.
+ * --------------------------------------------------------------- */
+.sf-navbar__search .wp-block-search__inside-wrapper {
+	position: relative;
+}
+
+/* The menu fades out while searching */
+.sf-navbar__menu {
+	transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.sf-navbar.is-searching .sf-navbar__menu {
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+}
+
+/* …and the divider before the icons hides, so it doesn't cut through the box */
+.sf-navbar.is-searching .sf-navbar__actions {
+	border-left-color: transparent;
+}
+
+/* The search box — sits to the left of the 🔍 and grows leftwards */
+.sf-navbar .sf-navbar__search .wp-block-search__input {
+	position: absolute;
+	top: 50%;
+	right: calc(100% + 10px);
+	z-index: 2;
+	width: var(--sf-search-width, var(--sf-navbar-search-width));
+	height: 40px;
+	padding: 0 44px 0 18px;              /* right side: room for the ✕ */
+	border: 1px solid var(--sf-navbar-border);
+	border-radius: var(--sf-navbar-radius);
+	background: rgba(255, 255, 255, 0.06);
+	translate: 0 -50%;
+	color: var(--sf-navbar-text);
+	font-family: var(--sf-navbar-font);
+	font-size: 14px;
+	transition: width 0.45s cubic-bezier(0.3, 1.1, 0.5, 1), border-color 0.2s ease;
+}
+
+.sf-navbar .sf-navbar__search .wp-block-search__input::placeholder {
+	color: rgba(255, 255, 255, 0.5);
+}
+
+.sf-navbar .sf-navbar__search .wp-block-search__input:focus {
+	border-color: var(--sf-navbar-accent);
+	outline: none;
+}
+
+/* Hide the browser's own little "clear" ✕ — we have our own */
+.sf-navbar__search .wp-block-search__input::-webkit-search-cancel-button {
+	-webkit-appearance: none;
+	appearance: none;
+}
+
+/* Our ✕ — inside the right end of the search box (added by navbar.js) */
+.sf-navbar__search-close {
+	position: absolute;
+	top: 50%;
+	right: calc(100% + 10px + 10px);
+	z-index: 3;
+	display: none;
+	place-items: center;
+	width: 26px;
+	height: 26px;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	background: transparent;
+	color: rgba(255, 255, 255, 0.6);
+	translate: 0 -50%;
+	cursor: pointer;
+	transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.sf-navbar__search-close:hover {
+	background: rgba(255, 255, 255, 0.1);
+	color: var(--sf-navbar-text);
+}
+
+.sf-navbar.is-searching .sf-navbar__search-close {
+	display: grid;
+}
+
+/* --- Currency switcher --------------------------------------------
+ *   MYR ▾  →  small glass dropdown: MYR / SGD / USD
+ * HTML comes from the [superfly_currency] shortcode (functions.php);
+ * the CURCY plugin does the actual switching.
+ * Opens on hover, or on click/tap (navbar.js adds `is-open`).
+ * --------------------------------------------------------------- */
+/* The switcher (and the icon group it sits in) takes the full height
+   of the bar, so its dropdown can open the same 10px below the bar
+   as the mega menu does. */
+.sf-navbar > .sf-navbar__actions {
+	align-self: stretch;
+}
+
+.sf-navbar__currency {
+	position: relative;
+	display: flex;
+	align-self: stretch;
+	align-items: center;
+}
+
+/* The "MYR ▾" button */
+.sf-navbar__currency-current {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	padding: 0;
+	border: 0;
+	background: none;
+	color: var(--sf-navbar-text);
+	font-family: var(--sf-navbar-font);
+	font-size: 13px;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	line-height: 1;
+	cursor: pointer;
+}
+
+.sf-navbar__currency-current .fa-chevron-down {
+	font-size: 9px;
+	transition: transform 0.2s ease;
+}
+
+/* The dropdown — hidden until hover / click */
+.sf-navbar__currency-list {
+	position: absolute;
+	top: calc(100% + 8px + 10px);      /* past the bar's own 8px padding, then the same 10px gap as the mega menu */
+	left: 50%;
+	z-index: 3;
+	min-width: 96px;
+	margin: 0;
+	padding: 6px;
+	list-style: none;
+	border: 1px solid var(--sf-navbar-border);
+	border-radius: 18px;               /* same as the mega menu */
+	background: var(--sf-navbar-dropdown-bg);
+	box-shadow: 0 30px 60px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+	-webkit-backdrop-filter: blur(var(--sf-navbar-blur));
+	backdrop-filter: blur(var(--sf-navbar-blur));
+	opacity: 0;
+	pointer-events: none;
+	translate: -50% 0;
+	transform: translateY(-6px);
+	transition: opacity 0.2s ease, transform 0.25s ease;
+}
+
+/* Invisible bridge over the gap, so it doesn't close on the way down */
+.sf-navbar__currency-list::before {
+	content: "";
+	position: absolute;
+	top: -20px;
+	left: 0;
+	right: 0;
+	height: 20px;
+}
+
+.sf-navbar__currency:hover .sf-navbar__currency-list,
+.sf-navbar__currency:focus-within .sf-navbar__currency-list,
+.sf-navbar__currency.is-open .sf-navbar__currency-list {
+	opacity: 1;
+	pointer-events: auto;
+	transform: none;
+}
+
+.sf-navbar__currency:hover .sf-navbar__currency-current .fa-chevron-down,
+.sf-navbar__currency.is-open .sf-navbar__currency-current .fa-chevron-down {
+	transform: rotate(180deg);
+}
+
+/* Each currency */
+.sf-navbar__currency-list a {
+	display: block;
+	padding: 10px 14px;
+	border-radius: 12px;               /* same as the mega menu rows */
+	color: rgba(255, 255, 255, 0.8);
+	font-family: var(--sf-navbar-font);
+	font-size: 13px;
+	font-weight: 500;
+	letter-spacing: 0.04em;
+	text-align: center;
+	text-decoration: none;
+	transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.sf-navbar__currency-list a:hover {
+	background: rgba(255, 255, 255, 0.06);   /* same as the mega menu rows */
+	color: var(--sf-navbar-text);
+}
+
+/* The one you're using now, in pink */
+.sf-navbar__currency-list a.is-current {
+	color: var(--sf-navbar-accent);
+}
+
+
+/* -------------------------------------------------------------
+ * 8. MEGA MENU
+ * One shared glass panel under the bar. navbar.js fills it with a
+ * row (icon, name, description) for every sub page, and moves /
+ * resizes it by setting:
+ *   --sf-mega-x       where it sits (left edge)
+ *   --sf-mega-width   how wide
+ *   --sf-mega-height  how tall
+ * Changing those glides the panel (the "morph"), because they are
+ * all in its transition list.
+ * ------------------------------------------------------------- */
+
+/* The normal WordPress dropdowns are replaced by the mega menu */
+.sf-navbar.sf-navbar--mega .sf-navbar__menu .wp-block-navigation__submenu-container {
+	display: none;
+}
+
+/* The panel — closed: invisible, tipped back a little, slightly small */
+.sf-mega {
+	position: absolute;
+	top: 100%;
+	left: 0;
+	z-index: 1;
+	width: var(--sf-mega-width, 0px);
+	height: var(--sf-mega-height, 0px);
+	margin-top: 10px;
+	border: 1px solid var(--sf-navbar-border);
+	border-radius: 18px;
+	background: var(--sf-navbar-dropdown-bg);
+	box-shadow: 0 30px 60px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+	-webkit-backdrop-filter: blur(var(--sf-navbar-blur)) saturate(160%);
+	backdrop-filter: blur(var(--sf-navbar-blur)) saturate(160%);
+	color: var(--sf-navbar-text);
+	font-family: var(--sf-navbar-font);
+	opacity: 0;
+	pointer-events: none;
+	transform: translateX(var(--sf-mega-x, 0px)) perspective(900px) rotateX(-14deg) scale(0.96);
+	transform-origin: 50% 0;
+	transition:
+		opacity   0.25s ease,
+		transform 0.5s cubic-bezier(0.3, 1.2, 0.5, 1),
+		width     0.5s cubic-bezier(0.3, 1.2, 0.5, 1),
+		height    0.5s cubic-bezier(0.3, 1.2, 0.5, 1);
+}
+
+/* Open: swings forward into place */
+.sf-mega.is-open {
+	opacity: 1;
+	pointer-events: auto;
+	transform: translateX(var(--sf-mega-x, 0px)) perspective(900px) rotateX(0deg) scale(1);
+}
+
+.sf-mega.is-instant {
+	transition: none;
+}
+
+/* Invisible bridge over the gap, so the panel doesn't close while
+   the mouse moves from the menu item down to it */
+.sf-mega::before {
+	content: "";
+	position: absolute;
+	top: -12px;
+	left: 0;
+	right: 0;
+	height: 12px;
+}
+
+/* The stage clips the lists while they slide from one item to the next */
+.sf-mega__stage {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	border-radius: inherit;
+}
+
+/* One list per menu item. The active one is shown; the others
+   wait to the side (--sf-slide) so they can slide in from there. */
+.sf-mega__section {
+	position: absolute;
+	top: 0;
+	left: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	width: var(--sf-mega-list-width);
+	padding: 6px;
+	opacity: 0;
+	pointer-events: none;
+	transform: translateX(var(--sf-slide, 0px));
+	transition: opacity 0.3s ease, transform 0.5s cubic-bezier(0.3, 1.2, 0.5, 1);
+}
+
+.sf-mega__section.is-active {
+	opacity: 1;
+	pointer-events: auto;
+	transform: none;
+}
+
+.sf-mega__section.is-instant {
+	transition: none;
+}
+
+/* --- Row --------------------------------------------------------
+ *   [icon]  Helmets                    ›
+ *           Full-face, modular
+ * On hover: the row lights up, the icon turns pink and the ›
+ * slides right and turns pink.
+ * --------------------------------------------------------------- */
+.sf-mega__row {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 8px 10px;
+	border-radius: 12px;
+	color: var(--sf-navbar-text);
+	text-decoration: none;
+	transition: background-color 0.2s ease;
+}
+
+.sf-mega__row:hover {
+	background: rgba(255, 255, 255, 0.06);
+}
+
+/* The icon in its small outlined box */
+.sf-mega__row-icon {
+	flex: none;
+	display: grid;
+	place-items: center;
+	width: 36px;
+	height: 36px;
+	border: 1px solid var(--sf-navbar-border);   /* neutral grey, not pink */
+	border-radius: 10px;
+	color: rgba(255, 255, 255, 0.85);
+	transition: border-color 0.25s ease, color 0.25s ease, transform 0.4s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+.sf-mega__row-icon .fas {
+	font-size: 16px;
+}
+
+/* On hover: only the icon turns pink (the box stays neutral) */
+.sf-mega__row:hover .sf-mega__row-icon {
+	border-color: rgba(255, 255, 255, 0.28);
+	color: var(--sf-navbar-accent);
+	transform: scale(1.06);
+}
+
+/* Name + description */
+.sf-mega__row-text {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 0;
+}
+
+.sf-mega__row-name {
+	font-size: 14px;
+	font-weight: 500;
+	line-height: 1.3;
+}
+
+.sf-mega__row-description {
+	font-size: 12px;
+	line-height: 1.35;
+	color: rgba(255, 255, 255, 0.5);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+/* The › on the right */
+.sf-mega__row-arrow {
+	flex: none;
+	margin-left: auto;
+	padding-left: 12px;
+	font-size: 11px;
+	opacity: 0.35;
+	transition: transform 0.25s ease, opacity 0.25s ease, color 0.25s ease;
+}
+
+.sf-mega__row:hover .sf-mega__row-arrow {
+	color: var(--sf-navbar-accent);
+	opacity: 1;
+	transform: translateX(3px);
+}
+
+/* Rows slide in one after another when a list appears (up to 8) */
+@keyframes sf-row-in {
+	from { opacity: 0; transform: translateY(8px); }
+	to   { opacity: 1; transform: none; }
+}
+
+.sf-mega__section.is-active .sf-mega__row {
+	animation-name: sf-row-in;
+	animation-duration: 0.4s;
+	animation-timing-function: cubic-bezier(0.3, 1.2, 0.5, 1);
+	animation-fill-mode: both;
+}
+
+.sf-mega__row:nth-child(2) { animation-delay: 0.04s; }
+.sf-mega__row:nth-child(3) { animation-delay: 0.08s; }
+.sf-mega__row:nth-child(4) { animation-delay: 0.12s; }
+.sf-mega__row:nth-child(5) { animation-delay: 0.16s; }
+.sf-mega__row:nth-child(6) { animation-delay: 0.20s; }
+.sf-mega__row:nth-child(7) { animation-delay: 0.24s; }
+.sf-mega__row:nth-child(8) { animation-delay: 0.28s; }
+
+
+/* -------------------------------------------------------------
+ * 9. RESPONSIVE
+ * ------------------------------------------------------------- */
+
+/* Smaller laptops: tighter spacing so everything stays on one line */
+@media (max-width: 1180px) {
+	.sf-navbar {
+		gap: 12px;
+		padding-inline: 18px;
+	}
+
+	.sf-navbar__menu .wp-block-navigation__responsive-container:not(.is-menu-open) :is(.wp-block-navigation__container, .wp-block-page-list) > li > .wp-block-navigation-item__content {
+		padding-inline: 10px;
+		font-size: 12px;
+		letter-spacing: 0.04em;
+	}
+}
+
+/* Tablet: search + currency tuck away; logo, menu, cart and login stay */
+@media (max-width: 960px) {
+	.sf-navbar {
+		gap: 10px;
+	}
+
+	.sf-navbar__actions .sf-navbar__search,
+	.sf-navbar__actions .sf-navbar__currency {
+		display: none;
+	}
+}
+
+/* Phone: ☰ at the left end, login + cart at the right end
+ * (the ☰ doesn't open anything yet — see section 6)
+ *
+ *   ☰ │ SUPERFLY ··········· 👤 🛒
+ *
+ * `.sf-navbar >` is needed to beat a WordPress rule that resets
+ * margins inside flex rows. */
+@media (max-width: 599px) {
+	.sf-navbar {
+		padding: 12px 20px;
+		gap: 12px;
+	}
+
+	.sf-navbar > .sf-navbar__menu {
+		order: -1;                      /* ☰ goes first, at the left end */
+		padding-right: 12px;
+		border-right: 1px solid var(--sf-navbar-border);
+	}
+
+	.sf-navbar > .sf-navbar__actions {
+		margin-left: auto;              /* push login + cart to the right end */
+		padding-left: 0;
+		border-left: 0;
+	}
+}
+
+
+/* -------------------------------------------------------------
+ * 10. ACCESSIBILITY
+ * ------------------------------------------------------------- */
+
+/* No box around links/icons after a mouse click or tap
+   (WordPress adds one to everything you click) */
+.sf-navbar a:focus:not(:focus-visible),
+.sf-navbar button:focus:not(:focus-visible) {
+	outline: none;
+}
+
+/* Keyboard users (Tab key) still get a soft rounded outline,
+   so they can see where they are */
+.sf-navbar a:focus-visible,
+.sf-navbar button:focus-visible {
+	outline: 2px solid var(--sf-navbar-focus);
+	outline-offset: 3px;
+	border-radius: 8px;
+}
+
+/* Respect "reduce motion" settings */
+@media (prefers-reduced-motion: reduce) {
+	.sf-navbar,
+	.sf-navbar::before,
+	.sf-navbar::after,
+	.sf-navbar *,
+	.sf-mega,
+	.sf-mega * {
+		transition: none !important;
+		animation: none !important;
+	}
+}
+
+/* Browsers without blur support: use a solid bar instead */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+	.sf-navbar::before {
+		background: rgba(12, 12, 16, 0.92);
+	}
+}

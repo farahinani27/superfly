@@ -1,0 +1,426 @@
+/* =============================================================
+ * SUPERFLY — PRODUCT PAGE + LISTING (the Beast layout)
+ * Thumbnails down the left, the shot in the middle, everything
+ * you choose on the right — and the fitment as a stack of rows
+ * rather than a dropdown, so the price for each one is visible
+ * before you pick.
+ * -------------------------------------------------------------
+ *   ┌──┐ ┌──────────────┐  READY STOCK
+ *   │▪ │ │              │  PROJECT X 4 SPOKE RIMS (GOLD)
+ *   ├──┤ │              │  the world's first 4-spoke…
+ *   │▪ │ │    photo     │  ┌────────────────────────┐
+ *   ├──┤ │              │  │ EGO 18T  1.6×14  RM448 │
+ *   │▪ │ │              │  ├────────────────────────┤
+ *   └──┘ └──────────────┘  │ Y15ZR    1.6×17  RM475 │
+ *                          └────────────────────────┘
+ *                          [ ADD TO CART — RM448.00 ]
+ *
+ *   Rows: assets/js/shop-beast.js turns WooCommerce's own
+ *   variation <select> into them and keeps the two in step, so
+ *   the cart still receives exactly what WooCommerce expects.
+ * ============================================================= */
+
+body.woocommerce,
+body.woocommerce-page {
+	--sb-tile:   #16161b;
+	--sb-line:   rgba(242, 242, 244, 0.12);
+	--sb-accent: #ec1e79;
+}
+
+
+/* -------------------------------------------------------------
+ * 1. THE LISTING — tiles, not white slabs
+ * ------------------------------------------------------------- */
+li.wc-block-product .wc-block-components-product-image {
+	background: var(--sb-tile);
+	overflow: hidden;
+}
+
+li.wc-block-product .wc-block-components-product-image img {
+	width: 100%;
+	aspect-ratio: 1 / 1;
+	object-fit: contain;          /* the whole part, never a crop */
+	padding: 14px;
+	transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+li.wc-block-product:hover .wc-block-components-product-image img {
+	transform: scale(1.04);
+}
+
+
+/* -------------------------------------------------------------
+ * 2. THE PRODUCT PAGE
+ * This site renders products with WooCommerce's *blocks*, not the
+ * classic single-product markup: there is no .summary and no
+ * .woocommerce-product-gallery — the gallery is
+ * .wp-block-woocommerce-product-image-gallery and the columns come
+ * from the block template. So this styles the pieces and leaves the
+ * layout to the template.
+ * ------------------------------------------------------------- */
+.wp-block-woocommerce-product-image-gallery img,
+.wc-block-components-product-image img {
+	background: var(--sb-tile);
+	object-fit: contain;
+}
+
+/* thumbnails in a column beside the shot, the way the reference site
+   does it. Inside the block, WooCommerce still prints its classic
+   gallery — .flex-viewport for the big image, .flex-control-thumbs for
+   the strip — so it can be laid out without touching the template. */
+.wp-block-woocommerce-product-image-gallery .woocommerce-product-gallery {
+	position: relative;
+	display: grid;
+	grid-template-columns: 84px minmax(0, 1fr);
+	gap: 12px;
+	align-items: start;
+}
+
+.wp-block-woocommerce-product-image-gallery .flex-viewport {
+	grid-column: 2;
+	grid-row: 1;
+	background: var(--sb-tile);
+}
+
+.wp-block-woocommerce-product-image-gallery .flex-control-thumbs {
+	grid-column: 1;
+	grid-row: 1;
+	display: grid;
+	gap: 10px;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+.wp-block-woocommerce-product-image-gallery .flex-control-thumbs li {
+	float: none;
+	width: 100%;
+	margin: 0;
+	list-style: none;
+}
+
+/* the zoom button belongs over the big image, not in the corner of the page */
+.wp-block-woocommerce-product-image-gallery .woocommerce-product-gallery__trigger {
+	position: absolute;
+	top: 12px;
+	right: 12px;
+	z-index: 3;
+}
+
+.wp-block-woocommerce-product-image-gallery .flex-control-thumbs img {
+	padding: 6px;
+	border: 1px solid transparent;
+	opacity: 0.7;
+	transition: opacity 0.2s ease, border-color 0.2s ease;
+}
+
+.wp-block-woocommerce-product-image-gallery .flex-control-thumbs img:hover,
+.wp-block-woocommerce-product-image-gallery .flex-control-thumbs img.flex-active {
+	opacity: 1;
+	border-color: var(--sb-accent);
+}
+
+
+/* -------------------------------------------------------------
+ * 3. THE FITMENT ROWS (built by shop-beast.js)
+ * ------------------------------------------------------------- */
+.sb-rows {
+	display: grid;
+	gap: 10px;
+	margin: 0 0 22px;
+}
+
+.sb-row {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto;
+	align-items: center;
+	gap: 12px;
+	width: 100%;
+	padding: 16px 18px;
+	background: none;
+	border: 1px solid var(--sb-line);
+	color: var(--wc-text, #f2f2f4);
+	font-family: var(--wc-body, "Archivo", sans-serif);
+	font-size: 14.5px;
+	text-align: left;
+	cursor: pointer;
+	transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.sb-row:hover { border-color: rgba(236, 30, 121, 0.5); }
+
+.sb-row.is-on {
+	border-color: var(--sb-accent);
+	background: rgba(236, 30, 121, 0.08);
+}
+
+.sb-row b {
+	font-family: var(--wc-tech, "Chakra Petch", sans-serif);
+	font-size: 16px;
+	font-weight: 700;
+	color: var(--sb-accent);
+}
+
+.sb-row.is-out {
+	opacity: 0.45;
+	cursor: not-allowed;
+}
+
+.sb-row.is-out b { color: var(--wc-faint, rgba(242,242,244,.34)); }
+
+/* the label above the rows */
+.sb-label {
+	margin: 0 0 12px;
+	font-family: var(--wc-tech, "Chakra Petch", sans-serif);
+	font-size: 12px;
+	font-weight: 700;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	color: var(--wc-faint, rgba(242,242,244,.34));
+}
+
+/* WooCommerce's own dropdown stays in the page for the form to submit,
+   but it is no longer what anyone looks at */
+.sb-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	clip-path: inset(50%);
+	white-space: nowrap;
+	border: 0;
+}
+
+/* ---- add to cart, full width with the price in it ---- */
+body.single-product div.product form.cart .single_add_to_cart_button,
+body.single-product .wc-block-add-to-cart-form .single_add_to_cart_button {
+	width: 100%;
+	height: 56px;
+	margin-top: 4px;
+	font-size: 14px;
+}
+
+body.single-product div.product form.cart .quantity {
+	margin-bottom: 12px;
+}
+
+.sb-note {
+	margin: 14px 0 0;
+	font-size: 12.5px;
+	text-align: center;
+	color: var(--wc-faint, rgba(242,242,244,.34));
+}
+
+
+/* -------------------------------------------------------------
+ * 4. PHONES
+ * ------------------------------------------------------------- */
+@media (max-width: 860px) {
+	.wp-block-woocommerce-product-image-gallery .woocommerce-product-gallery {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.wp-block-woocommerce-product-image-gallery .flex-viewport { grid-column: 1; }
+
+	.wp-block-woocommerce-product-image-gallery .flex-control-thumbs {
+		grid-column: 1;
+		grid-row: 2;
+		grid-auto-flow: column;
+		grid-auto-columns: 72px;
+		overflow-x: auto;
+	}
+}
+
+@media (max-width: 620px) {
+	.sb-row { padding: 14px 15px; font-size: 13.5px; }
+	.sb-row b { font-size: 15px; }
+}
+
+
+/* -------------------------------------------------------------
+ * 5. THE BUY ROW
+ * The page prints the price three times: the range under the
+ * title, WooCommerce's variation price under the rows, and the
+ * one on the button. Keep the range (it tells you the spread
+ * before you choose) and the button (it tells you what you are
+ * about to pay); drop the middle one.
+ * ------------------------------------------------------------- */
+body.single-product .woocommerce-variation-price {
+	display: none;
+}
+
+/* the empty availability line the variation leaves behind */
+body.single-product .woocommerce-variation-availability:empty {
+	display: none;
+}
+
+/* quantity and button on one line, the button taking the rest */
+body.single-product form.cart:not(.variations_form),
+body.single-product .variations_form .woocommerce-variation-add-to-cart {
+	display: flex;
+	align-items: stretch;
+	gap: 12px;
+}
+
+body.single-product form.cart .quantity {
+	margin: 0;
+	flex: 0 0 auto;
+}
+
+/* body-first and with the input's own tag, so it beats both
+   WooCommerce's and the theme's field sizing */
+body.woocommerce.single-product form.cart .quantity input.qty,
+body.woocommerce-page.single-product form.cart .quantity input.qty {
+	box-sizing: border-box;      /* 56 means 56, borders included */
+	height: 56px;
+	width: 92px;
+	margin: 0;
+	padding: 0 10px;
+	line-height: 1;
+}
+
+body.single-product form.cart .quantity { display: flex; align-items: stretch; }
+
+body.single-product form.cart .single_add_to_cart_button {
+	flex: 1 1 220px;               /* shares the first line with the quantity */
+	width: auto;
+	margin-top: 0;
+}
+
+/* the secondary links start the next line */
+body.single-product form.cart .shopengine_comparison_add_to_list_action {
+	flex-basis: 100%;
+	margin-right: 0;
+}
+
+@media (max-width: 520px) {
+	body.single-product form.cart:not(.variations_form),
+	body.single-product .variations_form .woocommerce-variation-add-to-cart {
+		flex-wrap: wrap;
+	}
+
+	body.single-product form.cart .quantity,
+	body.single-product form.cart .quantity .qty { width: 100%; }
+}
+
+/* ShopEngine puts its compare and wishlist links inside the buy row,
+   where they are clutter next to the one thing that matters. They are
+   still on every card in the listing, so nothing is lost by taking
+   them off the product page. Delete this block to bring them back. */
+body.single-product form.cart .shopengine_comparison_add_to_list_action,
+body.single-product form.cart .shopengine_add_to_list_action,
+body.single-product form.cart .shopengine-quickview-trigger {
+	display: none;
+}
+
+
+/* =============================================================
+ * 6. THE FILTER RAIL (templates/archive-product.html)
+ * WooCommerce's filter blocks, dressed to match the rest of the
+ * shop: a quiet column of groups with pink for what is chosen.
+ * ============================================================= */
+.sf-shop { align-items: flex-start; }
+
+.sf-shop__rail { position: sticky; top: 96px; }
+
+.sf-shop__rail h3 {
+	margin: 0 0 14px;
+	font-family: var(--wc-title);
+	font-weight: 400;
+	font-size: 15px;
+	text-transform: uppercase;
+	letter-spacing: 0.02em;
+	color: var(--wc-text);
+}
+
+.sf-shop__rail .wp-block-woocommerce-product-filter-attribute,
+.sf-shop__rail .wp-block-woocommerce-product-filter-price,
+.sf-shop__rail .wp-block-woocommerce-product-filter-status {
+	padding-bottom: 20px;
+	margin-bottom: 20px;
+	border-bottom: 1px solid var(--wc-line);
+}
+
+/* the checkbox rows */
+.sf-shop__rail .wc-block-product-filter-checkbox-list__item,
+.sf-shop__rail .wc-block-product-filter-checkbox-list li {
+	margin: 0 0 2px;
+}
+
+.sf-shop__rail .wc-block-product-filter-checkbox-list__label,
+.sf-shop__rail label {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 9px 10px;
+	font-family: var(--wc-body);
+	font-size: 14px;
+	color: var(--wc-muted);
+	cursor: pointer;
+	transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.sf-shop__rail .wc-block-product-filter-checkbox-list__label:hover,
+.sf-shop__rail label:hover {
+	background: rgba(255, 255, 255, 0.03);
+	color: var(--wc-text);
+}
+
+.sf-shop__rail input[type="checkbox"] {
+	accent-color: var(--wc-accent);
+	width: 15px;
+	height: 15px;
+}
+
+.sf-shop__rail .wc-block-product-filter-checkbox-list__text-count,
+.sf-shop__rail .wc-block-product-filter-checkbox-list__count {
+	margin-left: auto;
+	font-family: var(--wc-tech);
+	font-size: 11px;
+	color: var(--wc-faint);
+}
+
+/* price slider */
+.sf-shop__rail .wc-block-product-filter-price-slider__range,
+.sf-shop__rail input[type="range"] {
+	accent-color: var(--wc-accent);
+}
+
+.sf-shop__rail .wc-block-product-filter-price-slider__content input,
+.sf-shop__rail .wc-block-product-filter-price__amount {
+	background: var(--wc-panel);
+	border: 1px solid var(--wc-line);
+	color: var(--wc-text);
+	font-family: var(--wc-tech);
+	font-size: 13px;
+	padding: 8px 10px;
+}
+
+/* what is currently filtered, and the way out */
+.sf-shop__rail .wc-block-product-filter-removable-chips__item,
+.sf-shop__rail .wc-block-product-filter-chips__item {
+	background: rgba(236, 30, 121, 0.12);
+	border: 1px solid rgba(236, 30, 121, 0.45);
+	color: var(--wc-text);
+	font-family: var(--wc-tech);
+	font-size: 11px;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+}
+
+.sf-shop__rail .wc-block-product-filter-clear-button,
+.sf-shop__rail .wc-block-product-filter-clear-button a {
+	font-family: var(--wc-tech);
+	font-size: 11px;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	color: var(--wc-accent);
+}
+
+@media (max-width: 900px) {
+	.sf-shop { display: block; }
+	.sf-shop__rail { position: static; margin-bottom: 26px; }
+}

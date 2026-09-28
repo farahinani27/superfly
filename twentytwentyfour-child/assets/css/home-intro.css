@@ -1,0 +1,356 @@
+/* =============================================================
+ * SUPERFLY — HOME INTRO (loading screen, every home page load)
+ * -------------------------------------------------------------
+ *   ┌───────────────────────┬───────────────────────┐
+ *   │ [SUPERFLY logo]       │ + + + + +             │
+ *   │ // PLEASE WAIT        │ + + + + +   ■ 47%     │  ← "+" pattern fills
+ *   │ // LOADING...         │ + + + + +             │    as the page loads
+ *   ├───────────────────────┼───────────────────────┤
+ *   │ ■ WHEELS // TRUING... │ ■ BRAKES // BLEEDING… │
+ *   │     ◎◎◎◎◎  (spinning) │     ◎◎◎◎ (spreading)  │
+ *   └───────────────────────┴───────────────────────┘
+ * At 100%: the pattern pushes the logo panel away, the bottom cards
+ * drop, the pattern fills the screen, "READY" — then the whole
+ * screen lifts like a shutter to show the home page.
+ *
+ *   Layout:    added to the home page by functions.php
+ *   Movement:  assets/js/home-intro.js
+ *   Shown every time the home page loads, in place of the start
+ *   lights (preloader.css) that the other pages use.
+ *
+ * CONTENTS
+ *   1. Settings (edit me)
+ *   2. Screen + grid
+ *   3. Logo panel
+ *   4. Meter panel ("+" pattern + percent)
+ *   5. Bottom cards + line drawings
+ *   6. Phones
+ *   7. Safety net + reduce motion
+ * ============================================================= */
+
+
+/* -------------------------------------------------------------
+ * 1. SETTINGS (edit me)
+ * ------------------------------------------------------------- */
+.sf-intro {
+	--sf-intro-bg:     #121216;                   /* dark panels */
+	--sf-intro-accent: #ec1e79;                   /* Superfly pink: the square by the %, label dots, rev lights */
+	--sf-intro-panel:  #16161a;                   /* the logo panel — dark, so the pink + white logo shows */
+	--sf-intro-ink:    rgba(245, 245, 245, 0.8);  /* "// PLEASE WAIT / LOADING" on the logo panel */
+	--sf-intro-text:   rgba(245, 245, 245, 0.75);
+	--sf-intro-line:   #26262c;                   /* lines between the panels */
+	--sf-intro-art:    rgba(245, 245, 245, 0.42); /* the line drawings */
+	--sf-intro-load:   0;                         /* 0 … 1, set by home-intro.js */
+	--sf-intro-title:  "Archivo Black", "Arial Black", sans-serif;
+	--sf-intro-tech:   "Chakra Petch", "Archivo", sans-serif;
+}
+
+
+/* -------------------------------------------------------------
+ * 2. SCREEN + GRID — two rows, each split in two
+ * ------------------------------------------------------------- */
+.sf-intro {
+	position: fixed;
+	inset: 0;
+	z-index: 1001;                     /* above the navbar and the start lights */
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	background: var(--sf-intro-bg);
+	font-family: var(--sf-intro-tech);
+}
+
+.sf-intro__row {
+	display: flex;
+	flex: 0 0 50%;                     /* home-intro.js grows the top row to 100% */
+	min-height: 0;
+	overflow: hidden;
+}
+
+.sf-intro__row--top {
+	border-bottom: 1px solid var(--sf-intro-line);
+}
+
+.sf-intro__cell {
+	position: relative;
+	flex: 1 1 50%;
+	min-width: 0;
+	overflow: hidden;
+	box-sizing: border-box;
+	padding: clamp(24px, 3vw, 44px);
+}
+
+.sf-intro__cell + .sf-intro__cell {
+	border-left: 1px solid var(--sf-intro-line);
+}
+
+
+/* -------------------------------------------------------------
+ * 3. LOGO PANEL (dark carbon, logo in its own colours)
+ *    + breathing pink glow, a light band sweeping across and the
+ *    shift-light rev bar
+ * ------------------------------------------------------------- */
+.sf-intro__brand {
+	flex: 0 0 50%;                     /* home-intro.js squeezes this to 0 */
+	background:
+		/* carbon-fibre weave, like the "Shop by category" section */
+		repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.03) 0 2px, transparent 2px 4px),
+		repeating-linear-gradient(-45deg, rgba(0, 0, 0, 0.35) 0 2px, transparent 2px 4px),
+		var(--sf-intro-panel);
+	color: var(--sf-intro-ink);
+}
+
+/* Pink glow breathing softly behind the bike in the logo */
+.sf-intro__brand::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background: radial-gradient(38% 48% at 24% 34%, rgba(236, 30, 121, 0.22), transparent 70%);
+	animation: sf-intro-breathe 2.4s ease-in-out infinite alternate;
+	pointer-events: none;
+}
+
+@keyframes sf-intro-breathe {
+	from { opacity: 0.45; }
+	to   { opacity: 1; }
+}
+
+/* A band of light gliding across the carbon, like light on real carbon fibre */
+.sf-intro__brand::after {
+	content: "";
+	position: absolute;
+	inset: 0 auto 0 0;
+	width: 60%;
+	background: linear-gradient(105deg, transparent 0%, rgba(255, 255, 255, 0.07) 50%, transparent 100%);
+	transform: translateX(-120%) skewX(-12deg);
+	animation: sf-intro-sweep 3.4s cubic-bezier(0.45, 0, 0.2, 1) 0.6s infinite;
+	pointer-events: none;
+}
+
+@keyframes sf-intro-sweep {
+	0%        { transform: translateX(-120%) skewX(-12deg); }
+	55%, 100% { transform: translateX(260%) skewX(-12deg); }
+}
+
+/* everything in the panel sits above the glow and the light band */
+.sf-intro__brand > * {
+	position: relative;
+	z-index: 1;
+}
+
+/* The logo rises and sharpens into place */
+.sf-intro__logo {
+	animation: sf-intro-logo-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes sf-intro-logo-in {
+	from { opacity: 0; transform: translateY(18px); filter: blur(6px); }
+	to   { opacity: 1; transform: none; filter: none; }
+}
+
+/* Shift-light rev bar, bottom of the panel: 12 slanted segments that
+   light up with the loading percent (--sf-intro-load, 0 … 1, set by
+   home-intro.js). Segment i is lit once the load passes (i+1)/12;
+   the last four light up pink, like a bike's shift lights. */
+.sf-intro__revs {
+	position: absolute;
+	left: clamp(24px, 3vw, 44px);
+	right: clamp(24px, 3vw, 44px);
+	bottom: clamp(20px, 3vh, 36px);
+	display: flex;
+	gap: 6px;
+}
+
+.sf-intro__revs i {
+	flex: 1;
+	height: 8px;
+	background: rgba(245, 245, 245, 0.9);
+	transform: skewX(-20deg);
+	opacity: clamp(0.12, (var(--sf-intro-load) * 12 - var(--i)) * 1.5, 1);
+	transition: opacity 0.15s linear;
+}
+
+.sf-intro__revs i:nth-child(n + 9) {
+	background: var(--sf-intro-accent);
+	box-shadow: 0 0 10px rgba(236, 30, 121, 0.6);
+}
+
+/* The Superfly logo, in its own colours. The logo file has empty
+   space around it, so it's shown in a wider box with the top/bottom
+   space cropped off (object-fit: cover). */
+.sf-intro__logo {
+	display: block;
+	width: clamp(160px, min(24vw, 36vh), 400px);   /* follows the screen height too, so the text + rev bar below always fit */
+	height: auto;
+	aspect-ratio: 1.35;                /* crops the empty space above and below */
+	margin-top: clamp(4px, 1.5vh, 24px);
+	margin-left: -2%;                  /* the logo file has a little empty space on the left too */
+	object-fit: cover;
+	object-position: 50% 52%;
+}
+
+/* One status line that changes as the page loads (home-intro.js):
+   ■ WARMING UP THE ENGINE... → CHECKING TYRE PRESSURE... →
+   SETTING THE SUSPENSION... → LIGHTS OUT...
+   (■ = the same small pink square as the labels) */
+.sf-intro__status {
+	display: flex;
+	align-items: center;
+	overflow: hidden;                  /* the old message slides out of view */
+	margin-top: clamp(12px, 2.5vh, 36px);
+	font-size: 12px;
+	font-weight: 600;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	white-space: nowrap;
+}
+
+.sf-intro__message {
+	display: inline-block;
+	margin-left: 10px;
+}
+
+/* new message sliding up into place */
+.sf-intro__message.is-new {
+	animation: sf-intro-message-in 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes sf-intro-message-in {
+	from { opacity: 0; transform: translateY(100%); }
+	to   { opacity: 1; transform: none; }
+}
+
+.sf-intro__dots {
+	display: inline-block;
+	width: 1.5em;                      /* room for "..." so the text doesn't jump */
+	text-align: left;
+}
+
+
+/* -------------------------------------------------------------
+ * 4. METER PANEL — "+" pattern filling from the left, and percent
+ * ------------------------------------------------------------- */
+.sf-intro__meter {
+	flex: 1 1 50%;
+}
+
+.sf-intro__fill {
+	position: absolute;
+	inset: 0 auto 0 0;
+	width: calc(var(--sf-intro-load) * 100%);
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20'%3E%3Cpath d='M10 7v6M7 10h6' stroke='%23f5f5f5' stroke-opacity='.16' stroke-width='1'/%3E%3C/svg%3E");
+	background-size: 20px 20px;
+}
+
+.sf-intro__progress {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	display: flex;
+	align-items: center;
+	gap: 22px;
+	transform: translate(-50%, -50%);
+	white-space: nowrap;
+}
+
+.sf-intro__square {
+	width: 30px;
+	height: 30px;
+	background: var(--sf-intro-accent);
+}
+
+.sf-intro__percent {
+	min-width: 3.4ch;                  /* stops the square jumping as digits change */
+	font-family: var(--sf-intro-tech);
+	font-size: clamp(34px, 3.6vw, 52px);
+	font-weight: 500;
+	letter-spacing: 0.02em;
+	color: var(--sf-intro-text);
+}
+
+
+/* -------------------------------------------------------------
+ * 5. BOTTOM CARDS + LINE DRAWINGS
+ * ------------------------------------------------------------- */
+.sf-intro__label {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	font-size: 12px;                   /* same size as the status line */
+	font-weight: 600;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: var(--sf-intro-text);
+	white-space: nowrap;
+}
+
+.sf-intro__dot {
+	width: 8px;
+	height: 8px;
+	flex: none;
+	background: var(--sf-intro-accent);
+}
+
+/* Stacked outline drawings — home-intro.js fans them out and back */
+.sf-intro__art {
+	position: absolute;
+	left: clamp(40px, 6vw, 90px);
+	bottom: clamp(30px, 7vh, 90px);
+	width: clamp(110px, 12vw, 170px);
+	aspect-ratio: 1;
+}
+
+.sf-intro__shape {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	fill: none;
+	stroke: var(--sf-intro-art);
+	stroke-width: 1;
+	vector-effect: non-scaling-stroke;
+	overflow: visible;
+}
+
+
+/* -------------------------------------------------------------
+ * 6. PHONES — just the pattern and the percent, full screen
+ * ------------------------------------------------------------- */
+@media (max-width: 767px) {
+	.sf-intro__brand,
+	.sf-intro__row--bottom {
+		display: none;
+	}
+
+	.sf-intro__row--top {
+		flex-basis: 100%;
+		border-bottom: 0;
+	}
+
+	.sf-intro__cell + .sf-intro__cell {
+		border-left: 0;
+	}
+}
+
+
+/* -------------------------------------------------------------
+ * 7. SAFETY NET + REDUCE MOTION
+ * If home-intro.js can't run, the screen hides itself after 13s so
+ * the page is never left covered. "Reduce motion": never shown.
+ * ------------------------------------------------------------- */
+.sf-intro {
+	animation: sf-intro-safety 0.3s ease 13s forwards;
+}
+
+@keyframes sf-intro-safety {
+	to {
+		opacity: 0;
+		visibility: hidden;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.sf-intro {
+		display: none;
+	}
+}
