@@ -1,0 +1,405 @@
+/* =============================================================
+ * SUPERFLY - TERMS & CONDITIONS (page 128)
+ * The agreement as a two-column grid of hard-edged panels, in
+ * the language of the site's own hero: words skewed -8deg, a
+ * magenta bar under the accent word, Chakra Petch tech labels
+ * and square corners. Each clause is a panel with its number
+ * riding the top edge on a skewed magenta tab.
+ *
+ * Nine clauses, so the last panel spans both columns rather
+ * than leaving a half-width gap.
+ *
+ * Everything is open - no <details>, no JavaScript at all. The
+ * text is the binding agreement, so it stays searchable and
+ * printable rather than folded behind a control.
+ *
+ * Markup: the page's Elementor HTML widget (a copy is kept at
+ * wordpress/terms-conditions/terms.html in this repo)
+ * ============================================================= */
+
+/* ---- the carbon weave ----
+ * Same recipe as the privacy page, so the two legal pages match.
+ * Unlike privacy, this page gets no slug body class: WordPress adds
+ * privacy-policy only because that page is designated in Settings ->
+ * Privacy. There is no equivalent for terms, so this hangs off the page
+ * id instead. If page 128 is ever recreated, this selector needs updating. */
+body.page-id-128 {
+	background-color: #101014;
+	background-image:
+		repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.025) 0 2px, transparent 2px 4px),
+		repeating-linear-gradient(-45deg, rgba(0, 0, 0, 0.35) 0 2px, transparent 2px 4px);
+	background-attachment: fixed;
+}
+.superfly-terms{
+  --superfly-terms-bg:#0a0a0a;
+  --superfly-terms-text:#f5f5f5;
+  --superfly-terms-muted:rgba(245,245,245,.62);
+  --superfly-terms-faint:rgba(245,245,245,.38);
+  --superfly-terms-line:rgba(245,245,245,.18);
+  --superfly-terms-hair:rgba(245,245,245,.10);
+  --superfly-terms-accent:#ec1e79;
+  /* --superfly-terms-panel was #131317, the old bordered card colour. The
+     clause cards are neumorphic now and use --card, which is deliberately
+     almost the page colour. Kept only in case a flat panel is ever wanted
+     back; nothing reads it today. */
+  --superfly-terms-panel:#131317;
+  /* the neumorphic set, identical to privacy.css's */
+  --superfly-terms-card:#0d0d10;
+  --superfly-terms-lift:rgba(255,255,255,.03);   /* the light side */
+  --superfly-terms-sink:rgba(0,0,0,.38);         /* the shadow side */
+  --superfly-terms-slant:-8deg;
+  --superfly-terms-font-title:"Archivo Black","Arial Black",sans-serif;
+  --superfly-terms-font-body:"Archivo","Inter",sans-serif;
+  --superfly-terms-font-tech:"Chakra Petch","Archivo",sans-serif;
+
+  max-width:1180px; margin-inline:auto;
+  padding:clamp(34px,5vw,64px) clamp(20px,5vw,40px) clamp(60px,9vw,120px);
+  color:var(--superfly-terms-text); font-family:var(--superfly-terms-font-body);
+}
+.superfly-terms *,.superfly-terms *::before,.superfly-terms *::after{ box-sizing:border-box; }
+
+/* ---- matching FAQ's and contact's measure inside Elementor ----
+ * This page is an Elementor page; FAQ and contact are not. That costs it
+ * 120px of width in two separate ways, and BOTH have to be undone or the
+ * page still does not line up:
+ *
+ *   1. Elementor wraps the widget in .e-con-inner, which is capped at
+ *      min(100%, 1140px) - its global content width. The block asks for
+ *      1180 and never gets it.
+ *   2. Elementor's frontend.css sets box-sizing:border-box on everything
+ *      inside .elementor, including this block. Outside Elementor the block
+ *      is content-box, so `max-width:1180px` means 1180 of CONTENT plus two
+ *      40px gutters = 1260 overall. Inside Elementor the same declaration
+ *      means 1180 OVERALL - 1100 of content. That is the subtler half, and
+ *      raising the container cap alone does not fix it: it gets the block
+ *      to 1180 outer, still 80px short.
+ *
+ * So: lift the cap to 1260 AND restate the block at 1260, which is the
+ * border-box spelling of "1180 of content in a 40px gutter". Measured
+ * against the live FAQ afterwards - eyebrow at 125px from the window edge
+ * on both, content 1180 on both.
+ *
+ * Scoped to this page's body id: .e-con-inner is Elementor's class on
+ * EVERY container on the site, and this must not reach the shop or home. */
+body.page-id-128 .e-con-inner{ max-width:min(100%,1260px); }
+body.page-id-128 .superfly-terms{ max-width:1260px; }
+
+/* ---------- masthead ----------
+ * Matched to the privacy page's head (.pp__head in privacy.css), so the
+ * three information pages open identically: an 11px tech eyebrow, one
+ * italic line of Archivo Black at clamp(32px,6vw,68px) closed by a magenta
+ * square, a muted sub, and a hairline under the lot.
+ *
+ * The title is ITALIC, not skewX'd, and carries no underline bar - that is
+ * what privacy does, and matching it was the point. --superfly-terms-slant
+ * is still used further down for the clause number tabs. */
+/* The gap from the bottom of the title to the count bar was 117px — the
+   largest empty area on the page once the clause rows were tightened. It is
+   made of three numbers, and all three had to come down to close it:
+   the title's own 16px margin (left alone), this padding, and the bar's
+   margin-top below. 16 + 20 + 14 = 50px, which is what it now measures.
+
+   The hairline moves up with this padding, so it now sits 36px under the
+   title rather than 60. That is deliberate: the rule reads as closing the
+   masthead rather than floating between two things.
+
+   This is the one number here that does NOT match privacy.css, which still
+   sets clamp(26px,4vw,44px). Terms carries a count bar under its rule and
+   privacy does not, so privacy has nothing to pull up. */
+.superfly-terms-head{
+  padding-bottom:clamp(14px,2vw,20px);
+  border-bottom:1px solid var(--superfly-terms-line);
+}
+.superfly-terms-eyebrow{
+  /* the gap below is the shared one - contact, faq and privacy all set this
+     same clamp. It was 14px until 2026-09-29, against contact's 38px. */
+  margin:0 0 clamp(20px,3vw,38px);
+  font-family:var(--superfly-terms-font-tech); font-size:11px; font-weight:700;
+  letter-spacing:.22em; text-transform:uppercase; color:var(--superfly-terms-accent);
+}
+
+/* The contact and FAQ title: upright rather than italic, two stacked lines
+   with the second in magenta, no magenta square. All five page titles were
+   italic-and-square until 2026-09-29; every one of them now uses this.
+   Values are copied from .superfly-contact-title - change one, change all.
+
+   The font-size is the shared page-title size - contact, faq, privacy (which
+   also dresses /return-refund/) and shop-archive all set exactly this. */
+.superfly-terms-title{
+  margin:0 0 16px;
+  font-family:var(--superfly-terms-font-title); font-weight:400;
+  /* .92, not 1: tighter than the type is tall, which is what closes the gap
+     between the two stacked lines */
+  font-size:clamp(32px,6vw,68px); line-height:.92; letter-spacing:-.025em;
+  text-transform:uppercase; color:var(--superfly-terms-text);
+}
+/* the second line, in magenta */
+.superfly-terms-title span{ display:block; color:var(--superfly-terms-accent); }
+
+/* UNUSED since 2026-09-29 - the paragraph this styles was removed from the
+   markup on request. Kept so restoring it stays a markup-only change; see
+   the comment where it used to sit in wordpress/terms-conditions/terms.html.
+
+   Privacy's sub is capped at 34ch, which suits its one-line summary. This
+   one was the store's binding opening paragraph - four times longer - and a
+   34ch column of it would be a very tall thin ribbon, so the measure stays
+   wide. The type size and colour are privacy's. */
+.superfly-terms-intro{
+  max-width:52ch; margin:0;
+  font-size:clamp(14px,1.15vw,16px); line-height:1.6; color:var(--superfly-terms-muted);
+}
+
+/* Spacing and type taken from privacy's .pp__bar. It carries NO rule of its
+   own: the masthead above already ends in a hairline, and a second one a
+   few pixels below reads as a mistake. */
+/* margin-top was clamp(30px,5vw,56px), privacy's figure — see the note on
+   .superfly-terms-head for why it came down. The bottom margin is unchanged;
+   22px to the first clause row was already right. */
+.superfly-terms-bar{
+  display:flex; align-items:baseline; justify-content:space-between; gap:20px;
+  margin:clamp(10px,1.4vw,14px) 0 clamp(16px,2vw,22px);
+}
+.superfly-terms-label,.superfly-terms-count{
+  margin:0; font-family:var(--superfly-terms-font-tech); font-size:11px; font-weight:700;
+  letter-spacing:.22em; text-transform:uppercase;
+}
+.superfly-terms-label{ color:var(--superfly-terms-faint); }
+/* The "Agreement terms" label was removed from the markup on 2026-09-29, so
+   the count is the only child left - and a lone child under space-between
+   falls to the LEFT, which is not where it was. margin-left:auto pushes it
+   back to the right edge. Restore the label and this is harmless: an auto
+   margin against a sibling under space-between does nothing.
+
+   THIS MUST STAY BELOW the shared .superfly-terms-label,.superfly-terms-count
+   rule above. That rule sets the `margin` SHORTHAND, which resets
+   margin-left to 0 - so written above it, this silently does nothing. It was
+   written above it first, and the count sat on the left until someone
+   looked. */
+.superfly-terms-count{ margin-left:auto; color:var(--superfly-terms-accent); }
+
+/* ---------- the clause rows ----------
+ *
+ * Rebuilt 2026-09-29 on the pattern of zeynapp.co.uk/what-we-do, which the
+ * operator picked out: each clause is a full-width row split in two — the
+ * number and a large heading on the left, the clause text on the right,
+ * vertically centred against it — with a hairline between rows and a lot of
+ * air around them.
+ *
+ * This REPLACED a stack of neumorphic cards. The cards, their 12px radius,
+ * their shadows and the skewed magenta number tab are all gone, so this page
+ * no longer shares a surface with privacy and return-refund. That was the
+ * point: those two are read in pieces, and this one is read straight through.
+ * The card variables (--superfly-terms-card, -lift, -sink) are left defined
+ * so restoring the old look is a CSS-only change.
+ *
+ * The MASTHEAD IS UNTOUCHED, on request — the eyebrow, the two stacked title
+ * lines and their sizes are exactly as they were.
+ *
+ * The reference separates its rows with whitespace alone. This page keeps a
+ * hairline as well: it carries nine clauses of legal text rather than four
+ * short ones, and without a rule the eye loses which paragraph belongs to
+ * which heading once the rows get tall.
+ * ----------------------------------------------------------- */
+.superfly-terms-grid{
+  display:grid; grid-template-columns:minmax(0,1fr);
+  gap:0;
+}
+/* The row. Two equal columns, like the reference, with a gap wide enough that
+   the heading and the text read as two things rather than one wrapped one.
+   The reference uses a flat 96px; this is a clamp so it does not swallow the
+   text column on a laptop. */
+/* Tightened 2026-09-29: the rows were reading as mostly empty. Three things
+   caused it and all three are set here.
+
+   - The columns were equal. Half of 1260px is a lot of room for the word
+     "GENERAL", so every short heading left a long empty shelf beside it.
+     The text column is now the wider of the two.
+   - The gap ran to 96px, the reference's figure — but the reference fills
+     its right column with a paragraph AND a four-item list, so it can
+     afford the gap. These clauses are two or three sentences.
+   - The padding ran to 72px top and bottom, which on a three-line clause is
+     more empty space than text.
+
+   Anyone re-widening these should look at the page at 1440px before and
+   after, not at the numbers. */
+.superfly-terms-clause{
+  display:grid;
+  grid-template-columns:minmax(0,0.85fr) minmax(0,1.15fr);
+  column-gap:clamp(26px,3.4vw,64px);
+  row-gap:clamp(14px,1.8vw,22px);
+  /* centred, not start: the heading is nearly always shorter than the clause
+     beside it, and pinning both to the top left the heading stranded at the
+     top of a tall row */
+  align-items:center;
+
+  padding-top:clamp(28px,3.2vw,44px);
+  padding-bottom:clamp(28px,3.2vw,44px);
+  border-top:1px solid var(--superfly-terms-hair);
+}
+
+/* no rule above the first row - the count bar already closes the masthead */
+.superfly-terms-clause:first-child{
+  border-top:0;
+  padding-top:clamp(20px,3vw,34px);
+}
+
+/* ---------- the reveal ----------
+ *
+ * Each row rises and fades in as it is scrolled to, following the reference
+ * page this layout comes from.
+ *
+ * EVERY RULE HERE IS SCOPED UNDER .is-revealing, a class that terms.js adds
+ * and that is in no markup. Without the script the rows are simply visible:
+ * nothing to fail open, because closed is the state that has to be asked for.
+ * This is binding legal text, so a reveal that could strand a clause
+ * off-screen is not acceptable - see the header of terms.js.
+ *
+ * The heading leads and the clause text follows it by 90ms. A stagger that
+ * small is not read as two animations; it reads as the row arriving with a
+ * bit of weight to it. Any longer and the text visibly lags.
+ *
+ * translate3d, not translateY: it keeps the row on the compositor, so nine
+ * rows animating do not repaint the carbon weave behind them. */
+.superfly-terms-grid.is-revealing .superfly-terms-clause-head,
+.superfly-terms-grid.is-revealing .superfly-terms-clause-body{
+  opacity:0;
+  transform:translate3d(0,22px,0);
+  transition:opacity .55s ease, transform .55s cubic-bezier(.22,.61,.36,1);
+}
+
+.superfly-terms-grid.is-revealing .superfly-terms-clause-body{
+  transition-delay:.09s;
+}
+
+.superfly-terms-grid.is-revealing .superfly-terms-clause.is-in .superfly-terms-clause-head,
+.superfly-terms-grid.is-revealing .superfly-terms-clause.is-in .superfly-terms-clause-body{
+  opacity:1;
+  transform:translate3d(0,0,0);
+}
+
+/* Belt and braces with the check in terms.js: if the class is ever added by
+   something else, reduced motion still gets the text with no movement. */
+@media (prefers-reduced-motion:reduce){
+  .superfly-terms-grid.is-revealing .superfly-terms-clause-head,
+  .superfly-terms-grid.is-revealing .superfly-terms-clause-body{
+    opacity:1;
+    transform:none;
+    transition:none;
+  }
+}
+
+/* Printing happens with no scrolling, so a row that was never reached would
+   print blank. Everything is visible on paper. */
+@media print{
+  .superfly-terms-grid.is-revealing .superfly-terms-clause-head,
+  .superfly-terms-grid.is-revealing .superfly-terms-clause-body{
+    opacity:1;
+    transform:none;
+    transition:none;
+  }
+}
+
+/* The row itself now centres its two halves (align-items above), so the body
+   no longer needs to stretch and centre its own contents — that rule went
+   with the tightening, along with the min-height:100% that made every row as
+   tall as its tallest column even when nothing needed the room. */
+
+/* The number is now a plain tracked label above the heading, the way the
+   reference sets it. The skewed magenta tab it used to be belonged to the
+   card edge it rode on, and there is no card any more. */
+.superfly-terms-number{
+  display:block; margin:0 0 clamp(10px,1.4vw,16px);
+  font-family:var(--superfly-terms-font-tech); font-size:12px; font-weight:700;
+  letter-spacing:.2em; text-transform:uppercase;
+  color:var(--superfly-terms-accent);
+}
+
+/* The statement. Upright and tight, but NOT the reference's 72px.
+   Two reasons it came down to 34, both from looking at the built page:
+   - the reference pairs its 72px headings with 18-24px body copy. This page
+     sets body copy at 13.5px, matching the footer, so a 48px heading was
+     three and a half times the text beside it and the row read as a heading
+     with a caption.
+   - a wrapped 48px heading was ~100px tall against clause text that is often
+     ~50px, so the heading, not the content, decided how tall every row was.
+     That is what made the page look empty. */
+.superfly-terms-clause h2{
+  margin:0; font-family:var(--superfly-terms-font-title); font-weight:400;
+  font-size:clamp(20px,2.3vw,34px); line-height:1.06; letter-spacing:-.02em;
+  text-transform:uppercase; color:var(--superfly-terms-text);
+}
+/* Justified — both edges flush, which suits a legal document and squares the
+   clause text off against the panel edges.
+ *
+ * hyphens:auto is not cosmetic here. Justifying a narrow column stretches
+ * word spaces to fill the line, and this text carries long unbreakable runs
+ * ("www.superflymotos.com", "Superflymotos") that would otherwise open up
+ * rivers of white space. Hyphenation gives the browser somewhere to break.
+ * It needs the lang attribute, which the page has from <html lang="en">.
+ *
+ * overflow-wrap is the backstop: if a URL is still too long for the column
+ * it breaks mid-string rather than pushing the panel wide. */
+.superfly-terms-clause p{
+  /* 13.5px flat, matching the footer's .sf-pf__small — the size body copy is set
+     at everywhere else on the site. These were clamps that grew to 15-16px on a
+     desktop, so the information pages read noticeably larger than the footer
+     under them. Set across return-refund, privacy, faq, contact and terms
+     together on 2026-09-29: the five are one family, so change it in all of
+     them or in none. */
+  margin:0 0 12px; font-size:13.5px; line-height:1.8;
+  color:var(--superfly-terms-muted);
+  text-align:justify;
+  hyphens:auto;
+  -webkit-hyphens:auto;
+  overflow-wrap:break-word;
+}
+.superfly-terms-clause p:last-child{ margin-bottom:0; }
+.superfly-terms-clause strong{ color:var(--superfly-terms-text); font-weight:700; }
+.superfly-terms-clause a{ color:var(--superfly-terms-accent); text-decoration:none; border-bottom:1px solid transparent; }
+.superfly-terms-clause a:hover{ border-bottom-color:var(--superfly-terms-accent); }
+
+/* ---------- foot ---------- */
+.superfly-terms-footer{
+  margin-top:clamp(40px,6vw,64px); padding-top:clamp(24px,3vw,34px);
+  border-top:1px solid var(--superfly-terms-line);
+  display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:22px;
+}
+.superfly-terms-footer p{ margin:0; font-size:13.5px; line-height:1.7; color:var(--superfly-terms-muted); }
+.superfly-terms-footer a{ color:var(--superfly-terms-accent); text-decoration:none; }
+.superfly-terms-footer a:hover{ text-decoration:underline; }
+.superfly-terms-updated{
+  font-family:var(--superfly-terms-font-tech); font-size:11px; letter-spacing:.16em;
+  text-transform:uppercase; margin-top:8px !important; color:var(--superfly-terms-faint) !important;
+}
+.superfly-terms-button{
+  position:relative; isolation:isolate; flex:none;
+  display:inline-flex; align-items:center; padding:15px 28px;
+  color:var(--superfly-terms-bg); font-family:var(--superfly-terms-font-tech); font-size:14px; font-weight:700;
+  letter-spacing:.14em; text-transform:uppercase; text-decoration:none; white-space:nowrap;
+  transition:color .25s;
+}
+.superfly-terms-button::before{
+  content:""; position:absolute; inset:0; z-index:-1;
+  border:1px solid var(--superfly-terms-text); background:var(--superfly-terms-text);
+  transform:skewX(-14deg); transition:background-color .25s;
+}
+.superfly-terms-button:hover{ color:var(--superfly-terms-text); }
+.superfly-terms-button:hover::before{ background:transparent; }
+
+/* The grid used to go two panels wide here, with the odd ninth panel spanning
+   both. There are no panels now — every clause is a full-width row that
+   splits internally — so that rule went with them. */
+@media (max-width:900px){
+  /* stacked: heading over its text, which is what the reference does on a
+     phone too. The heading comes down in size with it, because a 48px line
+     over a 13.5px paragraph at 375px wide reads as two unrelated pages. */
+  .superfly-terms-clause{
+    grid-template-columns:minmax(0,1fr);
+  }
+  .superfly-terms-clause h2{
+    font-size:clamp(22px,6vw,30px);
+  }
+}
+@media (prefers-reduced-motion:reduce){
+  .superfly-terms-clause,.superfly-terms-button,.superfly-terms-button::before{ transition:none; }
+}

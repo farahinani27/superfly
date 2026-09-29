@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Terms &amp; Conditions - local preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700&family=Archivo+Black&family=Chakra+Petch:wght@500;600;700&display=swap" rel="stylesheet">
+<!-- the real stylesheet, in the theme - not a copy of it -->
+<link rel="stylesheet" href="../../twentytwentyfour-child/assets/css/terms.css">
+<style>
+  /* The only rule here. WordPress puts no margin on <body> and sets the text
+     colour from theme.json; locally neither of those exists, so this stands
+     in for them. Everything else - including the page background - comes from
+     the theme stylesheet above, so the preview cannot drift from the site. */
+  html, body { margin: 0; color: #f5f5f5; }
+</style>
+</head>
+<!-- the body class the live page carries: it is what terms.css hangs the
+     carbon-weave background off, so the preview gets the real background -->
+<body class="page-id-128">
+<!-- terms.html is injected here so the markup is never duplicated either -->
+<div id="mount">Loading terms.html&hellip;</div>
+<script>
+  fetch('terms.html')
+    .then(function (r) { return r.text(); })
+    .then(function (h) { document.getElementById('mount').innerHTML = h; })
+    .then(function () {
+      /* The theme's real scroll-reveal script, loaded AFTER the markup is in
+         the DOM — it runs once, on whatever rows exist at that moment, so
+         loading it in <head> the way the live page does would find nothing
+         here and the preview would show no animation. Same file as the site
+         enqueues; not a copy. */
+      var s = document.createElement('script');
+      /* cache-buster: without it the browser holds on to the copy it already
+         has and you end up testing the previous version of the script
+         without knowing it. The live site does not need this — WordPress
+         versions the file by filemtime. */
+      s.src = '../../twentytwentyfour-child/assets/js/terms.js?v=' + Date.now();
+      document.body.appendChild(s);
+    })
+    .catch(function () {
+      document.getElementById('mount').textContent =
+        'Open this over http (see README), not as a file:// path.';
+    });
+</script>
+</body>
+</html>
