@@ -1,0 +1,284 @@
+<!-- wp:html -->
+<!-- ============================================================
+     SUPERFLY - Frequently Asked Questions page markup
+     superfly.durianbikers.com/faq/  (page 158)
+
+     THE wp:html WRAPPER ON THE FIRST AND LAST LINES IS
+     LOAD-BEARING. This file is the page's `content` verbatim -
+     copy it in whole, wrapper included, and do not strip it.
+     Without it WordPress runs wpautop() over the markup, which
+     inserts an empty <p> into every block (~34px of dead space
+     each) and turns the newline after each </svg> into a <br>,
+     knocking every icon off its label. Both read as CSS bugs and
+     neither one is; it cost a wasted deploy on the contact page,
+     2026-09-29.
+
+     NOT an Elementor widget, so there is no render cache to
+     clear after an edit.
+
+     Markup only - the CSS lives in
+     twentytwentyfour-child/assets/css/faq.css and is enqueued
+     by the theme. See README.md.
+
+     Do NOT paste the stylesheet back in here.
+
+     The answers fold natively: <details> + <summary>, no script.
+     Question 01 is the only one with `open`, so the page shows
+     one worked example and a clean index of the rest.
+
+     The rail on the right links the other help pages. Every one
+     of them exists and returns 200 - if a page is ever deleted,
+     delete its row too.
+
+     There is no sub-heading and no "08 questions" count. The
+     count had to be hand-edited whenever a question was added
+     and went stale silently; the rows say how many there are.
+
+     Two answers are marked CONTENT REVIEW. They describe the
+     WooCommerce checkout and payment setup, which do not match
+     the live Unicart store's wording. The operator has to sign
+     those off before launch - see README.md.
+     ============================================================ -->
+<article class="superfly-faq">
+
+  <!-- head matched to the privacy page: eyebrow / one italic title line
+       closed by a magenta square / hairline. -->
+  <header class="superfly-faq-head">
+    <p class="superfly-faq-eyebrow">Superfly / FAQ</p>
+    <!-- Two stacked lines, second one magenta - the contact page's title,
+         not the italic-and-square masthead terms and privacy use. The line
+         break is the <span>, which is display:block in faq.css. -->
+    <h1 class="superfly-faq-title">Frequently<span>Asked questions</span></h1>
+  </header>
+
+  <div class="superfly-faq-split">
+
+    <div class="superfly-faq-list">
+
+      <section class="superfly-faq-group" id="faq-ordering">
+        <h2 class="superfly-faq-group-label">Ordering & delivery</h2>
+
+        <details class="superfly-faq-item" open>
+          <summary class="superfly-faq-question">
+            How do I place an order?
+            <i class="superfly-faq-sign" aria-hidden="true"></i>
+          </summary>
+          <div class="superfly-faq-answer">
+            <p>The whole order takes a few minutes.</p>
+            <!-- CONTENT REVIEW: written for the WooCommerce checkout. The live
+                 Unicart copy describes a multi-page flow ("Shipping Address"
+                 page, "next" buttons) that will not exist on this store. -->
+            <ol class="superfly-faq-steps">
+              <li>Press <strong>Add to cart</strong> on the products you want.</li>
+              <li>Press <strong>Continue shopping</strong> to keep browsing, or
+                <strong>Checkout</strong> when you are done.</li>
+              <li>Sign in, or check out as a guest &mdash; an account lets you track the
+                order later.</li>
+              <li>Fill in your billing and shipping address, then pick a shipping
+                method.</li>
+              <li>Choose a payment method.</li>
+              <li>Review the order, agree to the terms and press
+                <strong>Place order</strong>.</li>
+            </ol>
+            <p class="superfly-faq-note">You will get a confirmation email the moment the
+              order is received. If it does not arrive, check your spam folder before
+              contacting us.</p>
+          </div>
+        </details>
+
+        <details class="superfly-faq-item">
+          <summary class="superfly-faq-question">
+            Can I cancel an order?
+            <i class="superfly-faq-sign" aria-hidden="true"></i>
+          </summary>
+          <div class="superfly-faq-answer">
+            <p>Yes &mdash; but only while the order is still <strong>pending</strong>.
+              Email <a href="mailto:superflymotosofficial@gmail.com">superflymotosofficial@gmail.com</a>
+              with the subject <strong>Request to cancel order</strong> and your order
+              number.</p>
+            <!-- page 11 on this site: the slug is return-refund, not
+                 return-refund-policy -->
+            <p class="superfly-faq-note">Orders that have already shipped cannot be
+              cancelled. See the <a href="/return-refund/">Return &amp; Refund Policy</a>
+              instead.</p>
+          </div>
+        </details>
+
+        <details class="superfly-faq-item">
+          <summary class="superfly-faq-question">
+            How long does delivery take?
+            <i class="superfly-faq-sign" aria-hidden="true"></i>
+          </summary>
+          <div class="superfly-faq-answer">
+            <p>Normally <strong>7 to 14 working days</strong> from the day payment
+              clears. Working days exclude weekends and public holidays.</p>
+          </div>
+        </details>
+      </section>
+
+      <section class="superfly-faq-group" id="faq-payment">
+        <h2 class="superfly-faq-group-label">Payment & pricing</h2>
+
+        <details class="superfly-faq-item">
+          <summary class="superfly-faq-question">
+            What payment methods are available?
+            <i class="superfly-faq-sign" aria-hidden="true"></i>
+          </summary>
+          <div class="superfly-faq-answer">
+            <!-- CONTENT REVIEW: the live page names PayPal and iPay88, which are
+                 the Unicart gateways. Stripe is planned for this store. The
+                 wording below is deliberately gateway-neutral so it is not wrong
+                 either way, but the operator should name the real providers
+                 before launch. -->
+            <p><strong>Card and online banking</strong> &mdash; Visa, Mastercard and
+              Malaysian internet banking, handled by our payment provider at checkout.</p>
+            <p><strong>Bank transfer</strong> &mdash; pay the invoice total into our
+              account, then email us the transfer details: bank name, date, time,
+              reference number, amount paid and your order number. Send the confirmation
+              to <a href="mailto:superflymotosofficial@gmail.com">superflymotosofficial@gmail.com</a>.</p>
+            <p class="superfly-faq-note">Bank-transfer orders are not shipped until we have
+              confirmed the payment.</p>
+          </div>
+        </details>
+
+        <details class="superfly-faq-item">
+          <summary class="superfly-faq-question">
+            What currency are prices in?
+            <i class="superfly-faq-sign" aria-hidden="true"></i>
+          </summary>
+          <div class="superfly-faq-answer">
+            <p>Every transaction is in <strong>Ringgit Malaysia (RM)</strong>. A price
+              shown in another currency is a conversion for reference only &mdash; your
+              bank is charged the RM amount.</p>
+          </div>
+        </details>
+      </section>
+
+      <section class="superfly-faq-group" id="faq-account">
+        <h2 class="superfly-faq-group-label">Your account</h2>
+
+        <details class="superfly-faq-item">
+          <summary class="superfly-faq-question">
+            How do I change my details or shipping address?
+            <i class="superfly-faq-sign" aria-hidden="true"></i>
+          </summary>
+          <div class="superfly-faq-answer">
+            <p>Sign in and open <strong>My account</strong>. <strong>Account details</strong>
+              holds your name, email and password; <strong>Addresses</strong> holds your
+              billing and shipping addresses.</p>
+            <p class="superfly-faq-note">Changing an address here does not change an order
+              that has already been placed &mdash; email us for that.</p>
+          </div>
+        </details>
+
+        <details class="superfly-faq-item">
+          <summary class="superfly-faq-question">
+            I forgot my password. How do I reset it?
+            <i class="superfly-faq-sign" aria-hidden="true"></i>
+          </summary>
+          <div class="superfly-faq-answer">
+            <ol class="superfly-faq-steps">
+              <li>On the login page, press <strong>Lost your password?</strong></li>
+              <li>Enter the email address you registered with and submit.</li>
+              <li>Open the reset link we email you and choose a new password.</li>
+            </ol>
+          </div>
+        </details>
+      </section>
+
+      <section class="superfly-faq-group superfly-faq-group-closer">
+        <details class="superfly-faq-item">
+          <summary class="superfly-faq-question">
+            My question is not answered here.
+            <i class="superfly-faq-sign" aria-hidden="true"></i>
+          </summary>
+          <div class="superfly-faq-answer">
+            <p>Email <a href="mailto:superflymotosofficial@gmail.com">superflymotosofficial@gmail.com</a>
+              and tell us your order number if you have one. We read every message.</p>
+          </div>
+        </details>
+      </section>
+
+    </div>
+
+    <!-- the other help pages, current one marked -->
+    <aside class="superfly-faq-rail">
+      <nav class="superfly-faq-jump">
+        <p class="superfly-faq-rail-label">On this page</p>
+        <ul class="superfly-faq-jump-list">
+          <li><a href="#faq-ordering">Ordering & delivery</a></li>
+          <li><a href="#faq-payment">Payment & pricing</a></li>
+          <li><a href="#faq-account">Your account</a></li>
+        </ul>
+      </nav>
+
+      <nav class="superfly-faq-rail-nav">
+        <p class="superfly-faq-rail-label">More help</p>
+      <ul class="superfly-faq-rail-list">
+        <li class="is-here">
+          <a href="/faq/" aria-current="page">
+            <svg class="superfly-faq-rail-arrow" viewBox="0 0 17 10" aria-hidden="true"><path d="M0 5h15M11 1l4 4-4 4"/></svg>
+            <span>FAQ</span>
+          </a>
+        </li>
+        <li>
+          <a href="/installation-guide/">
+            <svg class="superfly-faq-rail-arrow" viewBox="0 0 17 10" aria-hidden="true"><path d="M0 5h15M11 1l4 4-4 4"/></svg>
+            <span>Installation guide</span>
+          </a>
+        </li>
+        <li>
+          <a href="/warranty/">
+            <svg class="superfly-faq-rail-arrow" viewBox="0 0 17 10" aria-hidden="true"><path d="M0 5h15M11 1l4 4-4 4"/></svg>
+            <span>Warranty</span>
+          </a>
+        </li>
+        <li>
+          <a href="/return-refund/">
+            <svg class="superfly-faq-rail-arrow" viewBox="0 0 17 10" aria-hidden="true"><path d="M0 5h15M11 1l4 4-4 4"/></svg>
+            <span>Return &amp; refund</span>
+          </a>
+        </li>
+        <li>
+          <a href="/terms-conditions/">
+            <svg class="superfly-faq-rail-arrow" viewBox="0 0 17 10" aria-hidden="true"><path d="M0 5h15M11 1l4 4-4 4"/></svg>
+            <span>Terms &amp; conditions</span>
+          </a>
+        </li>
+        <li>
+          <a href="/privacy-policy/">
+            <svg class="superfly-faq-rail-arrow" viewBox="0 0 17 10" aria-hidden="true"><path d="M0 5h15M11 1l4 4-4 4"/></svg>
+            <span>Privacy policy</span>
+          </a>
+        </li>
+        <li>
+          <a href="/contact-us/">
+            <svg class="superfly-faq-rail-arrow" viewBox="0 0 17 10" aria-hidden="true"><path d="M0 5h15M11 1l4 4-4 4"/></svg>
+            <span>Contact us</span>
+          </a>
+        </li>
+        </ul>
+      </nav>
+
+      <!-- Moved out of the page footer and into the rail: it is help content,
+           it belongs with the help links, and the right-hand column was
+           otherwise empty for roughly 750px below the last link.
+
+           No Contact us button here: /contact-us/ is already linked from the
+           rail above and again from the site footer. Three routes to one page
+           in one column is noise, not emphasis. The mailto stays, because
+           emailing is a different action from opening the contact page. -->
+      <div class="superfly-faq-tail">
+        <p class="superfly-faq-tail-heading">Still stuck?</p>
+        <p class="superfly-faq-tail-text">Fitment, spec or warranty questions &mdash; email
+          <a href="mailto:superflymotosofficial@gmail.com">superflymotosofficial@gmail.com</a>
+          and tell us your order number if you have one. We read every message.</p>
+      </div>
+
+    </aside>
+
+  </div>
+
+</article>
+
+<!-- /wp:html -->

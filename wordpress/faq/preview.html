@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FAQ - local preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700&family=Archivo+Black&family=Chakra+Petch:wght@500;600;700&display=swap" rel="stylesheet">
+<!-- the real stylesheet, in the theme - not a copy of it -->
+<link rel="stylesheet" href="../../twentytwentyfour-child/assets/css/faq.css">
+<style>
+  /* The only rule here. WordPress puts no margin on <body> and sets the text
+     colour from theme.json; locally neither of those exists, so this stands
+     in for them. Everything else - including the page background - comes from
+     the theme stylesheet above, so the preview cannot drift from the site. */
+  html, body { margin: 0; color: #f5f5f5; }
+</style>
+</head>
+<!-- the body class the live page carries. functions.php adds it via the
+     body_class filter, and faq.css hangs the carbon-weave background off it,
+     so the preview gets the real background -->
+<body class="superfly-faq-page">
+<!-- faq.html is injected here so the markup is never duplicated either -->
+<div id="mount">Loading faq.html&hellip;</div>
+<script>
+  fetch('faq.html')
+    .then(function (r) { return r.text(); })
+    .then(function (h) { document.getElementById('mount').innerHTML = h; })
+    .catch(function () {
+      document.getElementById('mount').textContent =
+        'Open this over http (see README), not as a file:// path.';
+    });
+</script>
+</body>
+</html>

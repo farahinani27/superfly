@@ -1247,6 +1247,53 @@ function superfly_privacy_assets() {
 }
 
 
+// Frequently asked questions — eight questions as hard-edged panels, each
+// with its number on a skewed magenta tab, matching the terms clauses. The
+// answers fold: they are native <details>, so there is no script on this
+// page at all.
+// Matched on the slug, not the page id: unlike terms there is nothing tying
+// this to a particular post, so the page can be deleted and rebuilt without
+// breaking its styling.
+// Markup: the page's own wp:html block, like privacy — not an Elementor
+// widget, so there is no render cache to clear after an edit.
+// Looks: assets/css/faq.css
+add_action( 'wp_enqueue_scripts', 'superfly_faq_assets', 27 );
+function superfly_faq_assets() {
+	if ( ! is_page( 'faq' ) ) {
+		return;
+	}
+
+	// Same fonts as the rest of the site: Archivo Black, Archivo, Chakra Petch
+	wp_enqueue_style(
+		'superfly-hero-fonts',
+		'https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800&family=Archivo+Black&family=Chakra+Petch:wght@500;600;700&display=swap',
+		array(),
+		null
+	);
+
+	wp_enqueue_style(
+		'superfly-faq',
+		get_stylesheet_directory_uri() . '/assets/css/faq.css',
+		array( 'superfly-child-style', 'superfly-hero-fonts' ),
+		filemtime( get_stylesheet_directory() . '/assets/css/faq.css' )
+	);
+}
+
+
+// The body class faq.css hangs the carbon-weave background off. WordPress
+// gives the privacy page a `privacy-policy` class of its own because that
+// page is designated in Settings → Privacy, and the terms page had to fall
+// back to `page-id-128`; this is the same idea without the id.
+add_filter( 'body_class', 'superfly_faq_body_class' );
+function superfly_faq_body_class( $classes ) {
+	if ( is_page( 'faq' ) ) {
+		$classes[] = 'superfly-faq-page';
+	}
+
+	return $classes;
+}
+
+
 // Page not found — a dial with the needle past the end of the sweep.
 // The template is templates/404.html in this theme, which WordPress picks
 // up on its own; there is no page to create and no page builder involved.

@@ -1,0 +1,789 @@
+/* =============================================================
+ * SUPERFLY - FREQUENTLY ASKED QUESTIONS
+ *
+ * The FAQ as rows on hairlines - no panels, no boxes. Each
+ * question is a <details> separated from the next by a single
+ * rule, with a magenta sign at the right that is a plus when the
+ * row is shut and a cross when it is open. The answer is
+ * indented beneath it.
+ *
+ * Beside the questions, down the right, is a rail of the other
+ * help pages with the current one marked. That rail is the
+ * reason this layout exists: a customer who lands on the FAQ
+ * needing the refund policy would otherwise have to go back to
+ * the footer to find it.
+ *
+ * The structure follows sowhat.one/faq, which the operator
+ * picked out. The palette, the masthead and the type do NOT -
+ * those stay matched to the privacy and terms pages so the three
+ * information pages still read as one family.
+ *
+ * The folding is native <details>/<summary>: there is no
+ * JavaScript on this page at all, so it works with scripts
+ * blocked, prints correctly, and stays findable by the browser's
+ * own in-page search (modern browsers expand a closed <details>
+ * to reveal a match).
+ *
+ * Every class is scoped under .superfly-faq, so nothing here can
+ * reach the rest of the site. Names are spelled out - no `sf-`
+ * shorthand, no BEM `__` separators - matching privacy.css and
+ * terms.css rather than the older `sf-` files.
+ *
+ * No shorthand properties anywhere: every declaration names the
+ * one thing it sets. It is longer, but a longhand file can be
+ * skimmed and edited a line at a time without having to work out
+ * which of four values a shorthand is quietly also resetting.
+ *
+ * Markup: the page's own wp:html block (a copy is kept at
+ *   wordpress/faq/faq.html in this repo). NOT an Elementor
+ *   widget - there is no render cache to clear after an edit.
+ * Enqueue: functions.php - superfly_faq_assets()
+ * Body class: functions.php - superfly_faq_body_class()
+ * ============================================================= */
+
+
+/* ---- the carbon weave ----
+ * Same recipe as the privacy and terms pages, so all three sit on the
+ * same background.
+ *
+ * This hangs off a body class the theme adds (see superfly_faq_body_class
+ * in functions.php), NOT off body.page-id-N. The terms page had to use an
+ * id because it was styled before the class existed, which means recreating
+ * that page breaks its background. This page has no such tie: the class
+ * follows the slug, so the page can be deleted and rebuilt freely. */
+body.superfly-faq-page {
+	background-color: #101014;
+	background-image:
+		repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.025) 0 2px, transparent 2px 4px),
+		repeating-linear-gradient(-45deg, rgba(0, 0, 0, 0.35) 0 2px, transparent 2px 4px);
+	background-attachment: fixed;
+}
+
+
+/* -------------------------------------------------------------
+ * The block
+ * ----------------------------------------------------------- */
+
+.superfly-faq {
+	/* colour */
+	--superfly-faq-text: #f5f5f5;
+	--superfly-faq-muted: rgba(245, 245, 245, 0.70);
+	--superfly-faq-faint: rgba(245, 245, 245, 0.38);
+	--superfly-faq-line: rgba(245, 245, 245, 0.18);
+	--superfly-faq-hair: rgba(245, 245, 245, 0.10);
+	--superfly-faq-accent: #ec1e79;
+
+
+	/* type */
+	--superfly-faq-font-title: "Archivo Black", "Arial Black", sans-serif;
+	--superfly-faq-font-body: "Archivo", "Inter", sans-serif;
+	--superfly-faq-font-tech: "Chakra Petch", "Archivo", sans-serif;
+
+	/* 1180px, the terms page's width, rather than the 1000px this page used
+	   when it was a single column of prose. The rail on the right makes it a
+	   two-column layout, which is what 1180 was chosen for on terms. The
+	   questions still sit on a comfortable measure because the rail takes
+	   300px out of it. */
+	max-width: 1180px;
+	margin-left: auto;
+	margin-right: auto;
+
+	padding-top: clamp(34px, 5vw, 64px);
+	padding-right: clamp(20px, 5vw, 40px);
+	padding-bottom: clamp(60px, 9vw, 120px);
+	padding-left: clamp(20px, 5vw, 40px);
+
+	color: var(--superfly-faq-text);
+	font-family: var(--superfly-faq-font-body);
+}
+
+.superfly-faq *,
+.superfly-faq *::before,
+.superfly-faq *::after {
+	box-sizing: border-box;
+}
+
+
+/* -------------------------------------------------------------
+ * Masthead
+ *
+ * Matched to the privacy page's head (.pp__head in privacy.css), so the
+ * three information pages open identically: an 11px tech eyebrow, one
+ * italic line of Archivo Black closed by a magenta square, and a hairline
+ * under the lot.
+ *
+ * The title is ITALIC, not skewX'd, and carries no underline bar - that is
+ * what privacy does, and matching it was the point.
+ *
+ * There is NO sub-heading. "Frequently Asked Questions." needs no gloss,
+ * and the questions immediately below state the scope better than a
+ * sentence could. Privacy has no sub either, and the terms page's intro is
+ * legal body copy rather than a tagline - so nothing is broken by leaving
+ * it out. If one is ever wanted back, it needs a rule of its own - the
+ * old .superfly-faq-intro was removed with the rest of the panel-era CSS.
+ * ----------------------------------------------------------- */
+
+.superfly-faq-head {
+	padding-bottom: clamp(26px, 4vw, 44px);
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: var(--superfly-faq-line);
+}
+
+.superfly-faq-eyebrow {
+	margin-top: 0;
+	margin-right: 0;
+	/* the gap between the eyebrow and the title. contact.css, terms.css and
+	   privacy.css all set this same clamp - it was 14px here, against
+	   contact's 38px, and the two pages visibly did not open alike */
+	margin-bottom: clamp(20px, 3vw, 38px);
+	margin-left: 0;
+
+	font-family: var(--superfly-faq-font-tech);
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.22em;
+	text-transform: uppercase;
+	color: var(--superfly-faq-accent);
+}
+
+/* This title is the CONTACT page's, not terms' and privacy's: upright rather
+   than italic, two stacked lines with the second in magenta, and no magenta
+   square closing it. Contact and FAQ are the two pages a customer actually
+   arrives on, so they open the same way; terms, privacy and return-refund
+   keep the italic-and-square masthead, which is the documents' house style.
+
+   Every value below is copied from .superfly-contact-title - size, leading
+   and tracking. Change one, change both. */
+.superfly-faq-title {
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
+
+	font-family: var(--superfly-faq-font-title);
+	font-weight: 400;
+
+	/* The shared page-title size. contact.css, terms.css, privacy.css
+	   (which also dresses /return-refund/) and shop-archive.css all set
+	   exactly this. It was clamp(30px, 5vw, 54px) across all five until
+	   2026-09-29; change it in all five or in none. */
+	font-size: clamp(32px, 6vw, 68px);
+
+	/* tighter than the type is tall, which is what closes the gap between
+	   the two stacked lines - terms and privacy set 1 because theirs are
+	   single-line mastheads */
+	line-height: 0.92;
+
+	letter-spacing: -0.025em;
+	text-transform: uppercase;
+	color: var(--superfly-faq-text);
+}
+
+/* the second line, in magenta */
+.superfly-faq-title span {
+	display: block;
+	color: var(--superfly-faq-accent);
+}
+
+/* -------------------------------------------------------------
+ * The split: questions on the left, help rail on the right
+ *
+ * There is no "INDEX / 08 QUESTIONS" strip any more. It was a count that
+ * had to be edited by hand every time a question was added or removed, and
+ * it went stale silently - the rows themselves say how many there are.
+ * ----------------------------------------------------------- */
+
+/* Two columns: the questions, and the help rail beside them.
+ *
+ * Briefly one full-width column with the rail as a band across the bottom
+ * (2026-09-29). Reverted the same day: the band read as a separate footer
+ * rather than as help belonging to the page, and it put the refund-policy
+ * link an entire page away from the customer who needs it. The rail is back
+ * beside the questions, and it now carries a jump index as well — which is
+ * what fills the column that was half empty in the first place. */
+.superfly-faq-split {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(0, 360px);
+	column-gap: clamp(32px, 5vw, 70px);
+	align-items: start;
+
+	margin-top: clamp(30px, 5vw, 56px);
+}
+
+
+/* -------------------------------------------------------------
+ * The questions
+ * ----------------------------------------------------------- */
+
+/* No border-top: the masthead above already ends in a hairline, and a
+   second rule a few pixels below it reads as a mistake. */
+.superfly-faq-list {
+	display: block;
+}
+
+.superfly-faq-item {
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: var(--superfly-faq-hair);
+}
+
+.superfly-faq-question {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 16px;
+	column-gap: 24px;
+	align-items: center;
+
+	/* 30px top and bottom made an 85px row for ~25px of text; tightened to 20
+	   on 2026-09-29 with the full-width change. Still a comfortable click
+	   target - a question is a control as well as a line of type. */
+	padding-top: clamp(16px, 1.8vw, 20px);
+	padding-bottom: clamp(16px, 1.8vw, 20px);
+
+	cursor: pointer;
+	list-style: none;
+
+	/* Archivo Black, uppercase - the face this site gives a heading of this
+	   rank everywhere it has been designed: the contact page's route headings
+	   (17px), the terms page's clause headings (21px), and the FAQ's own
+	   questions before this layout. Privacy and return-refund set their
+	   accordion heads in the body face instead, but those two are one
+	   stylesheet, and they are the minority.
+
+	   The borderless rows were briefly set in Archivo 500 to keep sowhat's
+	   lightness. That made the FAQ the only page on the site using the body
+	   face for a heading, which is a worse trade than losing the lightness. */
+	font-family: var(--superfly-faq-font-title);
+	font-weight: 400;
+	font-size: clamp(15px, 1.6vw, 19px);
+	letter-spacing: 0.005em;
+	line-height: 1.32;
+	text-transform: uppercase;
+	color: var(--superfly-faq-text);
+
+	transition-property: color;
+	transition-duration: 0.2s;
+	transition-timing-function: ease;
+}
+
+/* Safari draws its own disclosure triangle unless this is removed: it
+   ignores list-style on a <summary>. */
+.superfly-faq-question::-webkit-details-marker {
+	display: none;
+}
+
+.superfly-faq-question:hover {
+	color: var(--superfly-faq-accent);
+}
+
+/* The theme draws a focus ring around the whole summary row, which fires on
+   every mouse click and boxes the question in magenta until you click away.
+
+   :focus-visible rather than :focus - the ring is suppressed for pointer
+   clicks but kept for keyboard tabbing, where it is the only thing showing
+   which question you are on. Removing it outright would make the page
+   unusable without a mouse. */
+.superfly-faq-question:focus {
+	outline: none;
+}
+
+/* A BAR IN THE GUTTER, not a box around the row.
+ *
+ * This indicator has to exist: it is the only thing telling a keyboard user
+ * which question they are on, and deleting it makes the page unusable
+ * without a mouse.
+ *
+ * But Chrome treats a click on a <summary> as keyboard-like focus — unlike a
+ * <button>, which it does not — so a mouse user saw a 2px magenta rectangle
+ * drawn around a mostly empty 65px row, offset 3px from it, and it read as a
+ * stray box rather than as focus.
+ *
+ * So the indicator moved rather than went. The box-shadow trick: a negative
+ * spread shrinks the shadow to a thin bar, and the negative x-offset pushes
+ * it into the gutter left of the text, which the article's own padding
+ * leaves room for. No outline, no layout shift, nothing drawn around the row.
+ *
+ * Do not replace this with "outline: none" on its own. */
+.superfly-faq-question:focus-visible {
+	outline: none;
+	box-shadow: -16px 0 0 -13px var(--superfly-faq-accent);
+}
+
+/* The sign - a plus that turns into a cross.
+   Two bars rather than a glyph: the plus and the multiplication sign are
+   different widths in Archivo, so a text sign shifts the row every time it
+   toggles. Rotating two identical bars by 45deg lands exactly on a cross. */
+.superfly-faq-sign {
+	position: relative;
+
+	width: 16px;
+	height: 16px;
+
+	color: var(--superfly-faq-accent);
+
+	transform-origin: 50% 50%;
+	transition-property: transform;
+	transition-duration: 0.22s;
+	transition-timing-function: ease;
+}
+
+.superfly-faq-item[open] .superfly-faq-sign {
+	transform: rotate(45deg);
+}
+
+.superfly-faq-sign::before,
+.superfly-faq-sign::after {
+	content: "";
+	position: absolute;
+	top: 50%;
+	right: 0;
+	left: 0;
+	height: 2px;
+	background-color: currentcolor;
+	transform: translateY(-50%);
+}
+
+.superfly-faq-sign::after {
+	transform: translateY(-50%) rotate(90deg);
+}
+
+
+/* -------------------------------------------------------------
+ * The answers
+ * ----------------------------------------------------------- */
+
+.superfly-faq-answer {
+	/* no top padding: the <summary> above already supplies the gap */
+	padding-top: 0;
+	padding-right: 0;
+	padding-bottom: clamp(26px, 3vw, 34px);
+
+	/* The indent no longer bottoms out at 0 on a phone, because there is a
+	   rule sitting in it now — see below. 16px reads as an indent without
+	   eating into the measure. */
+	padding-left: clamp(16px, 4vw, 54px);
+
+	/* An open answer used to be a paragraph floating under a question with
+	   nothing tying the two together, which is what made a one-line answer
+	   look like an empty row. This rule runs the height of the answer and
+	   marks it as belonging to the question above it. */
+	border-left-width: 1px;
+	border-left-style: solid;
+	border-left-color: var(--superfly-faq-hair);
+
+	/* No max-width: the answer fills the question column. It was capped at
+	   62ch, a comfortable reading measure, which left the text wrapping at
+	   about 70% of the column and looking unfinished beside the rule above
+	   it. The operator asked for the full width. */
+	max-width: none;
+
+	/* 13.5px flat, matching the footer's .sf-pf__small — the size body copy is set
+	   at everywhere else on the site. These were clamps that grew to 15-16px on a
+	   desktop, so the information pages read noticeably larger than the footer
+	   under them. Set across return-refund, privacy, faq, contact and terms
+	   together on 2026-09-29: the five are one family, so change it in all of
+	   them or in none. */
+	font-size: 13.5px;
+	line-height: 1.8;
+	text-align: justify;
+	/* justified text on a long measure opens rivers between words; automatic
+	   hyphenation is what closes them, and it needs the lang on <html> */
+	hyphens: auto;
+	color: var(--superfly-faq-muted);
+}
+
+.superfly-faq-answer p {
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 15px;
+	margin-left: 0;
+}
+
+.superfly-faq-answer p:last-child {
+	margin-bottom: 0;
+}
+
+.superfly-faq-answer strong {
+	font-weight: 600;
+	color: var(--superfly-faq-text);
+}
+
+.superfly-faq-answer a {
+	color: var(--superfly-faq-accent);
+}
+
+
+/* -------------------------------------------------------------
+ * Numbered steps
+ * The one place the FAQ needs an ordered list. The markers are
+ * drawn by a counter rather than by the browser's own numbering,
+ * so they can carry the tech face and the accent colour.
+ * ----------------------------------------------------------- */
+
+.superfly-faq-steps {
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 15px;
+	margin-left: 0;
+
+	padding-left: 0;
+	list-style: none;
+	counter-reset: superflyfaqstep;
+}
+
+.superfly-faq-steps li {
+	position: relative;
+
+	margin-bottom: 10px;
+	padding-left: 38px;
+
+	counter-increment: superflyfaqstep;
+}
+
+.superfly-faq-steps li::before {
+	content: counter(superflyfaqstep, decimal-leading-zero);
+	position: absolute;
+	top: 2px;
+	left: 0;
+
+	font-family: var(--superfly-faq-font-tech);
+	font-size: 11.5px;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	color: var(--superfly-faq-accent);
+}
+
+
+/* -------------------------------------------------------------
+ * A note inside an answer - the thing the customer will get
+ * wrong if they skim.
+ * ----------------------------------------------------------- */
+
+.superfly-faq-note {
+	color: var(--superfly-faq-text);
+}
+
+
+/* -------------------------------------------------------------
+ * The help rail
+ *
+ * Every link here is a page that exists on this site. If one is ever
+ * deleted, delete the row with it - a dead link on the help page is worse
+ * than no link at all.
+ * ----------------------------------------------------------- */
+
+/* Sticky, so the help links and the jump index stay reachable once the
+   reader is a group or two down the page. */
+.superfly-faq-rail {
+	position: sticky;
+	top: 30px;
+}
+
+.superfly-faq-rail-label {
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 16px;
+	margin-left: 0;
+
+	font-family: var(--superfly-faq-font-tech);
+	font-size: 10.5px;
+	font-weight: 700;
+	letter-spacing: 0.22em;
+	text-transform: uppercase;
+	color: var(--superfly-faq-faint);
+}
+
+.superfly-faq-rail-list {
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
+
+	padding-left: 0;
+	list-style: none;
+}
+
+.superfly-faq-rail-list a {
+	display: grid;
+	grid-template-columns: 24px minmax(0, 1fr);
+	align-items: center;
+
+	padding-top: 10px;
+	padding-bottom: 10px;
+
+	text-decoration: none;
+
+	font-family: var(--superfly-faq-font-tech);
+	font-size: 12px;
+	font-weight: 700;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: var(--superfly-faq-faint);
+
+	transition-property: color;
+	transition-duration: 0.2s;
+	transition-timing-function: ease;
+}
+
+.superfly-faq-rail-list a:hover {
+	color: var(--superfly-faq-text);
+}
+
+/* The arrow keeps its 24px column on every row, not only the current one,
+   so nothing shifts sideways when a row is hovered. */
+.superfly-faq-rail-arrow {
+	width: 17px;
+	height: 10px;
+
+	fill: none;
+	stroke: currentcolor;
+	stroke-width: 1.5;
+	stroke-linecap: round;
+	opacity: 0;
+
+	transition-property: opacity;
+	transition-duration: 0.2s;
+	transition-timing-function: ease;
+}
+
+.superfly-faq-rail-list a:hover .superfly-faq-rail-arrow {
+	opacity: 0.45;
+}
+
+.superfly-faq-rail-list .is-here a {
+	color: var(--superfly-faq-accent);
+}
+
+.superfly-faq-rail-list .is-here .superfly-faq-rail-arrow {
+	opacity: 1;
+}
+
+
+/* -------------------------------------------------------------
+ * Closing panel
+ * ----------------------------------------------------------- */
+
+/* Sits at the foot of the rail, under the help links - not across the
+   bottom of the page, where it used to leave the right-hand column empty
+   for about 750px. Stacked rather than a flex row: it has a 360px column
+   to work in now, not the full page width. */
+.superfly-faq-tail {
+	display: block;
+
+	margin-top: clamp(26px, 3vw, 34px);
+	padding-top: clamp(20px, 2.4vw, 26px);
+
+	border-top-width: 1px;
+	border-top-style: solid;
+	border-top-color: var(--superfly-faq-line);
+}
+
+.superfly-faq-tail-heading {
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 6px;
+	margin-left: 0;
+
+	font-family: var(--superfly-faq-font-title);
+	font-weight: 400;
+	font-size: clamp(15px, 1.6vw, 18px);
+	text-transform: uppercase;
+	color: var(--superfly-faq-text);
+}
+
+.superfly-faq-tail-text {
+	max-width: none;
+
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
+
+	font-size: 13.5px;
+	line-height: 1.7;
+	text-align: justify;
+	/* The rail is a 360px column - about 45 characters a line, half the
+	   measure the answers get. Justifying a line that short stretches the
+	   word spacing hard, and this paragraph contains a 31-character email
+	   address that cannot be broken. Hyphenation is what keeps the gaps
+	   from opening into rivers. */
+	hyphens: auto;
+	color: var(--superfly-faq-muted);
+}
+
+.superfly-faq-tail-text a {
+	color: var(--superfly-faq-accent);
+}
+
+/* -------------------------------------------------------------
+ * The groups
+ *
+ * The eight questions are grouped into Ordering & delivery, Payment &
+ * pricing and Your account, with "My question is not answered here" left
+ * outside them and unlabelled — it is not a question about a stage of the
+ * order, it is the way out when none of them fit.
+ *
+ * Added 2026-09-29 with the jump index in the rail. Between them they are
+ * the answer to the rail being 466px tall against a 1020px list: the column
+ * now carries the page's own contents rather than seven links and a gap.
+ *
+ * Group order and membership live in the markup, not here. If a question is
+ * added, put it in a group there — an ungrouped <details> will still render,
+ * but it will sit under whichever label happens to precede it, which is
+ * worse than being obviously out of place.
+ * ----------------------------------------------------------- */
+
+.superfly-faq-group {
+	/* the hairline between questions separates them inside a group; this is
+	   the space that says one group has ended and another begun */
+	padding-bottom: clamp(20px, 3vw, 34px);
+
+	/* an in-page link that lands a heading flush against the top of the
+	   window puts it under the floating site header */
+	scroll-margin-top: 90px;
+}
+
+.superfly-faq-group:last-child {
+	padding-bottom: 0;
+}
+
+.superfly-faq-group-label {
+	margin-top: clamp(26px, 3.4vw, 40px);
+	margin-right: 0;
+	margin-bottom: 4px;
+	margin-left: 0;
+
+	font-family: var(--superfly-faq-font-tech);
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.22em;
+	text-transform: uppercase;
+	color: var(--superfly-faq-accent);
+}
+
+/* the first label sits directly under the masthead, which already has a rule
+   under it — it does not need the air the later ones get */
+.superfly-faq-group:first-child .superfly-faq-group-label {
+	margin-top: 0;
+}
+
+/* no label of its own, so without this the closer would run straight on from
+   the account questions as if it belonged to them */
+.superfly-faq-group-closer {
+	margin-top: clamp(26px, 3.4vw, 40px);
+}
+
+
+/* -------------------------------------------------------------
+ * The jump index
+ *
+ * Sits above the help links in the rail. Same rows, same spacing — the
+ * label above it is .superfly-faq-rail-label, shared with "More help".
+ * ----------------------------------------------------------- */
+
+.superfly-faq-jump {
+	margin-bottom: clamp(26px, 3.4vw, 38px);
+	padding-bottom: clamp(20px, 2.6vw, 28px);
+
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: var(--superfly-faq-hair);
+}
+
+.superfly-faq-jump-list {
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
+
+	padding-left: 0;
+	list-style: none;
+}
+
+.superfly-faq-jump-list li {
+	margin-bottom: 10px;
+}
+
+.superfly-faq-jump-list li:last-child {
+	margin-bottom: 0;
+}
+
+.superfly-faq-jump-list a {
+	font-size: 14px;
+	line-height: 1.4;
+	color: var(--superfly-faq-muted);
+	text-decoration: none;
+	transition-property: color;
+	transition-duration: 0.2s;
+}
+
+.superfly-faq-jump-list a:hover,
+.superfly-faq-jump-list a:focus-visible {
+	color: var(--superfly-faq-accent);
+}
+
+
+/* -------------------------------------------------------------
+ * Narrow screens
+ * The rail is secondary, so it drops below the questions rather
+ * than squeezing them.
+ * ----------------------------------------------------------- */
+
+@media (max-width: 920px) {
+	.superfly-faq-split {
+		grid-template-columns: minmax(0, 1fr);
+		row-gap: clamp(30px, 6vw, 46px);
+	}
+
+	.superfly-faq-rail {
+		position: static;
+
+		padding-top: clamp(22px, 4vw, 30px);
+		border-top-width: 1px;
+		border-top-style: solid;
+		border-top-color: var(--superfly-faq-line);
+	}
+
+	.superfly-faq-answer {
+		/* was 0 — the answer carries a left rule now, so it keeps a small
+		   indent at every width rather than putting the rule against the
+		   first letter */
+		padding-left: 16px;
+	}
+
+	/* stacked, the rail is below the questions — an index there would sit
+	   under everything it links to, which is no use to anyone */
+	.superfly-faq-jump {
+		display: none;
+	}
+}
+
+
+/* -------------------------------------------------------------
+ * Preferences
+ * ----------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+	.superfly-faq-sign,
+	.superfly-faq-rail-arrow,
+	.superfly-faq-question,
+	.superfly-faq-rail-list a {
+		transition-duration: 0.01ms;
+	}
+}
+
+@media print {
+	/* every answer on the page, and none of the navigation */
+	.superfly-faq-answer {
+		display: block;
+	}
+
+	.superfly-faq-sign,
+	.superfly-faq-rail {
+		display: none;
+	}
+
+	.superfly-faq-split {
+		display: block;
+	}
+}
