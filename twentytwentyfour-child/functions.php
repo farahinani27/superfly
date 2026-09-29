@@ -762,7 +762,6 @@ function superfly_account_greeting() {
 	echo '</div>';
 }
 
-
 // ---------------------------------------------------------------
 // WISHLIST — /my-account/wishlist/
 //
@@ -1247,48 +1246,6 @@ function superfly_privacy_assets() {
 }
 
 
-// Terms & conditions (page 128) — the agreement as a two-column grid of
-// hard-edged panels in the hero's own language. Everything is open: no
-// <details>, no script, so the binding text stays searchable and printable.
-// Matched on the page id, not the slug: WordPress gives the privacy page a
-// `privacy-policy` body class of its own, but there is no equivalent here.
-// Markup: the page's Elementor HTML widget · looks: assets/css/terms.css
-add_action( 'wp_enqueue_scripts', 'superfly_terms_assets', 26 );
-function superfly_terms_assets() {
-	if ( ! is_page( 128 ) ) {
-		return;
-	}
-
-	// Same fonts as the rest of the site: Archivo Black, Archivo, Chakra Petch
-	wp_enqueue_style(
-		'superfly-hero-fonts',
-		'https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800&family=Archivo+Black&family=Chakra+Petch:wght@500;600;700&display=swap',
-		array(),
-		null
-	);
-
-	wp_enqueue_style(
-		'superfly-terms',
-		get_stylesheet_directory_uri() . '/assets/css/terms.css',
-		array( 'superfly-child-style', 'superfly-hero-fonts' ),
-		filemtime( get_stylesheet_directory() . '/assets/css/terms.css' )
-	);
-
-	// The clause rows rise into place as they are scrolled to. The script is
-	// what HIDES them — they are visible without it — so a blocked or failed
-	// script leaves the binding text on the page rather than swallowing it.
-	// See the header of terms.js. Loaded in the footer, so it never delays
-	// the text it is animating.
-	wp_enqueue_script(
-		'superfly-terms',
-		get_stylesheet_directory_uri() . '/assets/js/terms.js',
-		array(),
-		filemtime( get_stylesheet_directory() . '/assets/js/terms.js' ),
-		true
-	);
-}
-
-
 // Return & Refund policy (page 11) — four numbered steps saying how a return
 // works, then the conditions sorted into refundable and not, then the live
 // store's binding paragraph in full, then the return address. Nothing folds
@@ -1345,6 +1302,48 @@ function superfly_return_refund_body_class( $classes ) {
 	}
 
 	return $classes;
+}
+
+
+// Terms & conditions (page 128) — the agreement as a two-column grid of
+// hard-edged panels in the hero's own language. Everything is open: no
+// <details>, no script, so the binding text stays searchable and printable.
+// Matched on the page id, not the slug: WordPress gives the privacy page a
+// `privacy-policy` body class of its own, but there is no equivalent here.
+// Markup: the page's Elementor HTML widget · looks: assets/css/terms.css
+add_action( 'wp_enqueue_scripts', 'superfly_terms_assets', 26 );
+function superfly_terms_assets() {
+	if ( ! is_page( 128 ) ) {
+		return;
+	}
+
+	// Same fonts as the rest of the site: Archivo Black, Archivo, Chakra Petch
+	wp_enqueue_style(
+		'superfly-hero-fonts',
+		'https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800&family=Archivo+Black&family=Chakra+Petch:wght@500;600;700&display=swap',
+		array(),
+		null
+	);
+
+	wp_enqueue_style(
+		'superfly-terms',
+		get_stylesheet_directory_uri() . '/assets/css/terms.css',
+		array( 'superfly-child-style', 'superfly-hero-fonts' ),
+		filemtime( get_stylesheet_directory() . '/assets/css/terms.css' )
+	);
+
+	// The clause rows rise into place as they are scrolled to. The script is
+	// what HIDES them — they are visible without it — so a blocked or failed
+	// script leaves the binding text on the page rather than swallowing it.
+	// See the header of terms.js. Loaded in the footer, so it never delays
+	// the text it is animating.
+	wp_enqueue_script(
+		'superfly-terms',
+		get_stylesheet_directory_uri() . '/assets/js/terms.js',
+		array(),
+		filemtime( get_stylesheet_directory() . '/assets/js/terms.js' ),
+		true
+	);
 }
 
 
