@@ -1,0 +1,1049 @@
+/* =============================================================
+ * SUPERFLY — SINGLE PRODUCT
+ *
+ * Shape: revamp/product-b.html, itself a measured reconstruction
+ * of the Lupine product page.
+ *
+ *   ┌───────────────┬──────────────────────────────────────────┐
+ *   │ ★★★★★ 0 REVIEWS│                                          │
+ *   │ PROJECT X      │            (gallery, 4:3)                │
+ *   │ 4 SPOKE RIMS   │                                          │
+ *   │ RM448 – RM475  │                                          │
+ *   │ [qty][ADD CART]├──────────────────────────────────────────┤
+ *   │ SKU / Category │  GOES WELL WITH                          │
+ *   │ ─────────────  │  ┌─────┐ ┌─────┐ ┌─────┐                 │
+ *   │ short descr.   │  DESCRIPTION / REVIEWS                   │
+ *   └───────────────┴──────────────────────────────────────────┘
+ *     sticky, 470px      scrolls past it
+ *
+ * THE SIDES ARE SWAPPED from WooCommerce's default (gallery left,
+ * buy panel right). The buy rail is LEFT, in the same 470px slot
+ * the category page's filter rail occupies, so moving from a
+ * category to a product does not move the page furniture.
+ *
+ * ---- THE MEASUREMENTS ----
+ * Read off the reference at a 1425px content width.
+ *
+ *   layout        grid 470px + the rest
+ *   rail          sticky top 48, padding 48 → 374 content
+ *   title         60px / 54px uppercase
+ *   price         tech 16px / 18.4, letter-spacing .64
+ *   purchase row  height 56; the button 176x56
+ *   add to cart   tech 10px / 12, ls 1, radius 2
+ *   description   margin-top 48; 14px / 18.48, ls .24, #878787
+ *   gallery       padding 48, stage 4:3
+ *   editorial     column, gap 48, padding 0 48, margin-top 48
+ *   section head  40px / 40, ls .8, uppercase
+ *   card          column gap 24; image 4/5 radius 2; content gap 8
+ *   story h2      110px / 99 uppercase  (only if the description
+ *                 has headings — see section 6)
+ *
+ * ---- WHY A SEPARATE FILE ----
+ * woocommerce.css skins everything WooCommerce draws, cart and
+ * account included. This changes the product page only, loads
+ * after it, and is enqueued only on is_product() — so a mistake
+ * here cannot reach the cart, and reverting is one enqueue line.
+ * It overrides woocommerce.css section 5 ("One product").
+ *
+ * ---- MARKUP IS WOOCOMMERCE'S OWN ----
+ * WooCommerce 11.1.1 renders this page with BLOCKS, not the
+ * legacy PHP template — there is no .summary.entry-summary on the
+ * page at all. The class names below are the plugin's and were
+ * read off the live page, not guessed. The `sf-pdp*` classes are
+ * ours, set in templates/single-product.html.
+ *
+ * Type is the house trio; the accent is SUPERFLY's #ec1e79.
+ *
+ * Enqueue: functions.php — superfly_single_product_assets()
+ * Markup:  templates/single-product.html
+ * Concept: revamp/product-b.html
+ * ============================================================= */
+
+.sf-pdp {
+	--sp-bg:     #0a0a0a;
+	--sp-text:   #f2f2f4;
+	--sp-muted:  #878787;
+	--sp-faint:  rgba(242, 242, 244, 0.34);
+	--sp-line:   rgba(242, 242, 244, 0.14);
+	--sp-hair:   rgba(242, 242, 244, 0.08);
+	--sp-accent: #ec1e79;
+	--sp-tile:   #ffffff;
+	--sp-dark:   #0f0f0f;
+	--sp-radius: 2px;
+
+	--sp-title: "Archivo Black", "Arial Black", sans-serif;
+	--sp-body:  "Archivo", "Inter", sans-serif;
+	--sp-tech:  "Chakra Petch", "Archivo", sans-serif;
+
+	--sp-step: 48px;
+	--sp-rail: 470px;
+}
+
+.sf-pdp *,
+.sf-pdp *::before,
+.sf-pdp *::after {
+	box-sizing: border-box;
+}
+
+
+/* -------------------------------------------------------------
+ * 1. THE SPLIT
+ * ------------------------------------------------------------- */
+.sf-pdp.wp-block-columns {
+	gap: 0;
+	margin-top: 0;
+	max-width: none;          /* theme.json caps "wide" at 1280 */
+	align-items: flex-start;
+}
+
+/* border-box so the 470 is the WHOLE rail including its 48px
+   padding, leaving 374 of content — the concept's width, and the
+   same slot the category filter rail uses. Left as content-box a
+   wp-block-column comes out 566. */
+.sf-pdp__rail,
+.sf-pdp__presentation {
+	box-sizing: border-box;
+}
+
+.sf-pdp__rail {
+	position: sticky;
+	top: var(--sp-step);
+	padding: var(--sp-step);
+	/* The reference lets a rail taller than the screen run off the
+	   bottom, which puts Add to cart out of reach on a short laptop.
+	   This scrolls instead, with the scrollbar hidden because a
+	   visible one takes 10px out of the 374 everything is built on. */
+	max-height: 100vh;
+	overflow-y: auto;
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+}
+
+.sf-pdp__rail::-webkit-scrollbar {
+	display: none;
+}
+
+.sf-pdp__presentation {
+	padding: 0;
+}
+
+
+/* -------------------------------------------------------------
+ * 2. THE RAIL
+ * ------------------------------------------------------------- */
+
+/* ---- 0 reviews ---- */
+.sf-pdp__rail .wc-block-components-product-rating {
+	margin: 0 0 16px;
+	font-family: var(--sp-tech);
+	font-size: 10px;
+	font-weight: 500;
+	line-height: 12px;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--sp-muted);
+}
+
+/* ---- the title: 60 / 54 ---- */
+.sf-pdp__rail h1.wp-block-post-title {
+	margin: 0;
+	font-family: var(--sp-title);
+	/* The reference sets 60/54, but its product names are short. Ours are
+	   "Superfly Project X 4 Spoke Sport Rims (Gold)" — 44 characters, which
+	   at 60px ran SIX lines and 324px down a 374px rail. Sized to read
+	   rather than to shout. Put 60/54 back the day product names get
+	   shorter. */
+	font-size: 30px;
+	font-weight: 400;
+	line-height: 32px;
+	letter-spacing: -0.01em;
+	text-transform: uppercase;
+	color: var(--sp-text);
+}
+
+/* ---- price: the reference's 16px mono ----
+ * woocommerce.css sets clamp(22px, 2.4vw, 32px) at
+ *   body.single-product .wp-block-woocommerce-product-price .wc-block-components-product-price
+ * which is (0,3,1). Adding .sf-pdp__rail makes this (0,4,1), so it wins
+ * on specificity alone — no !important needed. */
+body.single-product .sf-pdp__rail .wp-block-woocommerce-product-price .wc-block-components-product-price,
+body.single-product .sf-pdp__rail .wc-block-components-product-price {
+	display: block;
+	margin: 16px 0 0;
+	font-family: var(--sp-tech);
+	font-size: 16px;
+	font-weight: 500;
+	line-height: 18.4px;
+	letter-spacing: 0.64px;
+	color: var(--sp-accent);
+}
+
+.sf-pdp__rail .wc-block-components-product-price del {
+	color: var(--sp-faint);
+}
+
+.sf-pdp__rail .wc-block-components-product-price ins {
+	text-decoration: none;
+}
+
+/* -------------------------------------------------------------
+ * 3. THE CONTROLS
+ *
+ * assets/css/shop-beast.css is DEQUEUED on product pages — see
+ * superfly_single_product_drop_beast() in functions.php — so this
+ * file owns every control in the form and there is no specificity
+ * war. Everywhere else on the site the Beast styles are untouched.
+ *
+ * shop-beast.JS still runs, and it is why the form looks like this:
+ * it rewrites WooCommerce's variation <select> into
+ *
+ *   .sb-label   "Select model"
+ *   .sb-rows    the stack
+ *     .sb-row   <button><span>EGO 18T 1.6x14</span><b>RM448.00</b></button>
+ *               states: .is-on (chosen), .is-out (no stock)
+ *   .sb-hidden  the real <select>, visually hidden but still in the
+ *               form, so WooCommerce receives exactly what it expects
+ *
+ * Those class names belong to that script. If it is ever removed the
+ * rows go and WooCommerce's dropdown returns — the <select> rules
+ * further down still cover that case.
+ * ------------------------------------------------------------- */
+.sf-pdp__rail .wp-block-add-to-cart-form,
+.sf-pdp__rail form.cart {
+	width: 100%;
+	margin: 24px 0 0;
+}
+
+/* ---- the fitment rows ---- */
+.sf-pdp__rail .sb-label {
+	margin: 0 0 12px;
+	font-family: var(--sp-tech);
+	font-size: 10px;
+	font-weight: 500;
+	line-height: 12px;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	color: var(--sp-muted);
+}
+
+.sf-pdp__rail .sb-rows {
+	display: grid;
+	gap: 8px;
+	margin: 0 0 24px;
+}
+
+.sf-pdp__rail .sb-row {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto;
+	align-items: center;
+	gap: 12px;
+	width: 100%;
+	padding: 14px 16px;
+	border: 1px solid var(--sp-line);
+	border-radius: var(--sp-radius);
+	background: none;
+	color: var(--sp-text);
+	font-family: var(--sp-body);
+	font-size: 14px;
+	line-height: 18.48px;
+	letter-spacing: 0.24px;
+	text-align: left;
+	cursor: pointer;
+	transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.sf-pdp__rail .sb-row:hover {
+	border-color: rgba(236, 30, 121, 0.5);
+}
+
+.sf-pdp__rail .sb-row.is-on {
+	border-color: var(--sp-accent);
+	background: rgba(236, 30, 121, 0.08);
+}
+
+.sf-pdp__rail .sb-row:focus-visible {
+	outline: 2px solid var(--sp-accent);
+	outline-offset: 2px;
+}
+
+/* the price on each row — the whole reason these rows exist */
+.sf-pdp__rail .sb-row b {
+	font-family: var(--sp-tech);
+	font-size: 14px;
+	font-weight: 500;
+	letter-spacing: 0.56px;
+	color: var(--sp-accent);
+}
+
+.sf-pdp__rail .sb-row.is-out {
+	opacity: 0.45;
+	cursor: not-allowed;
+}
+
+.sf-pdp__rail .sb-row.is-out b {
+	color: var(--sp-faint);
+}
+
+/* the real <select>: hidden from sight, still in the form */
+.sf-pdp__rail .sb-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	clip-path: inset(50%);
+	white-space: nowrap;
+}
+
+/* ---- the dropdown, for when the rows are not there ----
+ * A product whose variations the script cannot read, or the script
+ * removed entirely, falls back to WooCommerce's own <select>. */
+.sf-pdp__rail table.variations:not(.sb-hidden) {
+	width: 100%;
+	margin: 0 0 16px;
+	border: 0;
+	border-collapse: collapse;
+}
+
+.sf-pdp__rail table.variations:not(.sb-hidden) th,
+.sf-pdp__rail table.variations:not(.sb-hidden) td {
+	display: block;
+	width: 100%;
+	padding: 0 0 12px;
+	border: 0;
+	text-align: left;
+}
+
+.sf-pdp__rail table.variations th label {
+	display: block;
+	margin: 0 0 8px;
+	font-family: var(--sp-tech);
+	font-size: 10px;
+	font-weight: 500;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	color: var(--sp-muted);
+}
+
+.sf-pdp__rail select {
+	width: 100%;
+	height: 44px;
+	padding: 0 40px 0 14px;
+	border: 1px solid var(--sp-line);
+	border-radius: var(--sp-radius);
+	background-color: transparent;
+	color: var(--sp-text);
+	font-family: var(--sp-tech);
+	font-size: 11px;
+	font-weight: 500;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	appearance: none;
+	-webkit-appearance: none;
+	cursor: pointer;
+	background-image:
+		linear-gradient(45deg, transparent 50%, var(--sp-muted) 50%),
+		linear-gradient(135deg, var(--sp-muted) 50%, transparent 50%);
+	background-position: calc(100% - 20px) 20px, calc(100% - 15px) 20px;
+	background-size: 5px 5px, 5px 5px;
+	background-repeat: no-repeat;
+}
+
+.sf-pdp__rail select option {
+	background: #111114;
+	color: #ffffff;
+	font-weight: 500;
+}
+
+.sf-pdp__rail .reset_variations {
+	display: inline-block;
+	margin: 0 0 16px;
+	font-family: var(--sp-tech);
+	font-size: 10px;
+	font-weight: 500;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	color: var(--sp-muted);
+}
+
+/* the rows already show every price, so WooCommerce's single
+   variation price underneath would only repeat one of them */
+.sf-pdp__rail .woocommerce-variation-price {
+	display: none;
+}
+
+.sf-pdp__rail .woocommerce-variation-availability p {
+	margin: 0 0 12px;
+	font-size: 13px;
+	line-height: 18.48px;
+	color: var(--sp-muted);
+}
+
+/* ---- the purchase row ----
+ * The reference puts [qty][Add to cart] on one line, the button
+ * 176x56 in 10px mono at 1px tracking. */
+.sf-pdp__rail form.cart,
+.sf-pdp__rail .woocommerce-variation-add-to-cart {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: stretch;
+	gap: 8px;
+}
+
+/* everything that is not the qty box or the button spans the row */
+.sf-pdp__rail form.cart > .sb-label,
+.sf-pdp__rail form.cart > .sb-rows,
+.sf-pdp__rail form.cart > table.variations,
+.sf-pdp__rail form.cart > .woocommerce-variation-add-to-cart,
+.sf-pdp__rail form.cart > .woocommerce-variation,
+.sf-pdp__rail form.cart > .reset_variations {
+	flex: 1 0 100%;
+	margin-left: 0;
+	margin-right: 0;
+}
+
+/* ShopEngine injects its wishlist and compare badges INTO form.cart, as
+   flex children. Left alone they come first in the DOM and push Add to
+   cart onto its own line on a simple product (the four items total 374px
+   against a 374px rail — a 7px cliff that only bites some products).
+   Ordering them last and giving them their own full-width row makes it
+   deterministic: row one is always [qty][Add to cart], row two is the
+   two badges. */
+.sf-pdp__rail form.cart > .shopengine-wishlist,
+.sf-pdp__rail form.cart > .shopengine-comparison,
+.sf-pdp__rail form.cart > .shopengine-quickview-trigger,
+.sf-pdp__rail .woocommerce-variation-add-to-cart > .shopengine-wishlist,
+.sf-pdp__rail .woocommerce-variation-add-to-cart > .shopengine-comparison,
+.sf-pdp__rail .woocommerce-variation-add-to-cart > .shopengine-quickview-trigger {
+	order: 3;
+	flex: 0 0 auto;
+	height: auto;
+	margin: 4px 16px 0 0;
+	color: var(--sp-muted);
+	font-family: var(--sp-tech);
+	font-size: 11px;
+}
+
+.sf-pdp__rail form.cart > .shopengine-wishlist:hover,
+.sf-pdp__rail form.cart > .shopengine-comparison:hover,
+.sf-pdp__rail .woocommerce-variation-add-to-cart > .shopengine-wishlist:hover,
+.sf-pdp__rail .woocommerce-variation-add-to-cart > .shopengine-comparison:hover {
+	color: var(--sp-accent);
+}
+
+/* the break that puts them on their own row */
+.sf-pdp__rail form.cart > .shopengine-wishlist::before,
+.sf-pdp__rail .woocommerce-variation-add-to-cart > .shopengine-wishlist::before {
+	content: '';
+	flex: 1 0 100%;
+	order: 3;
+}
+
+.sf-pdp__rail .quantity {
+	order: 1;
+	display: inline-flex;
+	align-items: stretch;
+	flex: none;
+	height: 56px;
+	margin: 0;
+	border: 1px solid var(--sp-line);
+	border-radius: var(--sp-radius);
+}
+
+.sf-pdp__rail .quantity input.qty {
+	width: 78px;
+	height: 100%;
+	padding: 0;
+	border: 0;
+	background: transparent;
+	text-align: center;
+	color: var(--sp-text);
+	font-family: var(--sp-tech);
+	font-size: 13px;
+	font-weight: 500;
+	letter-spacing: 0.06em;
+	-moz-appearance: textfield;
+}
+
+.sf-pdp__rail .quantity input.qty::-webkit-outer-spin-button,
+.sf-pdp__rail .quantity input.qty::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+/* (0,5,3), to beat woocommerce.css's `.woocommerce div.product form.cart .button`
+   at (0,4,2). Specificity, not !important. */
+body.single-product .sf-pdp .sf-pdp__rail form.cart button.single_add_to_cart_button,
+body.single-product .sf-pdp .sf-pdp__rail form.cart .single_add_to_cart_button {
+	order: 2;
+	/* Pinned at the reference's 176, not grown to fill the rail. The
+	   reference's purchase row is three items wide (qty 126 / wishlist 56 /
+	   cart 176 = 374); ours is two, so pinning leaves space to the right of
+	   the button rather than stretching it. max-width keeps it from
+	   overflowing a rail narrower than 176 + the qty box. */
+	flex: 0 0 176px;
+	width: 176px;
+	max-width: 100%;
+	height: 56px;
+	padding: 0 24px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border: 1px solid var(--sp-accent);
+	border-radius: var(--sp-radius);
+	background: var(--sp-accent);
+	color: #000000;
+	font-family: var(--sp-tech);
+	font-size: 10px;
+	font-weight: 500;
+	line-height: 12px;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	cursor: pointer;
+	transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+body.single-product .sf-pdp .sf-pdp__rail form.cart button.single_add_to_cart_button:hover {
+	background: #ff3d92;
+	border-color: #ff3d92;
+}
+
+body.single-product .sf-pdp .sf-pdp__rail form.cart button.single_add_to_cart_button.disabled,
+body.single-product .sf-pdp .sf-pdp__rail form.cart button.single_add_to_cart_button:disabled {
+	background: transparent;
+	border-color: var(--sp-line);
+	color: var(--sp-muted);
+	cursor: not-allowed;
+}
+
+/* ---- meta: SKU, category, tags ---- */
+.sf-pdp__rail .wp-block-woocommerce-product-meta {
+	margin: 24px 0 0;
+	padding: 18px 0 0;
+	border-top: 1px solid var(--sp-hair);
+}
+
+.sf-pdp__rail .wp-block-woocommerce-product-meta .wp-block-group {
+	gap: 8px 20px;
+}
+
+.sf-pdp__rail .wp-block-woocommerce-product-meta,
+.sf-pdp__rail .wp-block-woocommerce-product-sku,
+.sf-pdp__rail .wp-block-post-terms {
+	font-family: var(--sp-body);
+	font-size: 13px;
+	line-height: 18.48px;
+	letter-spacing: 0.24px;
+	color: var(--sp-muted);
+}
+
+.sf-pdp__rail .wp-block-post-terms a {
+	color: var(--sp-text);
+	text-decoration: none;
+}
+
+.sf-pdp__rail .wp-block-post-terms a:hover {
+	color: var(--sp-accent);
+}
+
+/* ---- the short description, at the foot of the rail ---- */
+.sf-pdp__rail .wp-block-post-excerpt {
+	margin: var(--sp-step) 0 0;
+	padding: 20px 0 0;
+	border-top: 1px solid var(--sp-hair);
+}
+
+.sf-pdp__rail .wp-block-post-excerpt__excerpt,
+.sf-pdp__rail .wp-block-post-excerpt p {
+	margin: 0 0 14px;
+	font-family: var(--sp-body);
+	font-size: 14px;
+	line-height: 18.48px;
+	letter-spacing: 0.24px;
+	color: var(--sp-muted);
+}
+
+/* nothing written → no empty rule floating at the foot of the rail */
+.sf-pdp__rail .wp-block-post-excerpt:empty {
+	display: none;
+}
+
+
+/* -------------------------------------------------------------
+ * 4. THE GALLERY
+ *
+ * WooCommerce's own gallery (FlexSlider + thumbnails + zoom) is
+ * kept intact — rebuilding it would cost the lightbox and the
+ * variation image swap. Only the stage is restyled: 4:3 on a dark
+ * tile, with the product CONTAINed rather than cropped.
+ * ------------------------------------------------------------- */
+.sf-pdp__gallery {
+	padding: var(--sp-step);
+	background: var(--sp-bg);
+}
+
+/* The block wrapper and the gallery both carry widths of their own
+   (512px, and an inline one FlexSlider writes) — they have to give. */
+.sf-pdp__gallery .wp-block-woocommerce-product-image-gallery,
+.sf-pdp__gallery .woocommerce-product-gallery {
+	width: 100% !important;
+	max-width: none;
+	margin: 0;
+}
+
+/* THE STAGE IS .flex-viewport, NOT __wrapper.
+   __wrapper is FlexSlider's TRACK: it is as wide as all the slides put
+   together (inline width:600% here), so an aspect-ratio on it produced a
+   2496x1872 box. .flex-viewport is the window you actually see through.
+   The second selector is the no-JS case, where FlexSlider has not run and
+   __wrapper IS the direct child. */
+.sf-pdp__gallery .flex-viewport,
+.sf-pdp__gallery .woocommerce-product-gallery > .woocommerce-product-gallery__wrapper {
+	aspect-ratio: 4 / 3;
+	width: 100%;
+	overflow: hidden;
+	border-radius: var(--sp-radius);
+	background:
+		radial-gradient(circle at 50% 45%, rgba(236, 30, 121, 0.08), transparent 62%),
+		var(--sp-dark);
+}
+
+.sf-pdp__gallery .flex-viewport .woocommerce-product-gallery__wrapper {
+	height: 100%;
+	margin: 0;
+	aspect-ratio: auto;
+	background: none;
+}
+
+.sf-pdp__gallery .woocommerce-product-gallery__image,
+.sf-pdp__gallery .woocommerce-product-gallery__image a {
+	display: block;
+	height: 100%;
+}
+
+.sf-pdp__gallery .woocommerce-product-gallery__image img {
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+	padding: 24px;
+}
+
+/* the zoom / lightbox trigger WooCommerce floats over the stage */
+.sf-pdp__gallery .woocommerce-product-gallery__trigger {
+	top: 20px;
+	right: 20px;
+	z-index: 3;
+	border-radius: var(--sp-radius);
+	background: rgba(0, 0, 0, 0.55);
+	color: #ffffff;
+}
+
+/* thumbnails under the stage, as a row of small tiles */
+.sf-pdp__gallery .flex-control-thumbs {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin: 8px 0 0;
+	padding: 0;
+	list-style: none;
+}
+
+.sf-pdp__gallery .flex-control-thumbs li {
+	width: 88px;
+	margin: 0;
+	list-style: none;
+}
+
+.sf-pdp__gallery .flex-control-thumbs img {
+	width: 100%;
+	aspect-ratio: 1 / 1;
+	object-fit: contain;
+	padding: 6px;
+	border: 1px solid transparent;
+	border-radius: var(--sp-radius);
+	background: var(--sp-dark);
+	opacity: 0.55;
+	cursor: pointer;
+	transition: opacity 0.2s ease, border-color 0.2s ease;
+}
+
+.sf-pdp__gallery .flex-control-thumbs img:hover,
+.sf-pdp__gallery .flex-control-thumbs img.flex-active {
+	opacity: 1;
+	border-color: var(--sp-accent);
+}
+
+
+/* -------------------------------------------------------------
+ * 5. THE EDITORIAL STACK
+ * ------------------------------------------------------------- */
+.sf-pdp__editorial {
+	padding: 0 var(--sp-step);
+	margin-top: var(--sp-step);
+}
+
+.sf-pdp__editorial > * + * {
+	margin-top: var(--sp-step);
+}
+
+/* every section heading on this column — "Related products",
+   "Description", "Reviews" — at the concept's 40/40 */
+.sf-pdp__editorial h2,
+.sf-pdp__editorial h2.wp-block-heading {
+	margin: 0 0 40px;
+	font-family: var(--sp-title);
+	font-size: 40px;
+	font-weight: 400;
+	line-height: 40px;
+	letter-spacing: 0.02em;
+	text-transform: uppercase;
+	color: var(--sp-text);
+}
+
+/* ---- related products: the archive card, unchanged ---- */
+.sf-pdp__editorial ul.wc-block-product-template {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 48px 25.5px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.sf-pdp__editorial li.wc-block-product {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+	position: relative;
+	padding: 0;
+	border: 0;
+	background: transparent;
+}
+
+.sf-pdp__editorial li.wc-block-product:hover {
+	border: 0;
+	transform: none;
+}
+
+/* white tile + contain, same reasoning as the archive: the rim
+   photography is shot on white with the logo in the corner */
+.sf-pdp__editorial li.wc-block-product .wc-block-components-product-image {
+	margin: 0;
+	aspect-ratio: 4 / 5;
+	overflow: hidden;
+	background: var(--sp-tile);
+	border-radius: var(--sp-radius);
+}
+
+.sf-pdp__editorial li.wc-block-product .wc-block-components-product-image a,
+.sf-pdp__editorial li.wc-block-product .wc-block-components-product-image img {
+	display: block;
+	width: 100%;
+	height: 100%;
+}
+
+.sf-pdp__editorial li.wc-block-product .wc-block-components-product-image img {
+	object-fit: contain;
+	background: var(--sp-tile);
+	transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sf-pdp__editorial li.wc-block-product:hover .wc-block-components-product-image img {
+	transform: scale(1.04);
+}
+
+.sf-pdp__editorial li.wc-block-product h3.wp-block-post-title {
+	margin: 0;
+	padding: 0;
+	font-family: var(--sp-title);
+	font-size: 20px;
+	font-weight: 400;
+	line-height: 22px;
+	letter-spacing: -0.01em;
+	text-transform: uppercase;
+	text-align: left;
+}
+
+.sf-pdp__editorial li.wc-block-product h3.wp-block-post-title a {
+	color: var(--sp-text);
+	text-decoration: none;
+}
+
+.sf-pdp__editorial li.wc-block-product:hover h3.wp-block-post-title a {
+	color: var(--sp-accent);
+}
+
+.sf-pdp__editorial li.wc-block-product .wc-block-components-product-price {
+	display: block;
+	margin: 8px 0 0;
+	padding: 0;
+	font-family: var(--sp-tech);
+	font-size: 14px;
+	font-weight: 500;
+	line-height: 16.1px;
+	letter-spacing: 0.04em;
+	text-align: left;
+	color: var(--sp-muted);
+}
+
+.sf-pdp__editorial li.wc-block-product .wp-block-button__link {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 44px;
+	margin: auto 0 0;
+	padding: 0 20px;
+	border: 1px solid var(--sp-line);
+	border-radius: var(--sp-radius);
+	background: transparent;
+	color: var(--sp-text);
+	font-family: var(--sp-tech);
+	font-size: 10px;
+	font-weight: 500;
+	line-height: 12px;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.sf-pdp__editorial li.wc-block-product .wp-block-button__link:hover {
+	border-color: var(--sp-accent);
+	color: var(--sp-accent);
+}
+
+/* ShopEngine's badges are siblings of the image; put them on the tile */
+.sf-pdp__editorial li.wc-block-product .shopengine-wishlist,
+.sf-pdp__editorial li.wc-block-product .shopengine-quickview-trigger,
+.sf-pdp__editorial li.wc-block-product .shopengine-comparison {
+	position: absolute;
+	right: 12px;
+	z-index: 2;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	margin: 0;
+	border-radius: var(--sp-radius);
+	background: rgba(0, 0, 0, 0.55);
+	color: #ffffff;
+	font-size: 13px;
+	line-height: 1;
+}
+
+.sf-pdp__editorial li.wc-block-product .shopengine-wishlist          { top: 12px; }
+.sf-pdp__editorial li.wc-block-product .shopengine-quickview-trigger { top: 52px; }
+.sf-pdp__editorial li.wc-block-product .shopengine-comparison        { top: 92px; }
+
+
+/* -------------------------------------------------------------
+ * 6. DESCRIPTION + REVIEWS (the product-details block)
+ * ------------------------------------------------------------- */
+.sf-pdp__editorial .woocommerce-tabs ul.tabs {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 24px;
+	margin: 0 0 32px;
+	padding: 0 0 16px;
+	border-bottom: 1px solid var(--sp-hair);
+	list-style: none;
+}
+
+.sf-pdp__editorial .woocommerce-tabs ul.tabs li {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: transparent;
+}
+
+.sf-pdp__editorial .woocommerce-tabs ul.tabs li a {
+	padding: 0;
+	font-family: var(--sp-tech);
+	font-size: 10px;
+	font-weight: 500;
+	line-height: 12px;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--sp-muted);
+	text-decoration: none;
+}
+
+.sf-pdp__editorial .woocommerce-tabs ul.tabs li.active a,
+.sf-pdp__editorial .woocommerce-tabs ul.tabs li a:hover {
+	color: var(--sp-accent);
+}
+
+/* the panel heading is a duplicate of the tab it sits under */
+.sf-pdp__editorial .woocommerce-Tabs-panel > h2:first-child {
+	display: none;
+}
+
+/* The concept's story blocks are one huge headline over italic
+   prose. There is no WooCommerce field for that, so nothing is
+   invented: a heading inside the product's own description gets
+   the 110/99 treatment, and the body gets the italic. Write the
+   description with h2s and the story blocks appear; write it flat
+   and it stays a plain description. */
+.sf-pdp__editorial .woocommerce-Tabs-panel h2,
+.sf-pdp__editorial .woocommerce-Tabs-panel h3 {
+	margin: 48px 0 24px;
+	font-family: var(--sp-title);
+	font-size: clamp(40px, 7vw, 110px);
+	font-weight: 400;
+	line-height: 0.9;
+	letter-spacing: -0.02em;
+	text-transform: uppercase;
+	color: var(--sp-text);
+}
+
+.sf-pdp__editorial .woocommerce-Tabs-panel h2:first-of-type {
+	margin-top: 0;
+}
+
+.sf-pdp__editorial .woocommerce-Tabs-panel h2 em,
+.sf-pdp__editorial .woocommerce-Tabs-panel h2 strong {
+	font-style: normal;
+	font-weight: inherit;
+	color: var(--sp-accent);
+}
+
+.sf-pdp__editorial .woocommerce-Tabs-panel p,
+.sf-pdp__editorial .woocommerce-Tabs-panel li {
+	max-width: 62ch;
+	font-family: var(--sp-body);
+	font-style: italic;
+	font-size: 24px;
+	line-height: 28.8px;
+	color: var(--sp-text);
+}
+
+/* ---- reviews ---- */
+.sf-pdp__editorial #reviews .commentlist {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.sf-pdp__editorial #reviews .comment_container {
+	padding: 24px 0;
+	border-bottom: 1px solid var(--sp-hair);
+}
+
+.sf-pdp__editorial #reviews .woocommerce-noreviews {
+	padding: 64px 0;
+	text-align: center;
+	font-family: var(--sp-title);
+	font-size: 40px;
+	font-weight: 400;
+	line-height: 40px;
+	letter-spacing: 0.02em;
+	text-transform: uppercase;
+	color: rgba(242, 242, 244, 0.2);
+}
+
+.sf-pdp__editorial #review_form input[type="text"],
+.sf-pdp__editorial #review_form input[type="email"],
+.sf-pdp__editorial #review_form textarea {
+	width: 100%;
+	padding: 12px 14px;
+	border: 1px solid var(--sp-line);
+	border-radius: var(--sp-radius);
+	background: transparent;
+	color: var(--sp-text);
+	font-family: var(--sp-body);
+	font-size: 14px;
+}
+
+.sf-pdp__editorial #review_form input:focus,
+.sf-pdp__editorial #review_form textarea:focus {
+	outline: 2px solid var(--sp-accent);
+	outline-offset: 2px;
+}
+
+.sf-pdp__editorial #review_form .submit {
+	height: 44px;
+	padding: 0 20px;
+	border: 1px solid var(--sp-accent);
+	border-radius: var(--sp-radius);
+	background: var(--sp-accent);
+	color: #000000;
+	font-family: var(--sp-tech);
+	font-size: 10px;
+	font-weight: 500;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	cursor: pointer;
+}
+
+
+/* -------------------------------------------------------------
+ * 7. NARROWER SCREENS
+ *
+ * Below 1000 the rail stops being a rail: it goes back on top,
+ * unsticky, and the gallery follows it. A sticky panel taller
+ * than a phone screen is a trap, not a convenience.
+ * ------------------------------------------------------------- */
+@media (max-width: 1200px) {
+	.sf-pdp__editorial ul.wc-block-product-template {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+@media (max-width: 1000px) {
+	.sf-pdp {
+		--sp-step: 24px;
+	}
+
+	.sf-pdp.wp-block-columns {
+		flex-wrap: wrap;
+	}
+
+	.sf-pdp__rail,
+	.sf-pdp__presentation {
+		flex-basis: 100% !important;
+		max-width: 100%;
+	}
+
+	.sf-pdp__rail {
+		position: static;
+		max-height: none;
+		overflow: visible;
+	}
+
+	.sf-pdp__rail h1.wp-block-post-title {
+		font-size: 26px;
+		line-height: 28px;
+	}
+
+	.sf-pdp__editorial .woocommerce-Tabs-panel p,
+	.sf-pdp__editorial .woocommerce-Tabs-panel li {
+		font-size: 19px;
+		line-height: 24px;
+	}
+}
+
+@media (max-width: 600px) {
+	.sf-pdp__editorial ul.wc-block-product-template {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.sf-pdp__rail .quantity input.qty {
+		width: 60px;
+	}
+
+	/* still 176 where it fits; below that it may shrink rather than
+	   overflow the rail */
+	.sf-pdp__rail button.single_add_to_cart_button {
+		flex: 0 1 176px;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.sf-pdp__editorial li.wc-block-product .wc-block-components-product-image img,
+	.sf-pdp__rail button.single_add_to_cart_button {
+		transition-duration: 0.001ms;
+	}
+}

@@ -1,0 +1,109 @@
+<!-- ============================================================
+     SUPERFLY — SINGLE PRODUCT
+
+     Shape: revamp/product-b.html — a short sticky buy rail down
+     the left third that never moves, against a wide right column
+     that scrolls: gallery first, then the editorial stack
+     (related products, description, reviews).
+
+     NOTE THE SIDES ARE SWAPPED from WooCommerce's default, which
+     puts the gallery left and the buy panel right. Here the buy
+     rail is LEFT, in the same 470px slot the category page's
+     filter rail occupies, so moving between a category and a
+     product does not move the page furniture.
+
+     WHY A BLOCK TEMPLATE AND NOT woocommerce/content-single-product.php:
+     WooCommerce 11.1.1 renders this page with its BLOCKIFIED
+     template, not the legacy PHP one — the live page has no
+     .summary.entry-summary at all. A classic template override
+     here would be dead code. This file overrides
+     woocommerce/templates/templates/blockified/single-product.html.
+
+     Block order in the rail follows the concept: rating, title,
+     price, add to cart, meta, then the short description last.
+
+     Looks: assets/css/single-product.css
+     Enqueue: functions.php — superfly_single_product_assets()
+     Concept: revamp/product-b.html
+     ============================================================ -->
+
+<!-- wp:template-part {"slug":"header","tagName":"header"} /-->
+
+<!-- wp:group {"tagName":"main","layout":{"inherit":true,"type":"constrained"}} -->
+<main class="wp-block-group">
+
+	<!-- align:full so the rail escapes <main>'s global padding and can take
+	     .sf-pdp's own 48px gutter instead — see archive-product.html and
+	     assets/css/breadcrumbs.css. -->
+	<!-- wp:woocommerce/breadcrumbs {"align":"full"} /-->
+
+	<!-- wp:woocommerce/store-notices /-->
+
+	<!-- wp:columns {"align":"full","className":"sf-pdp","style":{"spacing":{"blockGap":{"left":"0"}}}} -->
+	<div class="wp-block-columns alignfull sf-pdp">
+
+		<!-- ── the sticky buy rail ── -->
+		<!-- wp:column {"width":"470px","className":"sf-pdp__rail"} -->
+		<div class="wp-block-column sf-pdp__rail" style="flex-basis:470px">
+
+			<!-- wp:woocommerce/product-rating {"isDescendentOfSingleProductTemplate":true} /-->
+
+			<!-- wp:post-title {"level":1,"__woocommerceNamespace":"woocommerce/product-query/product-title"} /-->
+
+			<!-- wp:woocommerce/product-price {"isDescendentOfSingleProductTemplate":true} /-->
+
+			<!-- wp:woocommerce/add-to-cart-form /-->
+
+			<!-- wp:woocommerce/product-meta -->
+			<div class="wp-block-woocommerce-product-meta">
+				<!-- wp:group {"layout":{"type":"flex","flexWrap":"wrap"}} -->
+				<div class="wp-block-group">
+					<!-- wp:woocommerce/product-sku /-->
+					<!-- wp:post-terms {"term":"product_cat","prefix":"Category: "} /-->
+					<!-- wp:post-terms {"term":"product_tag","prefix":"Tags: "} /-->
+				</div>
+				<!-- /wp:group -->
+			</div>
+			<!-- /wp:woocommerce/product-meta -->
+
+			<!-- the short description sits at the FOOT of the rail, under a
+			     rule, exactly as in the concept — not between the price and
+			     the button where WooCommerce puts it by default -->
+			<!-- wp:post-excerpt {"__woocommerceNamespace":"woocommerce/product-query/product-summary","excerptLength":100} /-->
+
+		</div>
+		<!-- /wp:column -->
+
+		<!-- ── the scrolling presentation column ── -->
+		<!-- wp:column {"className":"sf-pdp__presentation"} -->
+		<div class="wp-block-column sf-pdp__presentation">
+
+			<!-- wp:group {"className":"sf-pdp__gallery","layout":{"type":"default"}} -->
+			<div class="wp-block-group sf-pdp__gallery">
+				<!-- wp:woocommerce/product-image-gallery /-->
+			</div>
+			<!-- /wp:group -->
+
+			<!-- the editorial stack. Related products come FIRST, the way
+			     "Goes well with" does in the concept, then the description
+			     and reviews. -->
+			<!-- wp:group {"className":"sf-pdp__editorial","layout":{"type":"default"}} -->
+			<div class="wp-block-group sf-pdp__editorial">
+
+				<!-- wp:pattern {"slug":"woocommerce-blocks/related-products"} /-->
+
+				<!-- wp:woocommerce/product-details {"className":"is-style-minimal"} /-->
+
+			</div>
+			<!-- /wp:group -->
+
+		</div>
+		<!-- /wp:column -->
+
+	</div>
+	<!-- /wp:columns -->
+
+</main>
+<!-- /wp:group -->
+
+<!-- wp:template-part {"slug":"footer","tagName":"footer"} /-->

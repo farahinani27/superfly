@@ -691,6 +691,56 @@ function superfly_shop_archive_assets() {
 }
 
 
+// Single product — the buy panel as a short sticky rail down the LEFT
+// third (the same 470px slot the category filter rail uses), against a
+// right column that scrolls: gallery, related products, description,
+// reviews. Loads AFTER superfly-shop so it can override woocommerce.css
+// section 5, and only on a product, so a mistake here cannot reach the
+// cart or the account pages.
+//
+// NOTE this page is BLOCKIFIED in WooCommerce 11 — there is no
+// .summary.entry-summary on it. The structure is set in
+// templates/single-product.html, not in a PHP template override.
+//
+// Looks: assets/css/single-product.css
+// Markup: templates/single-product.html
+// Concept: revamp/product-b.html
+add_action( 'wp_enqueue_scripts', 'superfly_single_product_assets', 22 );
+function superfly_single_product_assets() {
+	if ( ! function_exists( 'is_product' ) || ! is_product() ) {
+		return;
+	}
+
+	wp_enqueue_style(
+		'superfly-single-product',
+		get_stylesheet_directory_uri() . '/assets/css/single-product.css',
+		array( 'superfly-shop' ),
+		filemtime( get_stylesheet_directory() . '/assets/css/single-product.css' )
+	);
+}
+
+// Drop the Beast STYLESHEET on a product page, so single-product.css can
+// own the controls without a specificity war between two of our own files.
+//
+// THE SCRIPT STAYS. shop-beast.js is what turns WooCommerce's variation
+// <select> into fitment rows with a price on each, which is a feature, not
+// a skin — single-product.css restyles those rows (.sb-label / .sb-rows /
+// .sb-row) in the reference's language. Dequeue the script too and the
+// rows vanish and a plain dropdown comes back.
+//
+// Priority 99 so it runs after superfly_shop_beast_assets() at 22 has
+// actually enqueued the handle; dequeuing before that does nothing.
+// Everywhere except a product page, the Beast styles are untouched.
+add_action( 'wp_enqueue_scripts', 'superfly_single_product_drop_beast', 99 );
+function superfly_single_product_drop_beast() {
+	if ( ! function_exists( 'is_product' ) || ! is_product() ) {
+		return;
+	}
+
+	wp_dequeue_style( 'superfly-shop-beast' );
+}
+
+
 // My account — design B: the links as tabs across the top, and a login
 // screen with a photo beside the form instead of a form on black.
 // Looks: assets/css/account.css
