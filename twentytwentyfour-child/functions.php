@@ -1247,6 +1247,65 @@ function superfly_privacy_assets() {
 }
 
 
+// Return & Refund policy (page 11) — four numbered steps saying how a return
+// works, then the conditions sorted into refundable and not, then the live
+// store's binding paragraph in full, then the return address. Nothing folds
+// and there is no script on the page.
+// Matched on the slug, like the FAQ and contact, so the page can be rebuilt.
+// Markup: an ELEMENTOR HTML widget (_elementor_edit_mode is `builder` on this
+// page), so post_content is NOT what renders and a REST write to `content`
+// changes nothing a visitor sees. The markup is in _elementor_data, and
+// Elementor caches the rendered widget — clear it with wp-cli after an edit.
+// See wordpress/return-refund/README.md. The comment here said wp:html until
+// 2026-09-29; it was wrong.
+// Looks: assets/css/return-refund.css
+//
+// This page used privacy.css and privacy.js until 2026-09-29 — the two policy
+// pages were one design. They are not any more: this one opens like the FAQ
+// (a customer arrives here mid-problem) rather than like a legal document.
+// privacy.js went with it; there is nothing left on this page to expand.
+//
+// The function itself was recovered from the live server on 2026-09-28: it had
+// been added directly on superfly.durianbikers.com and never committed here,
+// so deploying the repo copy of functions.php would have deleted it and
+// unstyled the page. Keep it committed.
+add_action( 'wp_enqueue_scripts', 'superfly_return_refund_assets', 24 );
+function superfly_return_refund_assets() {
+	if ( ! is_page( 'return-refund' ) ) {
+		return;
+	}
+
+	// Same fonts as the rest of the site: Archivo Black, Archivo, Chakra Petch
+	wp_enqueue_style(
+		'superfly-hero-fonts',
+		'https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800&family=Archivo+Black&family=Chakra+Petch:wght@500;600;700&display=swap',
+		array(),
+		null
+	);
+
+	wp_enqueue_style(
+		'superfly-return-refund',
+		get_stylesheet_directory_uri() . '/assets/css/return-refund.css',
+		array( 'superfly-child-style', 'superfly-hero-fonts' ),
+		filemtime( get_stylesheet_directory() . '/assets/css/return-refund.css' )
+	);
+}
+
+
+// The body class return-refund.css hangs the carbon-weave background off.
+// privacy.css used body.page-id-11 for this, which is brittle: recreate the
+// page and the id changes and the background silently goes away. Same idea as
+// superfly_faq_body_class, without the id.
+add_filter( 'body_class', 'superfly_return_refund_body_class' );
+function superfly_return_refund_body_class( $classes ) {
+	if ( is_page( 'return-refund' ) ) {
+		$classes[] = 'superfly-return-page';
+	}
+
+	return $classes;
+}
+
+
 // Frequently asked questions — eight questions as hard-edged panels, each
 // with its number on a skewed magenta tab, matching the terms clauses. The
 // answers fold: they are native <details>, so there is no script on this

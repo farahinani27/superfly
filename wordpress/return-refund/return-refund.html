@@ -1,0 +1,146 @@
+<!-- ============================================================
+     SUPERFLY - Return & Refund Policy page markup
+     superfly.durianbikers.com/return-refund/  (page 11)
+
+     THIS IS AN ELEMENTOR HTML WIDGET, like the terms page - NOT
+     a wp:html block, whatever the old functions.php comment
+     said. _elementor_edit_mode is `builder` on this page, so
+     post_content is not what renders: writing this file to
+     `content` over REST returns 200 and changes nothing a
+     visitor sees.
+
+     This file is the widget's markup verbatim. It goes into
+     _elementor_data[0].elements[0].settings.html, and there is
+     therefore NO wp:html wrapper on it - adding one would put a
+     literal comment in the page.
+
+     Elementor caches the rendered widget, and a REST write does
+     not invalidate that cache. Clear it with wp-cli over SSH
+     afterwards or the page keeps serving the old markup. See
+     README.md.
+
+     Markup only - the CSS lives in
+     twentytwentyfour-child/assets/css/return-refund.css and is
+     enqueued by the theme. See README.md.
+
+     Do NOT paste the stylesheet back in here.
+
+     THE POLICY PARAGRAPH IS THE LIVE UNICART STORE'S WORDING,
+     VERBATIM, including its grammar ("customer will received",
+     "has been used"). It is the binding text. Do not tidy it
+     without the operator's say-so.
+
+     The step strip and the two lists above it are a READING AID
+     that restates that paragraph - they are not the policy, and
+     the page says so. If the paragraph is ever changed, they
+     have to be re-checked against it line by line, because
+     nothing enforces that they agree.
+
+     TWO THINGS THE POLICY DOES NOT SAY, and this page therefore
+     does not either. Both need the operator before launch:
+       - who pays return shipping
+       - whether there is a deadline to START a return (the 15
+         days is the refund AFTER confirmation, not a window to
+         send the goods back in)
+     ============================================================ -->
+<article class="superfly-return">
+
+  <!-- The contact and FAQ title, not the italic-and-square masthead terms and
+       privacy use: two stacked lines, the second one magenta. The line break
+       is the <span>, which is display:block in return-refund.css. -->
+  <header class="superfly-return-head">
+    <p class="superfly-return-eyebrow">Superfly / Returns</p>
+    <h1 class="superfly-return-title">Return &amp;<span>Refund policy</span></h1>
+  </header>
+
+  <p class="superfly-return-label">How a return works</p>
+
+  <!-- An <ol>: the order is the point. -->
+  <ol class="superfly-return-steps">
+    <li class="superfly-return-step">
+      <span class="superfly-return-step-number">01</span>
+      <h2>Pack it</h2>
+      <p>Original packaging, in the original shipping container, with the receipt.</p>
+    </li>
+    <li class="superfly-return-step">
+      <span class="superfly-return-step-number">02</span>
+      <h2>Ship it back</h2>
+      <p>Send it to the return address below. Keep your tracking number.</p>
+    </li>
+    <li class="superfly-return-step">
+      <span class="superfly-return-step-number">03</span>
+      <h2>We check it</h2>
+      <p>The goods are checked against the receipt and confirmed.</p>
+    </li>
+    <li class="superfly-return-step">
+      <span class="superfly-return-step-number">04</span>
+      <h2>Refund in 15 days</h2>
+      <p>Paid within 15 days of the confirmation.</p>
+    </li>
+  </ol>
+
+  <p class="superfly-return-label">What is refundable</p>
+
+  <div class="superfly-return-split">
+    <div class="superfly-return-column superfly-return-column-yes">
+      <h2>Refundable</h2>
+      <ul>
+        <li>Returned with the receipt</li>
+        <li>Goods in good condition</li>
+        <li>Packaging in original condition</li>
+        <li>In the original shipping container as received</li>
+      </ul>
+    </div>
+    <div class="superfly-return-column superfly-return-column-no">
+      <h2>Not refundable</h2>
+      <ul>
+        <li>Goods used by the customer</li>
+        <li>Goods damaged by the customer</li>
+        <li>Shipments lost during the return transit &mdash; Superflymotos is not
+          responsible for these</li>
+      </ul>
+    </div>
+  </div>
+
+  <p class="superfly-return-label">The policy in full</p>
+
+  <!-- VERBATIM. See the note at the top of this file before touching a word. -->
+  <div class="superfly-return-policy">
+    <p>The returned goods/products will be checked with the receipt together and the
+      goods should be in the good condition. The packaging should also be in original
+      condition in the original shipping container as received. If the goods/products
+      has been used or damaged by the customer, there will not be any refund.
+      <strong>Superflymotos</strong> will also not be responsible if your shipment is
+      lost during the return transit. Once we have checked and confirm the
+      goods/products, customer will received their refund within
+      <span class="superfly-return-figure">15 days</span> after the confirmation.</p>
+  </div>
+
+  <p class="superfly-return-label">Where to send it</p>
+
+  <!-- The address is the live store's, unchanged. The email is the account the
+       warranty form also runs on - see warranty/form/SETUP.md. -->
+  <div class="superfly-return-address">
+    <div>
+      <h2>Return address</h2>
+      <address>
+        <strong>Superflymotos</strong>
+        3, Jalan Tiong Emas 1,<br>
+        Taman Mount Austin,<br>
+        81100 Johor Bahru, Johor
+      </address>
+    </div>
+    <div>
+      <h2>Questions</h2>
+      <address>
+        <!-- the email leads the column, so it has a top line to align against
+             the return address opposite it -->
+        <a class="superfly-return-email" href="mailto:superflymotosofficial@gmail.com">superflymotosofficial@gmail.com</a>
+        Please contact us if you have any questions or doubts.
+      </address>
+    </div>
+  </div>
+
+  <p class="superfly-return-foot">Superfly &middot; Return &amp; refund policy</p>
+
+</article>

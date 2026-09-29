@@ -1,0 +1,664 @@
+/* =============================================================
+ * SUPERFLY — RETURN & REFUND POLICY (page 11)
+ *
+ * The policy read from the top down in three passes, each one
+ * longer than the last: four numbered steps saying how a return
+ * works, then the conditions sorted into what is refundable and
+ * what is not, then the binding paragraph in full, then the
+ * address to send it to.
+ *
+ * The strip and the checklist are a READING AID. The paragraph
+ * under them is the live store's wording, verbatim, and is what
+ * binds — which is why the page labels it "The policy in full"
+ * rather than leaving the reader to guess which version counts.
+ *
+ * Nothing folds. There is no <details> and no JavaScript on this
+ * page at all: a policy is read through once rather than looked
+ * up a line at a time, and an open page stays searchable by the
+ * browser's own find and prints correctly.
+ *
+ * Green appears here and nowhere else on the site. It is doing
+ * work the magenta cannot: the two lists are only tellable apart
+ * at a glance if they are different colours, and magenta is
+ * already the "no refund" side. The tick and the cross carry the
+ * same meaning, so the colour is not the only signal.
+ *
+ * Every class is scoped under .superfly-return. Names are spelled
+ * out — no `sf-` shorthand, no BEM `__` separators — matching
+ * faq.css, contact.css and terms.css.
+ *
+ * No shorthand properties: every declaration names the one thing
+ * it sets, so a line can be edited without working out which of
+ * four values a shorthand is quietly also resetting.
+ *
+ * Markup: the page's own wp:html block (a copy is kept at
+ *   wordpress/return-refund/return-refund.html in this repo).
+ *   NOT an Elementor widget — there is no render cache to clear
+ *   after an edit.
+ * Enqueue: functions.php — superfly_return_refund_assets()
+ * Body class: functions.php — superfly_return_refund_body_class()
+ *
+ * Replaced privacy.css on this page 2026-09-29. Until then the two
+ * policy pages shared one stylesheet and one design; they no longer
+ * do, so privacy.css must not be edited on this page's behalf.
+ * ============================================================= */
+
+
+/* ---- the carbon weave ----
+ * Same recipe as the privacy, terms and FAQ pages, so all four sit on the
+ * same background.
+ *
+ * This hangs off a body class the theme adds (superfly_return_refund_body_class
+ * in functions.php), NOT off body.page-id-11. The id is what privacy.css used
+ * and it is brittle in the way terms.css's body.page-id-128 is: recreate the
+ * page, the id changes, and the background silently goes away. The class
+ * follows the slug, so the page can be deleted and rebuilt freely. */
+body.superfly-return-page {
+	background-color: #101014;
+	background-image:
+		repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.025) 0 2px, transparent 2px 4px),
+		repeating-linear-gradient(-45deg, rgba(0, 0, 0, 0.35) 0 2px, transparent 2px 4px);
+	background-attachment: fixed;
+}
+
+
+/* ---- the Elementor container this page sits in ----
+ * The privacy page's markup is a wp:html block and sits directly in the
+ * content, so its wrapper reaches the full 1260px. This page is an Elementor
+ * HTML widget, and Elementor caps its inner container at
+ * `min(100%, 1140px)` — its global content width — so the article below could
+ * never grow past 1140 however wide its own max-width was, and the two pages
+ * did not line up.
+ *
+ * Scoped to this page's body class, so it cannot widen any other Elementor
+ * page on the site. If Elementor's global content width is ever raised to
+ * 1260 in its settings, this rule becomes a no-op rather than a conflict. */
+body.superfly-return-page .e-con-inner {
+	max-width: 1260px;
+}
+
+
+/* -------------------------------------------------------------
+ * The block
+ * ----------------------------------------------------------- */
+
+.superfly-return {
+	/* colour */
+	--superfly-return-text: #f5f5f5;
+	--superfly-return-muted: rgba(245, 245, 245, 0.72);
+	--superfly-return-faint: rgba(245, 245, 245, 0.38);
+	--superfly-return-line: rgba(245, 245, 245, 0.18);
+	--superfly-return-hair: rgba(245, 245, 245, 0.10);
+	--superfly-return-accent: #ec1e79;
+
+	/* the refundable side. Not a brand colour — see the note at the top of
+	   this file for why it is here at all. */
+	--superfly-return-ok: #3ddc97;
+
+	/* Cards are neumorphic, matching the privacy page: the card is the page's
+	   own colour with no edge, so its shape is made only by the light falling
+	   on it — lit from the top-left, shadowed to the bottom-right.
+	   Softened again on request 2026-09-29, from privacy.css's .03 / .38 to
+	   .022 / .26, with the offsets and blurs pulled in to match (see the
+	   box-shadow rules below). This page carries far more cards than privacy
+	   does — four steps, two lists, the policy and the address — so the same
+	   shadow that sits quietly under eight privacy cards read as heavy here.
+	   BOTH sides moved, in proportion: the lift is what stops a neumorphic
+	   card reading as a plain dark rectangle, so do not cut it on its own,
+	   and do not cut the sink alone either or the cards stop lifting off the
+	   weave at all. */
+	--superfly-return-panel: #0d0d10;
+	--superfly-return-lift: rgba(255, 255, 255, 0.022);
+	--superfly-return-sink: rgba(0, 0, 0, 0.26);
+
+	/* type */
+	--superfly-return-font-title: "Archivo Black", "Arial Black", sans-serif;
+	--superfly-return-font-body: "Archivo", "Inter", sans-serif;
+	--superfly-return-font-tech: "Chakra Petch", "Archivo", sans-serif;
+
+	/* 1260px and the padding below are the PRIVACY page's, not the 1180 that
+	   terms.css and faq.css set. privacy.css widened /privacy-policy/ and
+	   /return-refund/ to 1260 while it dressed both, so this page has always
+	   been that wide — dropping it to 1180 visibly narrowed the page and
+	   pushed the top of the content down. Matched back on request. */
+	max-width: 1260px;
+	margin-left: auto;
+	margin-right: auto;
+
+	padding-top: clamp(28px, 4vw, 52px);
+	padding-right: clamp(20px, 4vw, 40px);
+	padding-bottom: clamp(60px, 9vw, 120px);
+	padding-left: clamp(20px, 4vw, 40px);
+
+	color: var(--superfly-return-text);
+	font-family: var(--superfly-return-font-body);
+}
+
+.superfly-return *,
+.superfly-return *::before,
+.superfly-return *::after {
+	box-sizing: border-box;
+}
+
+
+/* -------------------------------------------------------------
+ * Masthead
+ *
+ * The CONTACT and FAQ title, not the italic-and-square masthead terms and
+ * privacy use: upright, two stacked lines with the second in magenta.
+ *
+ * That is a deliberate move away from privacy.css, which used to dress this
+ * page. A customer arrives here mid-problem, the same way they arrive on the
+ * FAQ — so it opens like the FAQ rather than like a legal document.
+ *
+ * Every value below is copied from .superfly-faq-title, which copied it from
+ * .superfly-contact-title. Change one, change all three.
+ * ----------------------------------------------------------- */
+
+/* NO hairline under the masthead, unlike faq.css, terms.css and privacy.css.
+   Every section label on this page already carries its own rule, and the
+   first one sits directly under the title — so the head's rule drew a second
+   line a few dozen pixels above an identical one. Removed on request
+   2026-09-29.
+
+   The padding went with it. The rule was what the padding was spacing the
+   title from; with no rule, the label's own margin-top is the whole gap,
+   which is why it is not simply the old padding plus that margin. */
+.superfly-return-head {
+	padding-bottom: 0;
+}
+
+.superfly-return-eyebrow {
+	margin-top: 0;
+	margin-right: 0;
+	/* the same clamp contact.css, faq.css, terms.css and privacy.css set —
+	   it is what makes the information pages open alike */
+	margin-bottom: clamp(20px, 3vw, 38px);
+	margin-left: 0;
+
+	font-family: var(--superfly-return-font-tech);
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.22em;
+	text-transform: uppercase;
+	color: var(--superfly-return-accent);
+}
+
+.superfly-return-title {
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
+
+	font-family: var(--superfly-return-font-title);
+	font-weight: 400;
+
+	/* the shared page-title size — contact.css, faq.css, terms.css,
+	   privacy.css and shop-archive.css all set exactly this */
+	font-size: clamp(32px, 6vw, 68px);
+
+	line-height: 0.92;
+	letter-spacing: -0.025em;
+	text-transform: uppercase;
+	color: var(--superfly-return-text);
+}
+
+/* the second line, in magenta */
+.superfly-return-title span {
+	display: block;
+	color: var(--superfly-return-accent);
+}
+
+
+/* -------------------------------------------------------------
+ * Section labels
+ *
+ * One hairline-ruled label opens each of the four blocks. They are the only
+ * navigation the page has — there is no contents list, because four entries
+ * would be longer than the thing it indexed.
+ * ----------------------------------------------------------- */
+
+.superfly-return-label {
+	margin-top: clamp(34px, 5vw, 56px);
+	margin-right: 0;
+	margin-bottom: clamp(16px, 2vw, 22px);
+	margin-left: 0;
+
+	padding-bottom: 12px;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: var(--superfly-return-hair);
+
+	font-family: var(--superfly-return-font-tech);
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.2em;
+	text-transform: uppercase;
+	color: var(--superfly-return-faint);
+}
+
+
+/* -------------------------------------------------------------
+ * The four steps
+ *
+ * An <ol>, because the order is the point — and a numbered list read by a
+ * screen reader announces "4 items" before the first one, which is the
+ * summary a sighted reader gets from the shape.
+ *
+ * Four neumorphic cards with real gaps between them, matching the privacy
+ * page. This replaced a hairline-ruled strip — one bordered container whose
+ * 1px grid gaps showed through as rules, with a 2px rule riding the top edge
+ * (magenta on step 01). All of that went with the card change on request:
+ * a neumorphic card has no edge by definition, so a border on top of it
+ * fought the light that is supposed to be making its shape.
+ * ----------------------------------------------------------- */
+
+.superfly-return-steps {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	/* the privacy grid's gap */
+	column-gap: clamp(14px, 1.6vw, 22px);
+	row-gap: clamp(14px, 1.6vw, 22px);
+	align-items: stretch;
+
+	list-style-type: none;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
+	padding-top: 0;
+	padding-right: 0;
+	padding-bottom: 0;
+	padding-left: 0;
+}
+
+.superfly-return-step {
+	padding-top: clamp(22px, 2.6vw, 30px);
+	padding-right: clamp(18px, 2vw, 26px);
+	padding-bottom: clamp(24px, 3vw, 34px);
+	padding-left: clamp(18px, 2vw, 26px);
+
+	border-width: 0;
+	border-radius: 12px;
+	background-color: var(--superfly-return-panel);
+	box-shadow:
+		-3px -3px 8px var(--superfly-return-lift),
+		4px 4px 10px var(--superfly-return-sink);
+	transition-property: box-shadow;
+	transition-duration: 0.3s;
+	transition-timing-function: ease;
+}
+
+.superfly-return-step:hover {
+	box-shadow:
+		-4px -4px 9px var(--superfly-return-lift),
+		5px 5px 12px var(--superfly-return-sink);
+}
+
+.superfly-return-step-number {
+	display: block;
+	margin-bottom: 14px;
+
+	font-family: var(--superfly-return-font-tech);
+	font-size: 12px;
+	font-weight: 700;
+	letter-spacing: 0.18em;
+	color: var(--superfly-return-accent);
+}
+
+.superfly-return-step h2 {
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 10px;
+	margin-left: 0;
+
+	font-family: var(--superfly-return-font-title);
+	font-weight: 400;
+	font-size: clamp(15px, 1.5vw, 19px);
+	line-height: 1.15;
+	letter-spacing: -0.01em;
+	text-transform: uppercase;
+}
+
+/* the last step carries the one figure a customer came for */
+.superfly-return-step:last-child h2 {
+	color: var(--superfly-return-accent);
+}
+
+.superfly-return-step p {
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
+
+	/* 13.5px flat, matching the footer's .sf-pf__small — the size body copy is set
+	   at everywhere else on the site. These were clamps that grew to 15-16px on a
+	   desktop, so the information pages read noticeably larger than the footer
+	   under them. Set across return-refund, privacy, faq, contact and terms
+	   together on 2026-09-29: the five are one family, so change it in all of
+	   them or in none. */
+	font-size: 13.5px;
+	line-height: 1.75;
+	color: var(--superfly-return-muted);
+}
+
+
+/* -------------------------------------------------------------
+ * Refundable / not refundable
+ * ----------------------------------------------------------- */
+
+.superfly-return-split {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	column-gap: clamp(14px, 1.6vw, 22px);
+	row-gap: clamp(14px, 1.6vw, 22px);
+	/* stretch, not start: the two cards are the same height however uneven the
+	   lists are, the way a privacy grid row is as tall as its tallest card */
+	align-items: stretch;
+}
+
+/* neumorphic, like the steps and the privacy cards */
+.superfly-return-column {
+	padding-top: clamp(24px, 3vw, 32px);
+	padding-right: clamp(20px, 2.4vw, 28px);
+	padding-bottom: clamp(24px, 3vw, 32px);
+	padding-left: clamp(20px, 2.4vw, 28px);
+
+	border-width: 0;
+	border-radius: 12px;
+	background-color: var(--superfly-return-panel);
+	box-shadow:
+		-3px -3px 8px var(--superfly-return-lift),
+		4px 4px 10px var(--superfly-return-sink);
+	transition-property: box-shadow;
+	transition-duration: 0.3s;
+	transition-timing-function: ease;
+}
+
+.superfly-return-column:hover {
+	box-shadow:
+		-4px -4px 9px var(--superfly-return-lift),
+		5px 5px 12px var(--superfly-return-sink);
+}
+
+.superfly-return-column h2 {
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 18px;
+	margin-left: 0;
+
+	font-family: var(--superfly-return-font-tech);
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.2em;
+	text-transform: uppercase;
+}
+
+.superfly-return-column-yes h2 {
+	color: var(--superfly-return-ok);
+}
+
+.superfly-return-column-no h2 {
+	color: var(--superfly-return-accent);
+}
+
+.superfly-return-column ul {
+	list-style-type: none;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
+	padding-top: 0;
+	padding-right: 0;
+	padding-bottom: 0;
+	padding-left: 0;
+}
+
+.superfly-return-column li {
+	position: relative;
+	padding-left: 30px;
+	margin-bottom: 14px;
+
+	font-size: 13.5px;
+	line-height: 1.7;
+	color: var(--superfly-return-muted);
+}
+
+.superfly-return-column li:last-child {
+	margin-bottom: 0;
+}
+
+/* The tick and the cross are CSS content, so they are decoration and stay out
+   of the accessibility tree — the column heading already says which list this
+   is, and a screen reader reading "tick" before every one of four items would
+   be noise. This is also why the colour is never the only signal. */
+.superfly-return-column li::before {
+	position: absolute;
+	left: 0;
+	top: -1px;
+	font-family: var(--superfly-return-font-tech);
+	font-size: 15px;
+	font-weight: 700;
+}
+
+.superfly-return-column-yes li::before {
+	content: "\2713";
+	color: var(--superfly-return-ok);
+}
+
+.superfly-return-column-no li::before {
+	content: "\2715";
+	color: var(--superfly-return-accent);
+}
+
+
+/* -------------------------------------------------------------
+ * The binding paragraph
+ *
+ * Set apart by a magenta rule and a wash of the same colour, so it reads as
+ * quoted rather than as more of the page's own prose — it is the live store's
+ * wording, carried over unedited.
+ * ----------------------------------------------------------- */
+
+.superfly-return-policy {
+	padding-top: clamp(24px, 3vw, 34px);
+	padding-right: clamp(22px, 2.6vw, 32px);
+	padding-bottom: clamp(24px, 3vw, 34px);
+	padding-left: clamp(22px, 2.6vw, 32px);
+
+	border-width: 0;
+	border-radius: 12px;
+	background-color: var(--superfly-return-panel);
+	box-shadow:
+		-3px -3px 8px var(--superfly-return-lift),
+		4px 4px 10px var(--superfly-return-sink);
+}
+
+/* The magenta wash and left rule that used to mark this block as quoted went
+   with the neumorphic change — a tinted, edged card is not the page's own
+   colour and the light stops reading as light. The "The policy in full" label
+   above it is now the only thing saying this paragraph is the binding text,
+   which is worth knowing if that label is ever reworded. */
+
+.superfly-return-policy p {
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
+
+	font-size: 13.5px;
+	line-height: 1.9;
+	color: var(--superfly-return-muted);
+}
+
+.superfly-return-policy strong {
+	font-weight: 700;
+	color: var(--superfly-return-text);
+}
+
+.superfly-return-figure {
+	font-weight: 700;
+	color: var(--superfly-return-accent);
+}
+
+
+/* -------------------------------------------------------------
+ * The address
+ * ----------------------------------------------------------- */
+
+/* A GRID, not flex. Flex sized both columns on their content, so two short
+   blocks — an address and an email — sat in about 470px of a 1060px card with
+   the rest of it empty, and the card read as a mistake rather than a panel.
+   Two equal columns fill it, and the hairline between them is what makes the
+   split look intended. */
+.superfly-return-address {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	column-gap: clamp(24px, 4vw, 56px);
+	row-gap: clamp(24px, 4vw, 40px);
+
+	padding-top: clamp(26px, 3.4vw, 38px);
+	padding-right: clamp(22px, 3vw, 34px);
+	padding-bottom: clamp(26px, 3.4vw, 38px);
+	padding-left: clamp(22px, 3vw, 34px);
+
+	border-width: 0;
+	border-radius: 12px;
+	background-color: var(--superfly-return-panel);
+	box-shadow:
+		-3px -3px 8px var(--superfly-return-lift),
+		4px 4px 10px var(--superfly-return-sink);
+}
+
+/* the hairline between the two columns — on the second one, so it never hangs
+   off the end of a single-column layout */
+.superfly-return-address > div + div {
+	padding-left: clamp(24px, 4vw, 56px);
+	border-left-width: 1px;
+	border-left-style: solid;
+	border-left-color: var(--superfly-return-hair);
+}
+
+.superfly-return-address h2 {
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 14px;
+	margin-left: 0;
+
+	font-family: var(--superfly-return-font-tech);
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.2em;
+	text-transform: uppercase;
+	color: var(--superfly-return-faint);
+}
+
+.superfly-return-address address {
+	font-style: normal;
+	font-size: 13.5px;
+	line-height: 1.8;
+	color: var(--superfly-return-muted);
+}
+
+.superfly-return-address address strong {
+	display: block;
+	margin-bottom: 6px;
+
+	font-family: var(--superfly-return-font-title);
+	font-weight: 400;
+	font-size: clamp(15px, 1.3vw, 18px);
+	letter-spacing: -0.01em;
+	text-transform: uppercase;
+	color: var(--superfly-return-text);
+}
+
+/* The email is the second column's headline, the way SUPERFLYMOTOS is the
+   first's: same position under the label, same weight in the eye. It was a
+   link buried on the second line of a sentence, which left the column with no
+   top line to align against and made the card look ragged. Not Archivo Black
+   and not uppercase, though — an email address set in a display face is hard
+   to read and impossible to transcribe. */
+.superfly-return-email {
+	display: block;
+	margin-bottom: 8px;
+
+	font-size: clamp(15px, 1.3vw, 18px);
+	font-weight: 700;
+	line-height: 1.4;
+}
+
+.superfly-return-address a {
+	color: var(--superfly-return-accent);
+	text-decoration: none;
+	/* the address is long enough to overflow the column on a phone */
+	word-break: break-word;
+}
+
+.superfly-return-address a:hover,
+.superfly-return-address a:focus {
+	text-decoration: underline;
+}
+
+
+/* -------------------------------------------------------------
+ * Foot
+ * ----------------------------------------------------------- */
+
+.superfly-return-foot {
+	margin-top: clamp(26px, 3vw, 36px);
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
+
+	padding-top: 16px;
+	border-top-width: 1px;
+	border-top-style: solid;
+	border-top-color: var(--superfly-return-hair);
+
+	font-family: var(--superfly-return-font-tech);
+	font-size: 11px;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: var(--superfly-return-faint);
+}
+
+
+/* -------------------------------------------------------------
+ * Narrow
+ *
+ * Two breakpoints, not one. The steps go four up, then two up, then one;
+ * the two lists hold side by side longer than the steps do, because a list
+ * item wraps gracefully and a step's heading does not.
+ * ----------------------------------------------------------- */
+
+@media (max-width: 900px) {
+	.superfly-return-steps {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+@media (max-width: 640px) {
+	.superfly-return-steps {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.superfly-return-split {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	/* the address card stacks too, and its divider turns from a vertical rule
+	   between the columns into a horizontal one between the rows */
+	.superfly-return-address {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.superfly-return-address > div + div {
+		padding-left: 0;
+		padding-top: clamp(24px, 4vw, 32px);
+
+		border-left-width: 0;
+		border-top-width: 1px;
+		border-top-style: solid;
+		border-top-color: var(--superfly-return-hair);
+	}
+}

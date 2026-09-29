@@ -21,7 +21,19 @@
  * background, so a weave that started at the content would leave a plain
  * strip across the top. Fixed, so it stays one continuous sheet however
  * far the page scrolls. Same recipe as the rest of the site.
- * "privacy-policy" is the page's slug, which WordPress puts on the body. */
+ * "privacy-policy" is a body class WordPress adds ONLY to the page set as
+ * the site's Privacy Policy (Settings -> Privacy) - it is not a generic slug
+ * class. If that designation is ever cleared, this page loses its background
+ * and needs a body_class filter of its own, the way /return-refund/ and
+ * /contact-us/ have one.
+ *
+ * A second selector, body.page-id-11, sat here until 2026-09-29: this file
+ * also dressed /return-refund/, which is an ordinary page and never gets the
+ * privacy-policy class. That page now has return-refund.css and a body class
+ * of its own, so this file no longer loads there and the id selector could
+ * never fire again. It was also brittle in the way terms.css's
+ * body.page-id-128 still is - recreate the page, the id changes, and the
+ * background silently goes away. */
 body.privacy-policy {
 	background-color: #101014;
 	background-image:
@@ -37,8 +49,14 @@ body.privacy-policy {
 	--pp-line:   rgba(242,242,244,.14);
 	--pp-accent: #ec1e79;
 	--pp-card:   #0d0d10;                  /* the page's own colour - no edge, only light */
-	--pp-lift:   rgba(255,255,255,.055);   /* the light side */
-	--pp-sink:   rgba(0,0,0,.85);          /* the shadow side */
+	/* Softened 2026-09-29 on request. Was .055 / .85 with offsets half again
+	   as large - see the box-shadow rules below. The dark side moved most:
+	   .85 was heavy enough that the cards cast a visible pool on the carbon
+	   weave rather than sitting on it. Keep the two in proportion if you
+	   tune them again - the lift is what stops a neumorphic card reading as
+	   a plain dark rectangle, so do not drop it alone. */
+	--pp-lift:   rgba(255,255,255,.03);    /* the light side */
+	--pp-sink:   rgba(0,0,0,.38);          /* the shadow side */
 	--pp-title:  "Archivo Black","Arial Black",sans-serif;
 	--pp-body:   "Archivo","Inter",sans-serif;
 	--pp-tech:   "Chakra Petch","Archivo",sans-serif;
@@ -51,6 +69,34 @@ body.privacy-policy {
 }
 .pp *, .pp *::before, .pp *::after { box-sizing: border-box; }
 
+/* ---- matching FAQ's and contact's measure inside Elementor ----
+ * Both pages this file dresses are Elementor pages; FAQ and contact are
+ * not. That costs them 120px of width in two separate ways, and BOTH have
+ * to be undone or they still do not line up:
+ *
+ *   1. Elementor wraps the widget in .e-con-inner, capped at
+ *      min(100%, 1140px) - its global content width. The block asks for
+ *      1180 and never gets it.
+ *   2. Elementor's frontend.css sets box-sizing:border-box on everything
+ *      inside .elementor, including .pp. Outside Elementor that block is
+ *      content-box, so `max-width:1180px` means 1180 of CONTENT plus two
+ *      40px gutters = 1260 overall. Inside Elementor the same declaration
+ *      means 1180 OVERALL. Raising the container cap alone leaves the page
+ *      80px short.
+ *
+ * So: lift the cap to 1260 AND restate the block at 1260, the border-box
+ * spelling of "1180 of content in a 40px gutter".
+ *
+ * Scoped per page: .e-con-inner is Elementor's class on EVERY container on
+ * the site, and this must not reach the shop or the home page. page-id-11
+ * is /return-refund/ - see the background note above for why that page
+ * needs an id and privacy does not. */
+body.privacy-policy .e-con-inner,
+body.page-id-11 .e-con-inner { max-width: min(100%, 1260px); }
+
+body.privacy-policy .pp,
+body.page-id-11 .pp { max-width: 1260px; }
+
 /* ---- the head ---- */
 .pp__head {
 	display: flex; align-items: flex-start; justify-content: space-between; gap: 30px;
@@ -58,26 +104,44 @@ body.privacy-policy {
 	border-bottom: 1px solid var(--pp-line);
 }
 .pp__eyebrow {
-	margin: 0 0 14px;
+	/* the gap below is the shared one - contact, faq and terms all set this
+	   same clamp. It was 14px until 2026-09-29, against contact's 38px. */
+	margin: 0 0 clamp(20px,3vw,38px);
 	font-family: var(--pp-tech); font-size: 11px; font-weight: 700;
 	letter-spacing: .22em; text-transform: uppercase; color: var(--pp-accent);
 }
+/* The contact and FAQ title: upright rather than italic, two stacked lines
+   with the second in magenta, no magenta square. All five page titles were
+   italic-and-square until 2026-09-29; every one of them now uses this.
+   Values are copied from .superfly-contact-title - change one, change all.
+   This file dresses /return-refund/ as well as /privacy-policy/. */
 .pp__title {
 	margin: 0 0 16px;
-	font-family: var(--pp-title); font-weight: 400; font-style: italic;
-	font-size: clamp(30px,5vw,54px); line-height: 1; letter-spacing: -.01em;
+	font-family: var(--pp-title); font-weight: 400;
+	/* the shared page-title size - also contact, terms, faq, shop-archive.
+	   Was clamp(30px,5vw,54px) across all five until 2026-09-29. Change it
+	   in all five or in none. */
+	font-size: clamp(32px,6vw,68px);
+	/* .92, not 1: tighter than the type is tall, which is what closes the
+	   gap between the two stacked lines */
+	line-height: .92; letter-spacing: -.025em;
 	text-transform: uppercase; color: var(--pp-text);
 }
-.pp__title i { display: inline-block; width: .22em; height: .22em; margin-left: .12em; background: var(--pp-accent); }
+/* the second line, in magenta */
+.pp__title span { display: block; color: var(--pp-accent); }
+/* UNUSED since 2026-09-29 - the one-line summary under the title was removed
+   from both /privacy-policy/ and /return-refund/ on request. Kept so putting
+   it back stays a markup-only change. (On return-refund it was wrong copy
+   anyway: it described data protection, on a page about returns.) */
 .pp__sub { margin: 0; max-width: 34ch; font-size: clamp(14px,1.15vw,16px); line-height: 1.6; color: var(--pp-muted); }
 
 /* the badge is neumorphic too, so the head and the cards agree */
 .pp__badge {
 	display: grid; place-items: center; flex: none;
 	width: clamp(78px,8vw,104px); aspect-ratio: 1;
-	border-radius: 28px;
+	border-radius: 16px;
 	background: var(--pp-card);
-	box-shadow: -9px -9px 20px var(--pp-lift), 11px 11px 26px var(--pp-sink);
+	box-shadow: -4px -4px 9px var(--pp-lift), 4px 4px 11px var(--pp-sink);
 }
 .pp__badge svg { width: 34%; height: 34%; fill: none; stroke: var(--pp-accent); stroke-width: 1.5; }
 
@@ -91,7 +155,12 @@ body.privacy-policy {
 	font-family: var(--pp-tech); font-size: 11px; font-weight: 700;
 	letter-spacing: .22em; text-transform: uppercase; color: var(--pp-faint);
 }
+/* The "Policy details" label was removed from the markup on 2026-09-29, so
+   this button is the only child left - and a lone child under space-between
+   falls to the LEFT, which is not where it was. margin-left:auto pushes it
+   back to the right edge. Harmless if the label is ever restored. */
 .pp__all {
+	margin-left: auto;
 	padding: 0; background: none; border: 0; cursor: pointer;
 	color: var(--pp-muted); font-family: var(--pp-body); font-size: 14px;
 	text-decoration: underline; text-underline-offset: 4px;
@@ -119,20 +188,20 @@ body.privacy-policy {
 	flex-direction: column;
 	padding: clamp(22px,2.4vw,30px);
 	border: 0;
-	border-radius: 22px;
+	border-radius: 12px;
 	background: var(--pp-card);
-	box-shadow: -10px -10px 22px var(--pp-lift), 12px 12px 28px var(--pp-sink);
+	box-shadow: -4px -4px 10px var(--pp-lift), 5px 5px 13px var(--pp-sink);
 	transition: box-shadow .3s ease;
 }
 .pp-card:hover {
-	box-shadow: -12px -12px 26px var(--pp-lift), 15px 15px 34px var(--pp-sink);
+	box-shadow: -5px -5px 12px var(--pp-lift), 6px 6px 16px var(--pp-sink);
 }
 
 /* open: the light flips and the card sinks into the surface instead of
    standing out - the neumorphic "pressed" state, and a second cue about
    which one is open */
 .pp-card[open] {
-	box-shadow: inset 7px 7px 16px var(--pp-sink), inset -7px -7px 16px var(--pp-lift);
+	box-shadow: inset 4px 4px 9px var(--pp-sink), inset -4px -4px 9px var(--pp-lift);
 }
 
 .pp-card__head {
@@ -178,13 +247,19 @@ body.privacy-policy {
 	padding-top: 18px;
 	border-top: 1px solid rgba(242,242,244,.07);
 }
-.pp-card__body p { margin: 0 0 14px; font-size: clamp(13.5px,1.05vw,15px); line-height: 1.85; color: var(--pp-muted); }
+/* 13.5px flat, matching the footer's .sf-pf__small — the size body copy is set
+   at everywhere else on the site. These were clamps that grew to 15-16px on a
+   desktop, so the information pages read noticeably larger than the footer
+   under them. Set across return-refund, privacy, faq, contact and terms
+   together on 2026-09-29: the five are one family, so change it in all of
+   them or in none. */
+.pp-card__body p { margin: 0 0 14px; font-size: 13.5px; line-height: 1.85; color: var(--pp-muted); }
 .pp-card__body p:last-child { margin-bottom: 0; }
 .pp-card__body strong { color: var(--pp-text); }
 
 /* ---- the tail ---- */
 .pp__foot { margin-top: clamp(34px,5vw,56px); padding-top: 22px; border-top: 1px solid var(--pp-line); }
-.pp__foot p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--pp-muted); }
+.pp__foot p { margin: 0; font-size: 13.5px; line-height: 1.7; color: var(--pp-muted); }
 .pp__foot a { color: var(--pp-accent); text-decoration: none; }
 .pp__foot a:hover { text-decoration: underline; }
 .pp__when {
