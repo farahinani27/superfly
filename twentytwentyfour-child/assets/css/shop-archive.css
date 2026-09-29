@@ -1,0 +1,739 @@
+/* =============================================================
+ * SUPERFLY — PRODUCT ARCHIVE (the shop and every category page)
+ *
+ * Shape: revamp/category-b.html, itself a measured reconstruction
+ * of lupinelights.com/en/collections/bike-lighting.
+ *
+ *   ┌──────────────────────────────────────────────────────────┐
+ *   │                                                          │
+ *   │                    W H E E L S            160px          │
+ *   │          the category description, centred               │
+ *   │                                                          │
+ *   │  FILTERS +        3 PRODUCTS         [ SORTING      ▾ ]  │
+ *   │  ┌ colour ─┬─ fits ─┬─ price ─┬─ availability ┐ (folded) │
+ *   │  ┌────────┐   ┌────────┐   ┌────────┐                    │
+ *   │  │ white  │   │ white  │   │ white  │  4/5 tiles         │
+ *   │  └────────┘   └────────┘   └────────┘                    │
+ *   │  PROJECT X    PROJECT X    PROJECT X     40px            │
+ *   │  RM574.00     RM448.00     RM433.00      muted           │
+ *   └──────────────────────────────────────────────────────────┘
+ *
+ * THIS REPLACED the two-column version (a sticky 470px filter
+ * rail beside the grid, revamp/category-a.html). The operator
+ * picked B. The old file is in git, not in a comment.
+ *
+ * ---- THE MEASUREMENTS ----
+ * Read off the reference at 1440px, where the container is 1440
+ * with 48px padding, so the content is 1344.
+ *
+ *   container    padding 0 48, max-width 2000
+ *   head         centred, margin 48 0, gap 8
+ *   title        160px / 144px uppercase, padding-top 98
+ *   description  24px / 28.8, centred, margin-bottom 48
+ *   bar          flex space-between, height 32, margin-bottom 24
+ *   grid         3 columns, gap 98px ROW / 48px COLUMN
+ *   card         flex column gap 24
+ *   card image   aspect-ratio 4/5, radius 2
+ *   card content gap 8
+ *   card title   40px / 40, letter-spacing .8, uppercase
+ *   excerpt      italic 18px / 23.76
+ *   price        tech 14px / 16.1, ls .56, colour #878787
+ *
+ * THE PRICE IS MUTED, NOT ACCENT. That is deliberate in the
+ * original and it is the opposite of the product page: on a
+ * collection the product NAME carries the row, not the number.
+ *
+ * The 98px row gap is not a typo. It is what stops a wall of
+ * cards reading as a spreadsheet.
+ *
+ * ---- WHY THIS FILE EXISTS RATHER THAN MORE woocommerce.css ----
+ * woocommerce.css skins everything WooCommerce draws, including
+ * cart and account. This changes archives only, loads after it,
+ * and is enqueued only on is_shop() || is_product_taxonomy() — so
+ * a mistake here cannot reach the cart, and reverting is one
+ * enqueue line. It overrides woocommerce.css section 9, which
+ * draws cards as bordered panels; those rules stay for the shop's
+ * other surfaces.
+ *
+ * ---- MARKUP IS WOOCOMMERCE'S OWN ----
+ * WooCommerce 11.1.1 renders archives with blocks, so the class
+ * names below are theirs and were read off the live page, not
+ * guessed. If this page ever goes plain after a WooCommerce
+ * update, check those names first. The `sf-shop*` classes are
+ * ours, set in templates/archive-product.html.
+ *
+ * Type is the house trio and the accent is SUPERFLY's #ec1e79 —
+ * the same in revamp/category-b.html since 2026-09-29, so the
+ * concept and this file cannot drift apart on colour.
+ *
+ * Enqueue: functions.php — superfly_shop_archive_assets()
+ * Fold:    assets/js/shop-archive.js
+ * Concept: revamp/category-b.html
+ * ============================================================= */
+
+.sf-shop {
+	--sa-bg:     #0a0a0a;
+	--sa-text:   #f2f2f4;
+	--sa-muted:  #878787;
+	--sa-faint:  rgba(242, 242, 244, 0.34);
+	--sa-line:   rgba(242, 242, 244, 0.14);
+	--sa-hair:   rgba(242, 242, 244, 0.08);
+	--sa-accent: #ec1e79;
+	--sa-tile:   #ffffff;
+	--sa-radius: 2px;
+
+	--sa-title: "Archivo Black", "Arial Black", sans-serif;
+	--sa-body:  "Archivo", "Inter", sans-serif;
+	--sa-tech:  "Chakra Petch", "Archivo", sans-serif;
+
+	--sa-step: 48px;
+
+	box-sizing: border-box;
+	max-width: 2000px;
+	margin: 0 auto;
+	padding: 0 var(--sa-step);
+}
+
+.sf-shop *,
+.sf-shop *::before,
+.sf-shop *::after {
+	box-sizing: border-box;
+}
+
+
+/* -------------------------------------------------------------
+ * 1. THE MASTHEAD
+ * ------------------------------------------------------------- */
+.sf-shop__head {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	margin: var(--sa-step) 0;
+	text-align: center;
+}
+
+/* The category name is the largest thing on the page — that is the
+ * whole idea of this layout.
+ *
+ * woocommerce.css section 10 screen-reader-hides every archive title
+ * site-wide, on the grounds that the breadcrumb already says it. Here
+ * the title IS the page, so it is put back — but only inside .sf-shop,
+ * so nothing else on the site changes. The selector has to out-specify
+ * `body.woocommerce h1.wp-block-query-title` (0,2,2), hence the body
+ * prefix and the h1. */
+body.woocommerce .sf-shop__head h1.wp-block-query-title,
+body.woocommerce-page .sf-shop__head h1.wp-block-query-title {
+	position: static;
+	width: auto;
+	height: auto;
+	overflow: visible;
+	clip: auto;
+	clip-path: none;
+	white-space: normal;
+	margin: 0;
+	padding: 0;
+	max-width: 100%;
+	font-family: var(--sa-title);
+	/* THE HOUSE PAGE TITLE, not the reference's 160/144.
+	   faq.css, contact.css, terms.css and privacy.css all set a page
+	   heading to exactly this, so the shop reads as part of the same site
+	   rather than shouting over it. The reference's 160px is kept in
+	   revamp/category-b.html if the argument is ever reopened.
+	   Was clamp(30px, 5vw, 54px) across all five until 2026-09-29. */
+	font-size: clamp(32px, 6vw, 68px);
+	font-weight: 400;
+	line-height: 1;
+	letter-spacing: -0.01em;
+	text-transform: uppercase;
+	color: var(--sa-text);
+}
+
+/* The real WooCommerce field, edited per category in Products →
+ * Categories. Every category is empty today, so this renders nothing
+ * and the header is title-only until someone writes them. */
+.sf-shop__head .wp-block-term-description {
+	margin: 0 0 var(--sa-step);
+	max-width: 62ch;
+	font-family: var(--sa-body);
+	font-style: italic;
+	font-size: 24px;
+	line-height: 28.8px;
+	color: var(--sa-text);
+}
+
+.sf-shop__head .wp-block-term-description p {
+	margin: 0;
+}
+
+/* nothing written yet → no empty 48px hole under the title */
+.sf-shop__head .wp-block-term-description:empty {
+	display: none;
+}
+
+
+/* -------------------------------------------------------------
+ * 2. THE BAR
+ * ------------------------------------------------------------- */
+.sf-shop__bar {
+	align-items: center;
+	gap: 16px;
+	min-height: 32px;
+	margin: 0 0 24px;
+}
+
+.sf-shop__filters-toggle {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 0;
+	border: 0;
+	background: none;
+	cursor: pointer;
+	font-family: var(--sa-tech);
+	font-size: 10px;
+	font-weight: 500;
+	line-height: 12px;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--sa-text);
+	transition: color 0.2s ease;
+}
+
+.sf-shop__filters-toggle:hover {
+	color: var(--sa-accent);
+}
+
+.sf-shop__filters-toggle i {
+	font-style: normal;
+	color: var(--sa-muted);
+}
+
+.sf-shop__filters-toggle[aria-expanded="true"] i {
+	color: var(--sa-accent);
+}
+
+.sf-shop__bar .wc-block-product-results-count {
+	margin: 0;
+	font-family: var(--sa-tech);
+	font-size: 10px;
+	font-weight: 500;
+	line-height: 12px;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--sa-muted);
+}
+
+.sf-shop__bar select.orderby {
+	height: 32px;
+	padding: 0 28px 0 10px;
+	border: 1px solid var(--sa-line);
+	border-radius: var(--sa-radius);
+	background-color: transparent;
+	color: var(--sa-text);
+	font-family: var(--sa-tech);
+	font-size: 10px;
+	font-weight: 500;
+	line-height: 12px;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	appearance: none;
+	-webkit-appearance: none;
+	cursor: pointer;
+	/* the chevron is drawn, so there is no asset to ship */
+	background-image:
+		linear-gradient(45deg, transparent 50%, var(--sa-muted) 50%),
+		linear-gradient(135deg, var(--sa-muted) 50%, transparent 50%);
+	background-position: calc(100% - 14px) 14px, calc(100% - 9px) 14px;
+	background-size: 5px 5px, 5px 5px;
+	background-repeat: no-repeat;
+}
+
+.sf-shop__bar select.orderby:hover {
+	border-color: var(--sa-accent);
+}
+
+/* the native dropdown list: Chakra Petch ships 500 and up, so name a
+   weight it has or this falls back to Archivo */
+.sf-shop__bar select.orderby option {
+	background: #111114;
+	color: #ffffff;
+	font-weight: 500;
+}
+
+
+/* -------------------------------------------------------------
+ * 3. THE FILTERS, FOLDED
+ *
+ * Closed by the JS on load, not here, so with scripts blocked the
+ * filters are simply open and usable rather than shut behind a
+ * dead button. See assets/js/shop-archive.js.
+ * ------------------------------------------------------------- */
+.sf-shop__filters {
+	margin: 0 0 var(--sa-step);
+	padding: 32px 0;
+	border-top: 1px solid var(--sa-hair);
+	border-bottom: 1px solid var(--sa-hair);
+}
+
+.sf-shop__filters[hidden] {
+	display: none;
+}
+
+/* the four groups across, not down */
+.sf-shop__filters .wc-block-product-filters {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: var(--sa-step);
+	align-items: start;
+}
+
+/* WooCommerce's own mobile drawer button and overlay chrome: this
+   layout has its own toggle, so the plugin's is not wanted. */
+.sf-shop__filters .wc-block-product-filters__open-overlay,
+.sf-shop__filters .wc-block-product-filters__overlay-header {
+	display: none;
+}
+
+.sf-shop__filters .wc-block-product-filters__overlay,
+.sf-shop__filters .wc-block-product-filters__overlay-wrapper,
+.sf-shop__filters .wc-block-product-filters__overlay-content {
+	display: contents;
+}
+
+.sf-shop__filters h3.wp-block-heading {
+	margin: 0 0 16px;
+	font-family: var(--sa-title);
+	font-size: 14px;
+	font-weight: 400;
+	line-height: 18px;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--sa-text);
+}
+
+/* ---- checkbox lists (Colour, Fits, Availability) ---- */
+.sf-shop__filters .wc-block-product-filter-checkbox-list__items {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.sf-shop__filters .wc-block-product-filter-checkbox-list__label {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	cursor: pointer;
+}
+
+.sf-shop__filters .wc-block-product-filter-checkbox-list__text {
+	font-family: var(--sa-body);
+	font-size: 14px;
+	line-height: 1.32;
+	letter-spacing: 0.24px;
+	color: var(--sa-muted);
+	transition: color 0.18s ease;
+}
+
+.sf-shop__filters .wc-block-product-filter-checkbox-list__label:hover
+	.wc-block-product-filter-checkbox-list__text {
+	color: var(--sa-text);
+}
+
+/* The tick is an <svg> mark layered over a real <input>, so both get
+   restyled rather than the input hidden — hiding it takes the keyboard
+   with it. */
+.sf-shop__filters .wc-block-product-filter-checkbox-list__input-wrapper {
+	position: relative;
+	flex: none;
+	width: 18px;
+	height: 18px;
+}
+
+.sf-shop__filters .wc-block-product-filter-checkbox-list__input {
+	appearance: none;
+	-webkit-appearance: none;
+	margin: 0;
+	width: 18px;
+	height: 18px;
+	border: 1px solid var(--sa-line);
+	border-radius: var(--sa-radius);
+	background: transparent;
+	cursor: pointer;
+	transition: border-color 0.18s ease, background-color 0.18s ease;
+}
+
+.sf-shop__filters .wc-block-product-filter-checkbox-list__input:checked {
+	border-color: var(--sa-accent);
+	background: var(--sa-accent);
+}
+
+.sf-shop__filters .wc-block-product-filter-checkbox-list__input:focus-visible {
+	outline: 2px solid var(--sa-accent);
+	outline-offset: 2px;
+}
+
+.sf-shop__filters .wc-block-product-filter-checkbox-list__mark {
+	position: absolute;
+	inset: 0;
+	margin: auto;
+	width: 12px;
+	height: 12px;
+	pointer-events: none;
+	color: #ffffff;
+	opacity: 0;
+	transition: opacity 0.18s ease;
+}
+
+.sf-shop__filters .wc-block-product-filter-checkbox-list__input:checked
+	+ .wc-block-product-filter-checkbox-list__mark {
+	opacity: 1;
+}
+
+.sf-shop__filters .wc-block-product-filter-checkbox-list__count {
+	margin-left: auto;
+	font-family: var(--sa-tech);
+	font-size: 10px;
+	font-weight: 500;
+	letter-spacing: 0.1em;
+	color: var(--sa-faint);
+}
+
+/* ---- price ---- */
+.sf-shop__filters .wc-block-product-filter-price-slider__range {
+	accent-color: var(--sa-accent);
+}
+
+.sf-shop__filters .wc-block-product-filter-price-slider__track {
+	background: var(--sa-line);
+}
+
+.sf-shop__filters .wc-block-product-filter-price__range-text,
+.sf-shop__filters .wc-block-product-filter-price-slider__content {
+	font-family: var(--sa-tech);
+	font-size: 12px;
+	font-weight: 500;
+	letter-spacing: 0.05em;
+	color: var(--sa-text);
+}
+
+/* ---- active chips + clear ---- */
+.sf-shop__filters .wc-block-product-filter-removable-chips__item {
+	border: 1px solid var(--sa-line);
+	border-radius: var(--sa-radius);
+	background: transparent;
+	font-family: var(--sa-tech);
+	font-size: 10px;
+	font-weight: 500;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--sa-text);
+}
+
+.sf-shop__filters .wc-block-product-filter-clear-button {
+	font-family: var(--sa-tech);
+	font-size: 10px;
+	font-weight: 500;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--sa-accent);
+	text-decoration: none;
+}
+
+
+/* -------------------------------------------------------------
+ * 4. THE GRID
+ * ------------------------------------------------------------- */
+.sf-shop__grid ul.wc-block-product-template {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 98px var(--sa-step);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+
+/* -------------------------------------------------------------
+ * 5. ONE CARD
+ *
+ * The override of woocommerce.css section 9, which draws the card
+ * as a bordered panel that lifts on hover. Here there is no border
+ * and no panel: the white photo tile is the shape.
+ * ------------------------------------------------------------- */
+.sf-shop__grid li.wc-block-product {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+	position: relative;
+	padding: 0;
+	border: 0;
+	background: transparent;
+}
+
+.sf-shop__grid li.wc-block-product:hover {
+	border: 0;
+	transform: none;
+}
+
+/* ---- the photo tile ----
+ * 4/5 portrait and WHITE, because the rim photography is shot on
+ * white and carries the RIDE.RACE.RESEARCH logo in the corner: a
+ * dark tile would show a white square floating inside it, and
+ * cropping a square photo to 4/5 cuts the logo off. So the tile is
+ * white and the photo is CONTAINed, never cropped.
+ *
+ * WooCommerce puts its own ratio modifier on this element
+ * (--aspect-ratio-1-1), which is why the ratio is forced here. */
+.sf-shop__grid li.wc-block-product .wc-block-components-product-image {
+	margin: 0;
+	aspect-ratio: 4 / 5;
+	overflow: hidden;
+	background: var(--sa-tile);
+	border-radius: var(--sa-radius);
+}
+
+.sf-shop__grid li.wc-block-product .wc-block-components-product-image a,
+.sf-shop__grid li.wc-block-product .wc-block-components-product-image img {
+	display: block;
+	width: 100%;
+	height: 100%;
+}
+
+.sf-shop__grid li.wc-block-product .wc-block-components-product-image img {
+	object-fit: contain;
+	background: var(--sa-tile);
+	transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sf-shop__grid li.wc-block-product:hover .wc-block-components-product-image img {
+	transform: scale(1.04);
+}
+
+/* everything under the tile sits on an 8px rhythm, not 24 */
+.sf-shop__grid li.wc-block-product > * + * {
+	margin-top: 0;
+}
+
+.sf-shop__grid li.wc-block-product .wc-block-components-product-rating {
+	margin: 0;
+	font-family: var(--sa-tech);
+	font-size: 10px;
+	font-weight: 500;
+	line-height: 12px;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--sa-muted);
+}
+
+.sf-shop__grid li.wc-block-product h2.wp-block-post-title {
+	margin: 8px 0 0;
+	padding: 0;
+	font-family: var(--sa-title);
+	/* The reference sets 40/40 over two lines, but its product names are
+	   short. Ours all begin "Superfly Project X 4 Spoke Sport Rims", which
+	   at 40px ran FIVE lines and 200px. Sized to read rather than to
+	   shout. Put 40/40 back the day product names get shorter. */
+	font-size: 20px;
+	font-weight: 400;
+	line-height: 24px;
+	letter-spacing: -0.01em;
+	text-transform: uppercase;
+	text-align: left;
+}
+
+.sf-shop__grid li.wc-block-product h2.wp-block-post-title a {
+	color: var(--sa-text);
+	text-decoration: none;
+	transition: color 0.2s ease;
+}
+
+.sf-shop__grid li.wc-block-product:hover h2.wp-block-post-title a {
+	color: var(--sa-accent);
+}
+
+/* the product's short description, in the house italic */
+.sf-shop__grid li.wc-block-product .wp-block-post-excerpt {
+	margin: 8px 0 0;
+}
+
+.sf-shop__grid li.wc-block-product .wp-block-post-excerpt__excerpt,
+.sf-shop__grid li.wc-block-product .wp-block-post-excerpt p {
+	margin: 0;
+	font-family: var(--sa-body);
+	font-style: italic;
+	font-size: 18px;
+	line-height: 23.76px;
+	color: var(--sa-text);
+}
+
+/* no short description written → no gap where one would be */
+.sf-shop__grid li.wc-block-product .wp-block-post-excerpt:empty {
+	display: none;
+}
+
+/* MUTED, not accent — see the note at the top of this file */
+.sf-shop__grid li.wc-block-product .wc-block-components-product-price {
+	display: block;
+	margin: 8px 0 0;
+	padding: 0;
+	font-family: var(--sa-tech);
+	font-size: 14px;
+	font-weight: 500;
+	line-height: 16.1px;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	text-align: left;
+	color: var(--sa-muted);
+}
+
+.sf-shop__grid li.wc-block-product .wc-block-components-product-price del {
+	color: var(--sa-faint);
+}
+
+.sf-shop__grid li.wc-block-product .wc-block-components-product-price ins {
+	text-decoration: none;
+	color: var(--sa-accent);
+}
+
+/* ---- the ShopEngine badges ----
+ * ShopEngine injects wishlist, quick view and compare as siblings of
+ * the image, so left alone they stack up under the price. They are
+ * moved onto the tile as icons rather than removed — they are
+ * features someone turned on deliberately. */
+.sf-shop__grid li.wc-block-product .shopengine-wishlist,
+.sf-shop__grid li.wc-block-product .shopengine-quickview-trigger,
+.sf-shop__grid li.wc-block-product .shopengine-comparison {
+	position: absolute;
+	right: 12px;
+	z-index: 2;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	margin: 0;
+	border-radius: var(--sa-radius);
+	background: rgba(0, 0, 0, 0.55);
+	color: #ffffff;
+	font-size: 13px;
+	line-height: 1;
+	transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.sf-shop__grid li.wc-block-product .shopengine-wishlist          { top: 12px; }
+.sf-shop__grid li.wc-block-product .shopengine-quickview-trigger { top: 52px; }
+.sf-shop__grid li.wc-block-product .shopengine-comparison        { top: 92px; }
+
+.sf-shop__grid li.wc-block-product .shopengine-wishlist:hover,
+.sf-shop__grid li.wc-block-product .shopengine-quickview-trigger:hover,
+.sf-shop__grid li.wc-block-product .shopengine-comparison:hover {
+	background: var(--sa-accent);
+	color: #000000;
+}
+
+
+/* -------------------------------------------------------------
+ * 6. NOTHING MATCHED
+ * ------------------------------------------------------------- */
+.sf-shop__grid .wp-block-woocommerce-product-collection-no-results {
+	padding: 96px 0;
+	text-align: center;
+	font-family: var(--sa-title);
+	font-size: 40px;
+	font-weight: 400;
+	line-height: 40px;
+	letter-spacing: 0.02em;
+	text-transform: uppercase;
+	color: rgba(242, 242, 244, 0.2);
+}
+
+
+/* -------------------------------------------------------------
+ * 7. PAGINATION
+ * Only renders past 12 products; styled now so it needs no
+ * attention the day the catalogue outgrows one page.
+ * ------------------------------------------------------------- */
+.sf-shop__grid .wp-block-query-pagination {
+	gap: 4px;
+	padding: var(--sa-step);
+}
+
+.sf-shop__grid .wp-block-query-pagination a,
+.sf-shop__grid .wp-block-query-pagination span {
+	padding: 12px;
+	font-family: var(--sa-tech);
+	font-size: 10px;
+	font-weight: 500;
+	line-height: 12px;
+	letter-spacing: 0.1em;
+	color: var(--sa-muted);
+	text-decoration: none;
+}
+
+.sf-shop__grid .wp-block-query-pagination .current {
+	color: var(--sa-text);
+}
+
+.sf-shop__grid .wp-block-query-pagination a:hover {
+	color: var(--sa-accent);
+}
+
+
+/* -------------------------------------------------------------
+ * 8. NARROWER SCREENS
+ *
+ * The reference is a fixed 3 x 416 and stops working below that.
+ * These breakpoints are the only additions to the measurement; the
+ * desktop numbers above are untouched.
+ * ------------------------------------------------------------- */
+@media (max-width: 1200px) {
+	.sf-shop__grid ul.wc-block-product-template {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 64px 32px;
+	}
+
+	.sf-shop__filters .wc-block-product-filters {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 32px;
+	}
+
+	.sf-shop__grid li.wc-block-product h2.wp-block-post-title {
+		font-size: 18px;
+		line-height: 22px;
+	}
+}
+
+@media (max-width: 760px) {
+	.sf-shop {
+		--sa-step: 20px;
+	}
+
+	.sf-shop__head .wp-block-term-description {
+		font-size: 17px;
+		line-height: 23px;
+	}
+
+	.sf-shop__grid ul.wc-block-product-template {
+		grid-template-columns: minmax(0, 1fr);
+		gap: 48px;
+	}
+
+	.sf-shop__filters .wc-block-product-filters {
+		grid-template-columns: minmax(0, 1fr);
+		gap: 28px;
+	}
+
+	.sf-shop__bar {
+		flex-wrap: wrap;
+		gap: 12px;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.sf-shop__grid li.wc-block-product .wc-block-components-product-image img,
+	.sf-shop__filters-toggle {
+		transition-duration: 0.001ms;
+	}
+}

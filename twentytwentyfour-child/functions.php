@@ -649,6 +649,48 @@ function superfly_shop_assets() {
 }
 
 
+// Product archive — the shop and every category page: a huge centred
+// category name, a one-line bar (Filters / count / sorting) with the
+// filters folded behind it, then a wide three-up grid of borderless
+// cards. Loads AFTER superfly-shop so it can override the bordered
+// card in woocommerce.css section 9, and only on archives, so a
+// mistake here cannot reach the cart or the account pages.
+// Looks: assets/css/shop-archive.css
+// Fold:  assets/js/shop-archive.js
+// Markup: templates/archive-product.html
+// Concept: revamp/category-b.html
+add_action( 'wp_enqueue_scripts', 'superfly_shop_archive_assets', 22 );
+function superfly_shop_archive_assets() {
+	if ( ! function_exists( 'is_shop' ) ) {
+		return;
+	}
+
+	// is_product_taxonomy() covers category AND tag archives; is_shop()
+	// is the /shop/ page itself, which uses the same template.
+	if ( ! ( is_shop() || is_product_taxonomy() ) ) {
+		return;
+	}
+
+	wp_enqueue_style(
+		'superfly-shop-archive',
+		get_stylesheet_directory_uri() . '/assets/css/shop-archive.css',
+		array( 'superfly-shop' ),
+		filemtime( get_stylesheet_directory() . '/assets/css/shop-archive.css' )
+	);
+
+	// Folds the filter panel behind the "Filters" button in the bar.
+	// Deferred, and the panel starts open in the markup, so with the
+	// script blocked the filters are simply visible.
+	wp_enqueue_script(
+		'superfly-shop-archive',
+		get_stylesheet_directory_uri() . '/assets/js/shop-archive.js',
+		array(),
+		filemtime( get_stylesheet_directory() . '/assets/js/shop-archive.js' ),
+		true
+	);
+}
+
+
 // My account — design B: the links as tabs across the top, and a login
 // screen with a photo beside the form instead of a form on black.
 // Looks: assets/css/account.css

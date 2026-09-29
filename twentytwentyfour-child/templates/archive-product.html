@@ -1,16 +1,68 @@
+<!-- ============================================================
+     SUPERFLY — PRODUCT ARCHIVE (the shop and every category page)
+
+     Shape: revamp/category-b.html — no filter rail. A huge centred
+     category name, a one-line bar (Filters / count / sorting), the
+     filters folded away behind that button, then a wide three-up
+     grid with a promo block across it.
+
+     This REPLACED the earlier two-column version (a sticky 470px
+     filter rail beside the grid, revamp/category-a.html). If you
+     want that back it is in git, not in a comment.
+
+     Looks: assets/css/shop-archive.css
+     Toggle: assets/js/shop-archive.js
+     Enqueue: functions.php — superfly_shop_archive_assets()
+
+     THE CATEGORY DESCRIPTION IS wp:term-description — the real
+     WooCommerce field, edited per category in Products →
+     Categories. Every category is currently EMPTY, so the header
+     renders as title-only until someone writes them. Nothing is
+     hardcoded here, or every category would share one sentence.
+     ============================================================ -->
+
 <!-- wp:template-part {"slug":"header","tagName":"header"} /-->
 
 <!-- wp:group {"tagName":"main","layout":{"inherit":true,"type":"constrained"}} -->
 <main class="wp-block-group">
-	<!-- wp:woocommerce/breadcrumbs /-->
+	<!-- align:full so the rail escapes <main>'s global padding (104px at a
+	     1440 viewport) and can take the shop's own 48px gutter instead —
+	     otherwise the crumbs sit on a different left edge from the grid
+	     below them. The gutter is in assets/css/breadcrumbs.css. -->
+	<!-- wp:woocommerce/breadcrumbs {"align":"full"} /-->
 
 	<!-- wp:woocommerce/store-notices /-->
 
-	<!-- wp:columns {"align":"wide","className":"sf-shop","style":{"spacing":{"blockGap":{"left":"var:preset|spacing|50"}}}} -->
-	<div class="wp-block-columns alignwide sf-shop">
+	<!-- wp:group {"align":"full","className":"sf-shop","layout":{"type":"default"}} -->
+	<div class="wp-block-group alignfull sf-shop">
 
-		<!-- wp:column {"width":"250px","className":"sf-shop__rail"} -->
-		<div class="wp-block-column sf-shop__rail" style="flex-basis:250px">
+		<!-- the masthead: the category name at 160px, centred -->
+		<!-- wp:group {"className":"sf-shop__head","layout":{"type":"default"}} -->
+		<div class="wp-block-group sf-shop__head">
+			<!-- wp:query-title {"type":"archive","showPrefix":false} /-->
+			<!-- wp:term-description /-->
+		</div>
+		<!-- /wp:group -->
+
+		<!-- the one-line bar. The Filters button is plain HTML because
+		     WooCommerce's own drawer button is hidden at desktop by the
+		     plugin's CSS, and un-hiding it would also fire the plugin's
+		     overlay. This one drives our own fold instead — see
+		     assets/js/shop-archive.js. -->
+		<!-- wp:group {"className":"sf-shop__bar","layout":{"type":"flex","flexWrap":"nowrap","justifyContent":"space-between"}} -->
+		<div class="wp-block-group sf-shop__bar">
+			<!-- wp:html -->
+			<button type="button" class="sf-shop__filters-toggle" aria-expanded="false" aria-controls="sf-shop-filters">Filters <i aria-hidden="true">+</i></button>
+			<!-- /wp:html -->
+
+			<!-- wp:woocommerce/product-results-count /-->
+			<!-- wp:woocommerce/catalog-sorting /-->
+		</div>
+		<!-- /wp:group -->
+
+		<!-- the filters, folded away until the button opens them -->
+		<!-- wp:group {"className":"sf-shop__filters","layout":{"type":"default"}} -->
+		<div class="wp-block-group sf-shop__filters">
 
 			<!-- wp:woocommerce/product-filters -->
 			<div class="wp-block-woocommerce-product-filters">
@@ -88,50 +140,39 @@
 			<!-- /wp:woocommerce/product-filters -->
 
 		</div>
-		<!-- /wp:column -->
+		<!-- /wp:group -->
 
-		<!-- wp:column {"className":"sf-shop__list"} -->
-		<div class="wp-block-column sf-shop__list">
+		<!-- the grid. No add-to-cart button on the card: the reference's
+		     cards are links to the product, nothing more, and a variable
+		     product cannot be added from here anyway. -->
+		<!-- wp:woocommerce/product-collection {"queryId":0,"query":{"woocommerceAttributes":[],"woocommerceStockStatus":["instock","outofstock","onbackorder"],"taxQuery":{},"isProductCollectionBlock":true,"perPage":12,"pages":0,"offset":0,"postType":"product","order":"asc","orderBy":"title","author":"","search":"","exclude":[],"sticky":"","inherit":true},"tagName":"div","className":"sf-shop__grid","dimensions":{"widthType":"fill","fixedWidth":""},"displayLayout":{"type":"flex","columns":3,"shrinkColumns":true},"convertedFromProducts":false,"queryContextIncludes":["collection"]} -->
+		<div class="wp-block-woocommerce-product-collection sf-shop__grid">
+			<!-- wp:woocommerce/product-template -->
+			<!-- wp:woocommerce/product-image {"showSaleBadge":false,"imageSizing":"thumbnail","isDescendentOfQueryLoop":true} /-->
+			<!-- wp:woocommerce/product-rating {"isDescendentOfQueryLoop":true,"fontSize":"small"} /-->
+			<!-- wp:post-title {"level":2,"isLink":true,"__woocommerceNamespace":"woocommerce/product-collection/product-title"} /-->
+			<!-- wp:post-excerpt {"excerptLength":18,"__woocommerceNamespace":"woocommerce/product-collection/product-summary"} /-->
+			<!-- wp:woocommerce/product-price {"isDescendentOfQueryLoop":true} /-->
+			<!-- /wp:woocommerce/product-template -->
 
-			<!-- wp:group {"layout":{"type":"flex","flexWrap":"nowrap","justifyContent":"space-between"}} -->
+			<!-- wp:query-pagination {"layout":{"type":"flex","justifyContent":"center"}} -->
+			<!-- wp:query-pagination-previous /-->
+			<!-- wp:query-pagination-numbers /-->
+			<!-- wp:query-pagination-next /-->
+			<!-- /wp:query-pagination -->
+
+			<!-- wp:woocommerce/product-collection-no-results -->
+			<!-- wp:group {"layout":{"type":"flex","orientation":"vertical","justifyContent":"center","flexWrap":"wrap"}} -->
 			<div class="wp-block-group">
-				<!-- wp:woocommerce/product-results-count /-->
-				<!-- wp:woocommerce/catalog-sorting /-->
+				<!-- wp:pattern {"slug":"woocommerce/no-products-found-clear-filters"} /-->
 			</div>
 			<!-- /wp:group -->
-
-			<!-- wp:woocommerce/product-collection {"queryId":0,"query":{"woocommerceAttributes":[],"woocommerceStockStatus":["instock","outofstock","onbackorder"],"taxQuery":{},"isProductCollectionBlock":true,"perPage":12,"pages":0,"offset":0,"postType":"product","order":"asc","orderBy":"title","author":"","search":"","exclude":[],"sticky":"","inherit":true},"tagName":"div","dimensions":{"widthType":"fill","fixedWidth":""},"displayLayout":{"type":"flex","columns":3,"shrinkColumns":true},"convertedFromProducts":false,"queryContextIncludes":["collection"]} -->
-			<div class="wp-block-woocommerce-product-collection">
-				<!-- wp:woocommerce/product-template -->
-				<!-- wp:woocommerce/product-image {"showSaleBadge":false,"imageSizing":"thumbnail","isDescendentOfQueryLoop":true} -->
-					<!-- wp:woocommerce/product-sale-badge {"isDescendentOfQueryLoop":true,"align":"right"} /-->
-				<!-- /wp:woocommerce/product-image -->
-				<!-- wp:post-title {"textAlign":"center","level":2,"isLink":true,"fontSize":"medium","__woocommerceNamespace":"woocommerce/product-collection/product-title","style":{"typography":{"lineHeight":"1.4"}}} /-->
-				<!-- wp:woocommerce/product-price {"textAlign":"center","isDescendentOfQueryLoop":true,"fontSize":"small","style":{"spacing":{"margin":{"bottom":"1rem"}}}} /-->
-				<!-- wp:woocommerce/product-button {"textAlign":"center","isDescendentOfQueryLoop":true,"fontSize":"small","style":{"spacing":{"margin":{"bottom":"1rem"}}}} /-->
-				<!-- /wp:woocommerce/product-template -->
-
-				<!-- wp:query-pagination {"layout":{"type":"flex","justifyContent":"center"}} -->
-				<!-- wp:query-pagination-previous /-->
-				<!-- wp:query-pagination-numbers /-->
-				<!-- wp:query-pagination-next /-->
-				<!-- /wp:query-pagination -->
-
-				<!-- wp:woocommerce/product-collection-no-results -->
-				<!-- wp:group {"layout":{"type":"flex","orientation":"vertical","justifyContent":"center","flexWrap":"wrap"}} -->
-				<div class="wp-block-group">
-					<!-- wp:pattern {"slug":"woocommerce/no-products-found-clear-filters"} /-->
-				</div>
-				<!-- /wp:group -->
-				<!-- /wp:woocommerce/product-collection-no-results -->
-			</div>
-			<!-- /wp:woocommerce/product-collection -->
-
+			<!-- /wp:woocommerce/product-collection-no-results -->
 		</div>
-		<!-- /wp:column -->
+		<!-- /wp:woocommerce/product-collection -->
 
 	</div>
-	<!-- /wp:columns -->
+	<!-- /wp:group -->
 </main>
 <!-- /wp:group -->
 
