@@ -111,6 +111,14 @@
 			return;                    // no cursor: the css leaves it softly lit
 		}
 
+		/* below 640px the css stands the word on its end with a rotate(),
+		   and getBoundingClientRect() then reports the TURNED box — the
+		   pointer would map to the wrong place in the letters. The css
+		   leaves it softly lit at that width instead. */
+		if (window.matchMedia('(max-width: 640px)').matches) {
+			return;
+		}
+
 		var box   = svg.viewBox.baseVal;            // 0 0 1200 300
 		var to    = { x: box.width / 2, y: box.height / 2 };
 		var at    = { x: to.x, y: to.y };

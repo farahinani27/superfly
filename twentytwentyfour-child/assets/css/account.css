@@ -747,3 +747,308 @@ body.woocommerce-account .woocommerce {
 body.woocommerce-account:not(.logged-in) .woocommerce {
 	display: block;
 }
+
+
+/* =============================================================
+ * DESIGN A — "PIT WALL"
+ * The console above the content and the panel around it. Both are
+ * printed by superfly_account_panel_open() in functions.php, on
+ * every endpoint, so these rules are not endpoint-specific.
+ * ============================================================= */
+
+/* ---- the console ---- */
+.sf-acc__console {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	margin: 0 0 30px;
+	background: var(--ac-panel);
+	border: 1px solid var(--ac-line);
+}
+
+/* the wishlist readout drops out when ShopEngine is not installed,
+   so the strip has to sit evenly at three across as well as four */
+.sf-acc__console > div:nth-child(3):nth-last-child(1) {
+	grid-column: span 2;
+}
+
+.sf-acc__console > div {
+	padding: 16px 18px;
+	border-left: 1px solid var(--ac-line);
+}
+
+.sf-acc__console > div:first-child {
+	border-left: 0;
+}
+
+.sf-acc__console dt {
+	margin: 0;
+	font-family: var(--ac-tech);
+	font-size: 10px;
+	font-weight: 700;
+	letter-spacing: 0.2em;
+	text-transform: uppercase;
+	color: var(--ac-faint);
+}
+
+.sf-acc__console dd {
+	margin: 7px 0 0;
+	font-family: var(--ac-title);
+	font-size: 24px;
+	line-height: 1;
+	color: var(--ac-text);
+}
+
+/* ---- the panel and its tab ---- */
+.sf-acc__panel {
+	position: relative;
+	padding: 34px 28px 28px;
+	background: var(--ac-panel);
+	border: 1px solid var(--ac-line);
+}
+
+/* it is a <p>, so it inherits the content column's paragraph colour
+   and line-height — both have to go or the tab sits off-centre */
+body.woocommerce-account .woocommerce-MyAccount-content p.sf-acc__tab {
+	position: absolute;
+	top: -1px;
+	left: -1px;
+	margin: 0;
+	padding: 6px 18px 6px 14px;
+	background: var(--ac-accent);
+	color: #fff;
+	font-family: var(--ac-tech);
+	font-size: 10px;
+	font-weight: 700;
+	line-height: 1.4;
+	letter-spacing: 0.2em;
+	text-transform: uppercase;
+	transform: skewX(-14deg);
+	transform-origin: left top;
+}
+
+/* the text is straightened again inside the skewed tab */
+.sf-acc__tab span {
+	display: inline-block;
+	transform: skewX(14deg);
+}
+
+/* the panel supplies the padding now, so the blocks inside it start
+   flush — WooCommerce's own first heading carries a top margin */
+.sf-acc__panel > :first-child + * {
+	margin-top: 0;
+}
+
+
+/* -------------------------------------------------------------
+ * ORDER STATUS AS A BADGE
+ * WooCommerce puts the status on the row as
+ * .woocommerce-orders-table__row--status-<status>, which is the
+ * only place the status is machine-readable — the cell itself
+ * holds nothing but the translated words.
+ * ------------------------------------------------------------- */
+.woocommerce-MyAccount-content .woocommerce-orders-table__cell-order-status {
+	font-family: var(--ac-tech);
+	font-size: 9.5px;
+	font-weight: 700;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+}
+
+.woocommerce-MyAccount-content .woocommerce-orders-table__cell-order-status::before {
+	content: "";
+	display: inline-block;
+	width: 7px;
+	height: 7px;
+	margin-right: 8px;
+	border-radius: 50%;
+	background: currentColor;
+	vertical-align: middle;
+}
+
+.woocommerce-orders-table__row--status-processing .woocommerce-orders-table__cell-order-status,
+.woocommerce-orders-table__row--status-pending .woocommerce-orders-table__cell-order-status {
+	color: #29abe2;                  /* T-Blue — moving */
+}
+
+.woocommerce-orders-table__row--status-on-hold .woocommerce-orders-table__cell-order-status {
+	color: #e0a33c;                  /* amber — waiting on someone */
+}
+
+.woocommerce-orders-table__row--status-completed .woocommerce-orders-table__cell-order-status {
+	color: #57c98a;                  /* green — done */
+}
+
+.woocommerce-orders-table__row--status-cancelled .woocommerce-orders-table__cell-order-status,
+.woocommerce-orders-table__row--status-refunded .woocommerce-orders-table__cell-order-status,
+.woocommerce-orders-table__row--status-failed .woocommerce-orders-table__cell-order-status {
+	color: var(--ac-faint);          /* nothing is coming — say so quietly */
+}
+
+
+/* -------------------------------------------------------------
+ * EMPTY ENDPOINTS
+ * On a parts store most accounts never have a download, so the
+ * empty state is the common case rather than the edge case.
+ * WooCommerce prints it as .woocommerce-info, which its own
+ * stylesheet gives a grey bar and a tick.
+ * ------------------------------------------------------------- */
+.woocommerce-MyAccount-content .woocommerce-info,
+.woocommerce-MyAccount-content .woocommerce-message {
+	display: grid;
+	justify-items: center;
+	gap: 14px;
+	padding: 46px 20px;
+	background: rgba(255, 255, 255, 0.02);
+	border: 1px dashed var(--ac-line);
+	border-top-width: 1px;           /* Woo draws a 3px coloured top border */
+	color: var(--ac-muted);
+	font-size: 13.5px;
+	line-height: 1.6;
+	text-align: center;
+}
+
+.woocommerce-MyAccount-content .woocommerce-info::before,
+.woocommerce-MyAccount-content .woocommerce-message::before {
+	display: none;                   /* the plugin's tick glyph */
+}
+
+.woocommerce-MyAccount-content .woocommerce-info .button,
+.woocommerce-MyAccount-content .woocommerce-message .button {
+	justify-self: center;
+}
+
+
+/* -------------------------------------------------------------
+ * ADDRESSES, SIDE BY SIDE
+ * Billing and shipping as two panels rather than one above the
+ * other — the pair is short enough that stacking them only makes
+ * the customer scroll to find out the second one is empty.
+ * ------------------------------------------------------------- */
+.woocommerce-MyAccount-content .woocommerce-Addresses {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 14px;
+}
+
+.woocommerce-MyAccount-content .woocommerce-Address {
+	background: rgba(255, 255, 255, 0.02);
+}
+
+.woocommerce-MyAccount-content .woocommerce-Address-title {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 12px;
+	margin-bottom: 14px;
+}
+
+.woocommerce-MyAccount-content .woocommerce-Address-title h2,
+.woocommerce-MyAccount-content .woocommerce-Address-title h3 {
+	margin: 0;
+	font-size: 14px;
+}
+
+.woocommerce-MyAccount-content .woocommerce-Address-title .edit {
+	flex: 0 0 auto;
+	padding: 8px 13px;
+	border: 1px solid var(--ac-line);
+	color: var(--ac-muted);
+	font-family: var(--ac-tech);
+	font-size: 10px;
+	font-weight: 700;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	text-decoration: none;
+	transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.woocommerce-MyAccount-content .woocommerce-Address-title .edit:hover {
+	border-color: var(--ac-accent);
+	color: var(--ac-accent);
+}
+
+.woocommerce-MyAccount-content .woocommerce-Address address {
+	margin: 0;
+	font-style: normal;
+	font-size: 14px;
+	line-height: 1.75;
+	color: var(--ac-muted);
+}
+
+
+/* ---- phones ---- */
+@media (max-width: 900px) {
+	.sf-acc__console {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.sf-acc__console > div:nth-child(3) {
+		border-left: 0;
+	}
+
+	.sf-acc__console > div:nth-child(n + 3) {
+		border-top: 1px solid var(--ac-line);
+	}
+
+	/* the three-readout span above is a four-column rule; at two
+	   across it would leave a full empty row */
+	.sf-acc__console > div:nth-child(3):nth-last-child(1) {
+		grid-column: auto;
+	}
+
+	.sf-acc__panel {
+		padding: 32px 18px 22px;
+	}
+
+	.woocommerce-MyAccount-content .woocommerce-Addresses {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+
+
+/* -------------------------------------------------------------
+ * BUTTONS THAT ARE LINKS
+ * The button rule above is
+ *   body.woocommerce-account .button            (0,2,1)
+ * and the content column's link colour is
+ *   body.woocommerce-account .woocommerce-MyAccount-content a   (0,3,2)
+ * — which wins, so every <a class="button"> inside the content
+ * column was drawing magenta text on the magenta button and the
+ * label disappeared. It went unnoticed because none of the
+ * endpoints shipped so far put a link-button in that column; the
+ * empty states below are the first.
+ *
+ * Same specificity as the link rule and later in the file, so the
+ * cascade settles it without !important.
+ * ------------------------------------------------------------- */
+body.woocommerce-account .woocommerce-MyAccount-content a.button {
+	color: #fff;
+}
+
+/* WooCommerce's own stylesheet supplies the padding on .button, so
+   ours never needed any — except here, where the button is centred
+   in a box of its own and a zero-padding sliver looks broken if
+   that stylesheet ever changes. */
+body.woocommerce-account .woocommerce-MyAccount-content .woocommerce-info a.button,
+body.woocommerce-account .woocommerce-MyAccount-content .woocommerce-message a.button {
+	padding: 12px 18px;
+}
+
+
+/* -------------------------------------------------------------
+ * WIDE TABLES ON A PHONE
+ * WooCommerce stacks its own tables on small screens, but only
+ * the ones it marked .shop_table_responsive. Anything else — a
+ * plugin's table on its own endpoint — keeps five columns and
+ * pushes the panel wider than the screen.
+ *
+ * Scoped with :not() so it cannot fight the stacking Woo already
+ * does; scrolling a table it had already stacked would undo that.
+ * ------------------------------------------------------------- */
+@media (max-width: 600px) {
+	body.woocommerce-account .woocommerce-MyAccount-content table.shop_table:not(.shop_table_responsive) {
+		display: block;
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+	}
+}

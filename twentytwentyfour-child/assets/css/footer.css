@@ -372,10 +372,56 @@ footer.wp-block-template-part {
 	.sf-pf__bar { flex-direction: column; align-items: flex-start; gap: 22px; }
 	.sf-pf__legal { text-align: left; }
 	.sf-pf__nav { flex-direction: column; gap: 34px; }
+
+	/* ---- the word, stood up ----
+	   Across the bottom there is no room for it on a phone: the svg is
+	   scaled to cover a 375px-wide box, so `slice` throws away both ends
+	   and all you see is the middle of the word. Turned a quarter-turn it
+	   runs down the right-hand edge instead, where the footer is tall and
+	   the space is free.
+
+	   The box is laid out unrotated and then turned about its own centre,
+	   so every number below describes the word BEFORE the quarter-turn:
+	   --band is the short side (the width of the stripe once it is stood
+	   up) and the long side is four times it, matching the 1200x300
+	   viewBox exactly so `slice` has nothing left to cut.
+
+	   The turn is ANTICLOCKWISE, so the word reads bottom-to-top: the S
+	   sits at the foot of the run and the Y at the head of it, the way a
+	   word set down a spine reads. Clockwise would put the Y at the
+	   bottom and read the other way about.
+
+	   `margin-right` puts that centre on the footer's right edge, offset
+	   inwards by 0.28 of the stripe, so the letters run off the right the
+	   way they run off both sides on a wide screen. `margin-bottom` drops
+	   the whole run to the foot of the footer: turned, the word stands
+	   4 x --band tall about that same centre, so holding the centre
+	   1.5 x --band above the bottom edge lands the foot of the run
+	   exactly on the footer's bottom edge, so the S sits ON it with no
+	   dark band left under the word. That margin is the knob, and 1.5 is
+	   the hinge: above it a gap opens under the S, below it the S runs
+	   off the bottom the way the word does across the bottom on a wide
+	   screen. */
+	.sf-pf__word {
+		--band: clamp(150px, 42vw, 210px);
+
+		top: auto;
+		right: 0;
+		bottom: 0;
+		left: auto;
+		width: calc(var(--band) * 4);
+		height: var(--band);
+		margin-right: calc(var(--band) * -1.72);
+		margin-bottom: calc(var(--band) * 1.5);
+		transform: rotate(-90deg);
+		transform-origin: center;
+	}
 }
 
-/* no pointer to follow: leave the word softly lit rather than dark */
-@media (hover: none) {
+/* no pointer to follow — or the word stood on its end, where the js hands
+   the light back because the turned box no longer maps to the letters:
+   leave it softly lit rather than dark */
+@media (hover: none), (max-width: 640px) {
 	.sf-pf__word-lit { opacity: 0.5; }
 }
 

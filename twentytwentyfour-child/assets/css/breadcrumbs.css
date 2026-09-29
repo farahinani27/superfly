@@ -26,11 +26,37 @@ body.woocommerce-page .woocommerce-breadcrumb,
 	--bc-accent: #ec1e79;
 	--bc-line:   rgba(242, 242, 244, 0.1);
 
-	/* full width, whatever the page's content width is */
-	width: 100vw;
-	max-width: 100vw;
-	margin-left: calc(50% - 50vw);
-	margin-right: calc(50% - 50vw);
+	/* ---- ALIGNMENT: do not reintroduce the 100vw trick ----
+	   This block used to read:
+
+	       width: 100vw; max-width: 100vw;
+	       margin-left:  calc(50% - 50vw);
+	       margin-right: calc(50% - 50vw);
+
+	   That is the standard "break out of a container" hack, and it is
+	   only correct when the element's parent spans the viewport. Here the
+	   parent is .wp-block-woocommerce-breadcrumbs, which the block theme
+	   lays out at the WIDE size (1222px at a 1440 viewport, offset 104px
+	   by <main>'s global padding). So 50% resolved against 1222, not the
+	   window, and the rail rendered 1440px wide starting at x=104 —
+	   pushing the document to 1544px and giving every shop page a 104px
+	   HORIZONTAL SCROLL, with the crumbs indented 104px past the product
+	   grid. Measured on the live build 2026-09-29 before this change.
+
+	   The fix is the block theme's own mechanism instead: the breadcrumbs
+	   block is marked {"align":"full"} in archive-product.html and
+	   single-product.html, which makes the theme's layout CSS take it
+	   edge to edge responsively. This file then only has to restate the
+	   PAGE'S OWN GUTTER, below, so the crumbs sit on the same left edge
+	   as the content under them.
+
+	   Nothing here sets width or negative margins any more. Only the two
+	   templates above are aligned full; anywhere else the rail just flows
+	   at its container's width, which lines it up with that page for
+	   free. Cart and checkout render NO breadcrumb today (checked on the
+	   live build), so the --bc-gutter default of 0 is only a safe landing
+	   for a page that gains one later. */
+
 	/* the block theme already leaves ~19px above <main>; this adds to it,
 	   so the rail sits clear of the navbar instead of hugging it */
 	margin-block: clamp(34px, 4.6vh, 52px) clamp(22px, 4vh, 44px);
@@ -40,7 +66,11 @@ body.woocommerce-page .woocommerce-breadcrumb,
 	flex-wrap: wrap;
 	gap: 0;
 	min-height: 44px;
-	padding: 0 clamp(18px, 4vw, 48px);
+	/* 0 by default: on a page that is NOT aligned full (cart, checkout,
+	   account) the container already supplies the gutter, and adding one
+	   here would indent the crumbs past that page's own content. The
+	   aligned-full templates set it below. */
+	padding: 0 var(--bc-gutter, 0px);
 	box-sizing: border-box;
 
 	/* The page itself is dark and carbon now, so the rail does not need its
@@ -76,6 +106,63 @@ body.woocommerce-page .woocommerce-breadcrumb,
 	margin: 0 10px;
 	font-style: normal;
 	color: var(--bc-faint);
+}
+
+
+/* -------------------------------------------------------------
+ * THE GUTTER
+ * Only for the two templates where the breadcrumbs block is
+ * {"align":"full"} — archive-product.html and single-product.html.
+ * Those go edge to edge, so the rail has to restate the gutter of
+ * the content underneath it or the crumbs float off the page grid.
+ *
+ * THESE NUMBERS MIRROR ANOTHER FILE. They are --sa-step in
+ * shop-archive.css and --sp-step in single-product.css. The two
+ * differ, and not only in value — they step down at DIFFERENT
+ * breakpoints, which is why this cannot be one shared rule:
+ *
+ *              default   narrow
+ *   archive      48px     20px at max-width 760   (--sa-step)
+ *   product      48px     24px at max-width 1000  (--sp-step)
+ *
+ * If either of those changes, change it here too. There is no way
+ * to read another stylesheet's custom property from here: --sa-step
+ * is declared on .sf-shop, which is a LATER SIBLING of the rail,
+ * and inheritance only travels down.
+ *
+ * Checked by measuring the first crumb's left edge against
+ * .sf-shop__bar and the product title on the live build — see the
+ * alignment note at the top of this file.
+ * ------------------------------------------------------------- */
+
+/* the shop, product categories and product tags */
+body.post-type-archive-product .woocommerce-breadcrumb,
+body.tax-product_cat .woocommerce-breadcrumb,
+body.tax-product_tag .woocommerce-breadcrumb {
+	--bc-gutter: 48px;
+	max-width: 2000px;          /* .sf-shop's cap, so they centre together */
+	margin-inline: auto;
+}
+
+@media (max-width: 760px) {
+	body.post-type-archive-product .woocommerce-breadcrumb,
+	body.tax-product_cat .woocommerce-breadcrumb,
+	body.tax-product_tag .woocommerce-breadcrumb {
+		--bc-gutter: 20px;
+	}
+}
+
+/* a single product. No max-width: .sf-pdp sets `max-width: none` and
+   runs edge to edge, so a cap here would inset the rail against it on
+   a very wide screen. */
+body.single-product .woocommerce-breadcrumb {
+	--bc-gutter: 48px;
+}
+
+@media (max-width: 1000px) {
+	body.single-product .woocommerce-breadcrumb {
+		--bc-gutter: 24px;
+	}
 }
 
 @media (max-width: 600px) {

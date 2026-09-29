@@ -855,6 +855,135 @@ function superfly_account_greeting() {
 }
 
 // ---------------------------------------------------------------
+// THE CONSOLE AND THE PANEL — design A, "Pit Wall"
+//
+// Two pieces of chrome that sit around whatever WooCommerce puts
+// in the content column:
+//
+//   ┌──────────┬──────────┬──────────┬──────────┐   the console
+//   │ ORDERS 12│ OPEN   1 │ SAVED  7 │ FILES  2 │
+//   └──────────┴──────────┴──────────┴──────────┘
+//   ╱ORDERS╱──────────────────────────────────┐    the panel, with
+//   │  …the endpoint's own markup…            │    its tab naming
+//   └─────────────────────────────────────────┘    the endpoint
+//
+// The console stays on EVERY endpoint, not just the dashboard.
+// That is the point of it: a readout that disappears when you open
+// Orders is a dashboard widget, not a console.
+//
+// Every number is the customer's own data, counted at render time.
+// There is deliberately NO warranty readout: warranty registrations
+// live on the Unicart site and there is no source for them here, so
+// the figure would have to be invented. dashboard.php holds the same
+// line — nothing on this page is made up.
+//
+// Looks: assets/css/account.css (.sf-acc__console, .sf-acc__panel)
+// ---------------------------------------------------------------
+
+/**
+ * The four readouts, as label => value.
+ *
+ * @return array<string,string>
+ */
+function superfly_account_console_figures() {
+	$user_id = get_current_user_id();
+
+	$open = wc_get_orders(
+		array(
+			'customer_id' => $user_id,
+			'status'      => array( 'pending', 'processing', 'on-hold' ),
+			'limit'       => -1,
+			'return'      => 'ids',
+		)
+	);
+
+	$saved = function_exists( 'superfly_wishlist_get_products' )
+		? count( superfly_wishlist_get_products() )
+		: null;
+
+	$figures = array(
+		__( 'Orders', 'twentytwentyfour-child' )      => (string) wc_get_customer_order_count( $user_id ),
+		__( 'In progress', 'twentytwentyfour-child' ) => (string) count( $open ),
+	);
+
+	// only when the wishlist is actually installed — without ShopEngine
+	// there is no saved list and an empty readout is worse than none
+	if ( null !== $saved ) {
+		$figures[ __( 'Saved', 'twentytwentyfour-child' ) ] = (string) $saved;
+	}
+
+	$figures[ __( 'Files', 'twentytwentyfour-child' ) ] =
+		(string) count( wc_get_customer_available_downloads( $user_id ) );
+
+	return $figures;
+}
+
+/**
+ * The name on the panel's tab — whichever endpoint is being shown.
+ *
+ * @return string
+ */
+function superfly_account_endpoint_label() {
+	$endpoint = '';
+
+	if ( WC()->query && method_exists( WC()->query, 'get_current_endpoint' ) ) {
+		$endpoint = WC()->query->get_current_endpoint();
+	}
+
+	$key   = $endpoint ? $endpoint : 'dashboard';
+	$items = wc_get_account_menu_items();
+
+	if ( isset( $items[ $key ] ) ) {
+		return $items[ $key ];
+	}
+
+	// view-order and anything a plugin adds its own endpoint for
+	if ( WC()->query && method_exists( WC()->query, 'get_endpoint_title' ) ) {
+		$title = WC()->query->get_endpoint_title( $endpoint );
+
+		if ( $title ) {
+			return $title;
+		}
+	}
+
+	return __( 'My account', 'twentytwentyfour-child' );
+}
+
+// WooCommerce hangs the endpoint dispatch on woocommerce_account_content
+// at the default priority 10, so 5 and 20 bracket it. Wrapping the
+// template file instead would mean overriding my-account.php and
+// re-shipping every future WooCommerce change to it.
+add_action( 'woocommerce_account_content', 'superfly_account_panel_open', 5 );
+function superfly_account_panel_open() {
+	if ( ! is_user_logged_in() ) {
+		return;                          // the login screen has its own layout
+	}
+
+	echo '<dl class="sf-acc__console">';
+
+	foreach ( superfly_account_console_figures() as $label => $value ) {
+		echo '<div><dt>' . esc_html( $label ) . '</dt>';
+		echo '<dd>' . esc_html( $value ) . '</dd></div>';
+	}
+
+	echo '</dl>';
+
+	echo '<section class="sf-acc__panel">';
+	echo '<p class="sf-acc__tab"><span>' . esc_html( superfly_account_endpoint_label() ) . '</span></p>';
+}
+
+add_action( 'woocommerce_account_content', 'superfly_account_panel_close', 20 );
+function superfly_account_panel_close() {
+	if ( ! is_user_logged_in() ) {
+		return;
+	}
+
+	echo '</section>';
+}
+
+
+
+// ---------------------------------------------------------------
 // WISHLIST — /my-account/wishlist/
 //
 // ShopEngine prints a four-column table there: one empty column,
