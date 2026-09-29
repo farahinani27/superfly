@@ -1486,6 +1486,49 @@ function superfly_faq_body_class( $classes ) {
 }
 
 
+// Contact us — three routes segmented by audience (riders, dealers, media),
+// the company stated formally beside the map, and the general enquiry form
+// last. That order follows the convention manufacturers use rather than the
+// single-form-with-a-dropdown pattern of a shop's contact page.
+// Matched on the slug, like the FAQ, so the page can be rebuilt freely.
+// Markup: the page's own wp:html block, not an Elementor widget, so there is
+// no render cache to clear after an edit.
+// Looks: assets/css/contact.css
+add_action( 'wp_enqueue_scripts', 'superfly_contact_assets', 28 );
+function superfly_contact_assets() {
+	if ( ! is_page( 'contact-us' ) ) {
+		return;
+	}
+
+	// Same fonts as the rest of the site: Archivo Black, Archivo, Chakra Petch
+	wp_enqueue_style(
+		'superfly-hero-fonts',
+		'https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800&family=Archivo+Black&family=Chakra+Petch:wght@500;600;700&display=swap',
+		array(),
+		null
+	);
+
+	wp_enqueue_style(
+		'superfly-contact',
+		get_stylesheet_directory_uri() . '/assets/css/contact.css',
+		array( 'superfly-child-style', 'superfly-hero-fonts' ),
+		filemtime( get_stylesheet_directory() . '/assets/css/contact.css' )
+	);
+}
+
+
+// The body class contact.css hangs the carbon-weave background off, on the
+// same slug condition as the enqueue above.
+add_filter( 'body_class', 'superfly_contact_body_class' );
+function superfly_contact_body_class( $classes ) {
+	if ( is_page( 'contact-us' ) ) {
+		$classes[] = 'superfly-contact-page';
+	}
+
+	return $classes;
+}
+
+
 // Page not found — a dial with the needle past the end of the sweep.
 // The template is templates/404.html in this theme, which WordPress picks
 // up on its own; there is no page to create and no page builder involved.
