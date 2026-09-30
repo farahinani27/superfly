@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cart (B &middot; Build Sheet) &ndash; Superfly</title>
+<meta name="description" content="Superfly Motos cart — option B, a single-column build sheet of item cards with a sticky checkout dock and an inline shipping estimator.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,500;0,600;0,700&family=Archivo+Black&family=Chakra+Petch:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  html,body{ margin:0; }
+  body{
+    background:#0a0a0a;
+    background-image:repeating-linear-gradient(45deg,
+      rgba(255,255,255,.024) 0, rgba(255,255,255,.024) 2px,
+      rgba(0,0,0,0) 2px, rgba(0,0,0,0) 6px);
+    color:#f2f2f4; font-family:"Archivo","Inter",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════ PASTE FROM HERE ═══════════ -->
+<style>
+/* ============================================================
+   OPTION B — "Build Sheet"
+   No sidebar. The cart is one column of item cards, read top to
+   bottom like a build sheet, and the money lives in a dock fixed
+   to the bottom of the viewport with the total and the checkout
+   button in it.
+
+   Why: most Superfly traffic is phone traffic, and on a phone the
+   option-A sidebar collapses under the items anyway — the total
+   and the checkout button end up below three tall rows. Here they
+   are always on screen, at any width, and the desktop view is the
+   same layout with more air rather than a second arrangement to
+   maintain.
+
+   Each card also carries what a rider actually double-checks
+   before paying: the colourway, the fitment it was bought against,
+   and the warranty line. That is the "Ride. Race. Research." voice
+   doing work in the cart instead of only on the product page.
+
+   Build cost: mid. cart.php has to stop rendering a table — the
+   card is a li, not a tr — so this is a real template override,
+   not just CSS. The dock is one partial plus a wc fragment refresh
+   if the totals are to move without a reload.
+
+   FIGURES: names and prices come from the catalogue. The RM600
+   threshold, RM18 flat rate, 6% SST line, the two pending SKUs
+   and both delivery estimates are INVENTED for layout and carry a
+   dagger. Confirm before build.
+
+   Qty steppers, remove, the undo row and the estimator are DEMO
+   ONLY — the live versions are WooCommerce form posts.
+   ============================================================ */
+.ctb{
+  --c-panel:#131317;
+  --c-sunk:#0d0d10;
+  --c-text:#f2f2f4;
+  --c-muted:rgba(242,242,244,.58);
+  --c-faint:rgba(242,242,244,.34);
+  --c-line:rgba(242,242,244,.12);
+  --c-accent:#ec1e79;
+  --c-blue:#29abe2;
+  --c-title:"Archivo Black","Arial Black",sans-serif;
+  --c-body:"Archivo","Inter",sans-serif;
+  --c-tech:"Chakra Petch","Archivo",sans-serif;
+
+  max-width:920px; margin:0 auto; padding:40px 20px 150px;
+  font-family:var(--c-body); color:var(--c-text);
+}
+
+/* ---- head ---- */
+.ctb__crumbs{ margin:0 0 24px; font-family:var(--c-tech); font-size:10.5px;
+  letter-spacing:.2em; text-transform:uppercase; color:var(--c-faint); }
+.ctb__crumbs a{ color:var(--c-faint); text-decoration:none; }
+.ctb__crumbs a:hover{ color:var(--c-accent); }
+.ctb__crumbs span{ margin:0 8px; }
+
+.ctb__head{ margin:0 0 8px; }
+.ctb__eyebrow{ display:flex; align-items:center; gap:12px; margin:0 0 12px;
+  font-family:var(--c-tech); font-size:10px; font-weight:700; letter-spacing:.3em;
+  text-transform:uppercase; color:var(--c-accent); }
+.ctb__eyebrow::before{ content:''; width:26px; height:1px; background:var(--c-accent); }
+.ctb__h1{ margin:0; font-family:var(--c-title); font-size:clamp(32px,7vw,58px);
+  line-height:.94; text-transform:uppercase; letter-spacing:-.025em; }
+.ctb__h1 em{ font-style:italic; color:var(--c-accent); }
+.ctb__lede{ margin:14px 0 0; font-size:14px; line-height:1.65; color:var(--c-muted); max-width:56ch; }
+
+/* ---- shipping progress ---- */
+.ctb__prog{ margin:26px 0 22px; border:1px solid var(--c-line); background:var(--c-panel); padding:16px 18px; }
+.ctb__prog p{ margin:0 0 12px; font-family:var(--c-tech); font-size:11px; font-weight:700;
+  letter-spacing:.16em; text-transform:uppercase; color:var(--c-faint); }
+.ctb__prog p b{ color:var(--c-text); }
+.ctb__prog p.is-clear b{ color:#57c98a; }
+.ctb__bar{ height:5px; background:var(--c-sunk); border:1px solid var(--c-line); }
+.ctb__bar i{ display:block; height:100%; background:linear-gradient(90deg,var(--c-accent),#ff5fb4);
+  transition:width .35s ease; }
+
+/* ---- item cards ---- */
+.ctb__list{ list-style:none; margin:0; padding:0; display:grid; gap:14px; }
+.ctb__card{ position:relative; display:grid; grid-template-columns:116px minmax(0,1fr);
+  gap:18px; border:1px solid var(--c-line); background:var(--c-panel); padding:18px; }
+.ctb__card::before{ content:''; position:absolute; left:0; top:0; bottom:0; width:2px; background:var(--c-accent); }
+.ctb__shot{ aspect-ratio:1; display:grid; place-items:center; background:var(--c-sunk);
+  border:1px solid var(--c-line); font-family:var(--c-tech); font-size:9px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--c-faint); text-align:center; padding:6px; }
+.ctb__body{ min-width:0; }
+.ctb__kicker{ margin:0 0 6px; font-family:var(--c-tech); font-size:9.5px; font-weight:700;
+  letter-spacing:.2em; text-transform:uppercase; color:var(--c-faint); }
+.ctb__name{ margin:0; font-size:16px; font-weight:600; line-height:1.3; padding-right:34px; }
+.ctb__name a{ color:inherit; text-decoration:none; }
+.ctb__name a:hover{ color:var(--c-accent); }
+.ctb__tags{ margin:10px 0 0; display:flex; gap:8px; flex-wrap:wrap; }
+.ctb__tag{ font-family:var(--c-tech); font-size:9.5px; font-weight:700; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--c-muted); border:1px solid var(--c-line); padding:5px 9px; }
+.ctb__tag--blue{ color:var(--c-blue); border-color:rgba(41,171,226,.4); }
+.ctb__tag--ok{ color:#57c98a; border-color:rgba(87,201,138,.4); }
+.ctb__tag--hold{ color:#e0a33c; border-color:rgba(224,163,60,.4); }
+
+.ctb__fit{ margin:12px 0 0; padding:10px 12px; background:var(--c-sunk); border:1px solid var(--c-line);
+  font-size:12.5px; line-height:1.55; color:var(--c-muted); }
+.ctb__fit b{ color:var(--c-text); }
+
+.ctb__foot{ display:flex; align-items:center; justify-content:space-between; gap:16px;
+  flex-wrap:wrap; margin:14px 0 0; padding-top:14px; border-top:1px solid var(--c-line); }
+.ctb__qty{ display:grid; grid-template-columns:36px 54px 36px; border:1px solid var(--c-line); }
+.ctb__qty button{ background:none; border:0; color:var(--c-muted); font-family:var(--c-tech);
+  font-size:17px; line-height:1; padding:10px 0; cursor:pointer; }
+.ctb__qty button:hover{ color:var(--c-accent); }
+.ctb__qty input{ box-sizing:border-box; width:100%; border:0; border-left:1px solid var(--c-line);
+  border-right:1px solid var(--c-line); background:none; color:var(--c-text); text-align:center;
+  font-family:var(--c-tech); font-size:15px; font-weight:700; padding:10px 0;
+  -moz-appearance:textfield; appearance:textfield; }
+.ctb__qty input::-webkit-outer-spin-button,
+.ctb__qty input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+
+.ctb__money{ text-align:right; }
+.ctb__unit{ margin:0; font-family:var(--c-tech); font-size:10.5px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--c-faint); }
+.ctb__line{ margin:4px 0 0; font-family:var(--c-tech); font-size:20px; font-weight:700; }
+
+.ctb__x{ position:absolute; top:14px; right:14px; width:28px; height:28px; line-height:1;
+  background:none; border:1px solid var(--c-line); color:var(--c-faint); font-size:14px; cursor:pointer; }
+.ctb__x:hover{ border-color:var(--c-accent); color:var(--c-accent); }
+
+/* undone row */
+.ctb__undo{ display:flex; align-items:center; justify-content:space-between; gap:14px;
+  border:1px dashed var(--c-line); background:var(--c-sunk); padding:14px 16px; }
+.ctb__undo p{ margin:0; font-size:13px; color:var(--c-muted); }
+.ctb__undo p b{ color:var(--c-text); }
+
+/* ---- estimator + coupon ---- */
+.ctb__tools{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin:22px 0 0; }
+.ctb__tool{ border:1px solid var(--c-line); background:var(--c-panel); padding:18px; }
+.ctb__tool h3{ margin:0 0 12px; font-family:var(--c-tech); font-size:10.5px; font-weight:700;
+  letter-spacing:.2em; text-transform:uppercase; color:var(--c-faint); }
+.ctb__tool form{ display:flex; gap:10px; }
+.ctb__tool input, .ctb__tool select{ box-sizing:border-box; flex:1 1 auto; min-width:0; padding:12px 13px;
+  background:rgba(255,255,255,.03); border:1px solid var(--c-line); color:var(--c-text);
+  font-family:var(--c-tech); font-size:12px; letter-spacing:.14em; text-transform:uppercase; }
+.ctb__tool input:focus, .ctb__tool select:focus{ border-color:var(--c-accent); outline:none; }
+.ctb__tool p{ margin:12px 0 0; font-family:var(--c-tech); font-size:10.5px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--c-muted); }
+.ctb__ghost{ display:inline-flex; align-items:center; gap:8px; padding:12px 16px;
+  border:1px solid var(--c-line); background:none; color:var(--c-muted); font-family:var(--c-tech);
+  font-size:10.5px; font-weight:700; letter-spacing:.16em; text-transform:uppercase;
+  cursor:pointer; text-decoration:none; }
+.ctb__ghost:hover{ border-color:var(--c-accent); color:var(--c-accent); }
+
+/* ---- breakdown (dock holds the total; this holds the detail) ---- */
+.ctb__sum{ margin:22px 0 0; border:1px solid var(--c-line); background:var(--c-panel); padding:6px 18px 18px; }
+.ctb__row{ display:flex; align-items:baseline; justify-content:space-between; gap:14px;
+  padding:13px 0; border-bottom:1px solid var(--c-line); }
+.ctb__row:last-child{ border-bottom:0; }
+.ctb__row dt{ font-family:var(--c-tech); font-size:11px; font-weight:700; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--c-faint); }
+.ctb__row dd{ margin:0; font-family:var(--c-tech); font-size:15px; font-weight:700; }
+.ctb__row--free dd{ color:#57c98a; }
+.ctb__note{ margin:14px 0 0; font-family:var(--c-tech); font-size:10px; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--c-faint); line-height:1.7; }
+
+/* ---- the dock ---- */
+.ctb__dock{
+  position:fixed; left:0; right:0; bottom:0; z-index:40;
+  border-top:1px solid var(--c-line); background:rgba(10,10,10,.93);
+  backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+}
+.ctb__dockin{ max-width:920px; margin:0 auto; padding:14px 20px;
+  display:flex; align-items:center; justify-content:space-between; gap:16px; }
+.ctb__dockin > div p{ margin:0; font-family:var(--c-tech); font-size:10px; font-weight:700;
+  letter-spacing:.2em; text-transform:uppercase; color:var(--c-faint); }
+.ctb__dockin > div b{ display:block; font-family:var(--c-title); font-size:26px; line-height:1.1; margin-top:4px; }
+.ctb__go{ display:inline-flex; align-items:center; gap:10px; padding:17px 26px;
+  background:var(--c-accent); border:1px solid var(--c-accent); color:#fff; font-family:var(--c-tech);
+  font-size:13px; font-weight:700; letter-spacing:.2em; text-transform:uppercase;
+  cursor:pointer; text-decoration:none; white-space:nowrap; }
+.ctb__go:hover{ filter:brightness(1.12); }
+
+/* ---- empty ---- */
+.ctb__empty{ display:none; place-items:center; gap:16px; padding:70px 24px; text-align:center;
+  border:1px dashed var(--c-line); background:var(--c-panel); }
+.ctb.is-empty .ctb__empty{ display:grid; }
+.ctb.is-empty .ctb__list,
+.ctb.is-empty .ctb__tools,
+.ctb.is-empty .ctb__sum,
+.ctb.is-empty .ctb__prog,
+.ctb.is-empty .ctb__dock{ display:none; }
+.ctb__empty h2{ margin:0; font-family:var(--c-title); font-size:22px; text-transform:uppercase; }
+.ctb__empty p{ margin:0; font-size:13.5px; color:var(--c-muted); max-width:46ch; line-height:1.65; }
+.ctb__empty svg{ width:38px; height:38px; fill:none; stroke:var(--c-faint); stroke-width:1.2; }
+
+@media (max-width:640px){
+  .ctb__card{ grid-template-columns:82px minmax(0,1fr); gap:14px; }
+  .ctb__tools{ grid-template-columns:minmax(0,1fr); }
+  .ctb__foot{ gap:12px; }
+  .ctb__money{ text-align:left; }
+  .ctb__dockin > div b{ font-size:21px; }
+  .ctb__go{ padding:15px 18px; font-size:11.5px; letter-spacing:.16em; }
+}
+</style>
+
+<div class="ctb" id="ctbRoot">
+
+  <nav class="ctb__crumbs" aria-label="Breadcrumb">
+    <a href="#">Home</a><span>/</span><a href="#">Shop</a><span>/</span>Cart
+  </nav>
+
+  <header class="ctb__head">
+    <p class="ctb__eyebrow">Build sheet</p>
+    <h1 class="ctb__h1">Your <em>build</em></h1>
+    <p class="ctb__lede">Check the colourway and the fitment against your bike before you pay. Every part here carries a 6-month warranty, registered once the box arrives.</p>
+  </header>
+
+  <div class="ctb__prog">
+    <p id="ctbProgMsg">RM<b>0.00</b> to free shipping&dagger;</p>
+    <div class="ctb__bar"><i id="ctbBar" style="width:100%"></i></div>
+  </div>
+
+  <ul class="ctb__list" id="ctbList">
+
+    <li class="ctb__card" data-item data-unit="211.40">
+      <button class="ctb__x" type="button" data-remove aria-label="Remove item">&times;</button>
+      <div class="ctb__shot"><span>Product shot</span></div>
+      <div class="ctb__body">
+        <p class="ctb__kicker">Suspension</p>
+        <h2 class="ctb__name"><a href="#">Project A+ Super Shocks Adjustable Suspension</a></h2>
+        <div class="ctb__tags">
+          <span class="ctb__tag">Little Boy</span>
+          <span class="ctb__tag ctb__tag--blue">Silver Chrome / Black</span>
+          <span class="ctb__tag ctb__tag--ok">In stock</span>
+        </div>
+        <p class="ctb__fit">Bought against <b>Yamaha Y15ZR</b>&dagger; &middot; 330mm &middot; warranty 6 months from registration</p>
+        <div class="ctb__foot">
+          <div class="ctb__qty">
+            <button type="button" data-step="-1" aria-label="Decrease quantity">&minus;</button>
+            <input type="number" min="1" value="1" aria-label="Quantity">
+            <button type="button" data-step="1" aria-label="Increase quantity">+</button>
+          </div>
+          <div class="ctb__money">
+            <p class="ctb__unit">RM211.40 each</p>
+            <p class="ctb__line" data-line>RM211.40</p>
+          </div>
+        </div>
+      </div>
+    </li>
+
+    <li class="ctb__card" data-item data-unit="448.00">
+      <button class="ctb__x" type="button" data-remove aria-label="Remove item">&times;</button>
+      <div class="ctb__shot"><span>Product shot</span></div>
+      <div class="ctb__body">
+        <p class="ctb__kicker">Sport rims</p>
+        <h2 class="ctb__name"><a href="#">Project X 4 Spoke Sport Rims</a></h2>
+        <div class="ctb__tags">
+          <span class="ctb__tag">1.6 x 14</span>
+          <span class="ctb__tag ctb__tag--blue">Gold</span>
+          <span class="ctb__tag ctb__tag--ok">In stock</span>
+        </div>
+        <p class="ctb__fit">Fits <b>EGO, EGO S, Y15ZR</b> &middot; pair, front and rear &middot; tyres not included&dagger;</p>
+        <div class="ctb__foot">
+          <div class="ctb__qty">
+            <button type="button" data-step="-1" aria-label="Decrease quantity">&minus;</button>
+            <input type="number" min="1" value="1" aria-label="Quantity">
+            <button type="button" data-step="1" aria-label="Increase quantity">+</button>
+          </div>
+          <div class="ctb__money">
+            <p class="ctb__unit">RM448.00 each</p>
+            <p class="ctb__line" data-line>RM448.00</p>
+          </div>
+        </div>
+      </div>
+    </li>
+
+    <li class="ctb__card" data-item data-unit="38.00">
+      <button class="ctb__x" type="button" data-remove aria-label="Remove item">&times;</button>
+      <div class="ctb__shot"><span>Product shot</span></div>
+      <div class="ctb__body">
+        <p class="ctb__kicker">Accessories</p>
+        <h2 class="ctb__name"><a href="#">Superfly Racing Decal Set&dagger;</a></h2>
+        <div class="ctb__tags">
+          <span class="ctb__tag">Magenta</span>
+          <span class="ctb__tag ctb__tag--hold">Ships in 5&ndash;7 days&dagger;</span>
+        </div>
+        <p class="ctb__fit">Universal &middot; die-cut vinyl &middot; no warranty registration on accessories&dagger;</p>
+        <div class="ctb__foot">
+          <div class="ctb__qty">
+            <button type="button" data-step="-1" aria-label="Decrease quantity">&minus;</button>
+            <input type="number" min="1" value="2" aria-label="Quantity">
+            <button type="button" data-step="1" aria-label="Increase quantity">+</button>
+          </div>
+          <div class="ctb__money">
+            <p class="ctb__unit">RM38.00 each</p>
+            <p class="ctb__line" data-line>RM76.00</p>
+          </div>
+        </div>
+      </div>
+    </li>
+  </ul>
+
+  <div class="ctb__tools">
+    <div class="ctb__tool">
+      <h3>Coupon</h3>
+      <form onsubmit="return false">
+        <input type="text" placeholder="Code" aria-label="Coupon code">
+        <button class="ctb__ghost" type="submit">Apply</button>
+      </form>
+      <p>One coupon per order&dagger;</p>
+    </div>
+    <div class="ctb__tool">
+      <h3>Delivery estimate</h3>
+      <form onsubmit="return false">
+        <select aria-label="State">
+          <option>Selangor</option>
+          <option>Kuala Lumpur</option>
+          <option>Johor</option>
+          <option>Penang</option>
+          <option>Sabah</option>
+          <option>Sarawak</option>
+        </select>
+        <button class="ctb__ghost" type="submit">Check</button>
+      </form>
+      <p>2&ndash;4 working days&dagger;</p>
+    </div>
+  </div>
+
+  <dl class="ctb__sum">
+    <div class="ctb__row"><dt>Subtotal</dt><dd id="ctbSub">RM735.40</dd></div>
+    <div class="ctb__row ctb__row--free"><dt>Shipping&dagger;</dt><dd id="ctbShip">Free</dd></div>
+    <div class="ctb__row"><dt>SST 6%&dagger;</dt><dd id="ctbTax">RM44.12</dd></div>
+    <p class="ctb__note">&dagger; Threshold, flat rate, SST line, delivery windows, fitment note and the two pending SKUs are placeholders &mdash; confirm before build.</p>
+  </dl>
+
+  <div class="ctb__empty">
+    <svg viewBox="0 0 24 24"><path d="M4 5h3l2 10h9l2-7H7"/><circle cx="10" cy="19" r="1.6"/><circle cx="18" cy="19" r="1.6"/></svg>
+    <h2>Nothing on the sheet</h2>
+    <p>Remove all three cards to see this. The dock hides with the items, so an empty cart has no floating total.</p>
+    <a class="ctb__ghost" href="#">Browse the shop</a>
+  </div>
+
+  <div class="ctb__dock">
+    <div class="ctb__dockin">
+      <div>
+        <p><span id="ctbCount">4</span> items &middot; total incl. SST&dagger;</p>
+        <b id="ctbTotal">RM779.52</b>
+      </div>
+      <a class="ctb__go" href="#">Checkout <i aria-hidden="true">&rarr;</i></a>
+    </div>
+  </div>
+</div>
+
+<script>
+/* DEMO ONLY — the live cart is a WooCommerce form post. */
+(function () {
+  var root = document.getElementById('ctbRoot');
+  if (!root) return;
+
+  var FREE = 600, FLAT = 18, TAX = 0.06;   /* all invented */
+
+  function money(n) {
+    return 'RM' + n.toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function recalc() {
+    var rows = root.querySelectorAll('[data-item]');
+    var sub = 0, count = 0;
+
+    rows.forEach(function (row) {
+      var unit = parseFloat(row.dataset.unit) || 0;
+      var input = row.querySelector('input[type=number]');
+      var qty = Math.max(1, parseInt(input.value, 10) || 1);
+      input.value = qty;
+      sub += unit * qty;
+      count += qty;
+      row.querySelector('[data-line]').textContent = money(unit * qty);
+    });
+
+    root.classList.toggle('is-empty', rows.length === 0);
+
+    var ship = sub >= FREE ? 0 : FLAT;
+    var tax = (sub + ship) * TAX;
+
+    document.getElementById('ctbCount').textContent = count;
+    document.getElementById('ctbSub').textContent = money(sub);
+    document.getElementById('ctbShip').textContent = ship === 0 ? 'Free' : money(ship);
+    document.getElementById('ctbTax').textContent = money(tax);
+    document.getElementById('ctbTotal').textContent = money(sub + ship + tax);
+
+    var gap = Math.max(0, FREE - sub);
+    var msg = document.getElementById('ctbProgMsg');
+    document.getElementById('ctbBar').style.width = Math.min(100, (sub / FREE) * 100) + '%';
+    msg.classList.toggle('is-clear', gap === 0);
+    msg.innerHTML = gap === 0
+      ? '<b>Free shipping unlocked</b>&dagger;'
+      : 'RM<b>' + gap.toFixed(2) + '</b> to free shipping&dagger;';
+  }
+
+  /* Remove drops the card into an undo row, because a card is a big
+     target on a phone and a mis-tap should not cost the rider the item. */
+  function undoRow(card) {
+    var name = card.querySelector('.ctb__name').textContent.trim();
+    var li = document.createElement('li');
+    li.className = 'ctb__undo';
+    li.innerHTML = '<p>Removed <b></b></p>';
+    li.querySelector('b').textContent = name;
+    var btn = document.createElement('button');
+    btn.className = 'ctb__ghost';
+    btn.type = 'button';
+    btn.textContent = 'Undo';
+    btn.addEventListener('click', function () {
+      li.replaceWith(card);
+      recalc();
+    });
+    li.appendChild(btn);
+    card.replaceWith(li);
+    recalc();
+  }
+
+  root.addEventListener('click', function (e) {
+    var step = e.target.closest('[data-step]');
+    if (step) {
+      var input = step.parentNode.querySelector('input[type=number]');
+      input.value = Math.max(1, (parseInt(input.value, 10) || 1) + parseInt(step.dataset.step, 10));
+      recalc();
+      return;
+    }
+    var kill = e.target.closest('[data-remove]');
+    if (kill) undoRow(kill.closest('[data-item]'));
+  });
+
+  root.addEventListener('input', function (e) {
+    if (e.target.matches('[data-item] input[type=number]')) recalc();
+  });
+
+  recalc();
+})();
+</script>
+<!-- ═══════════ TO HERE ═══════════ -->
+
+</body>
+</html>

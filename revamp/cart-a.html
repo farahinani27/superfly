@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cart (A &middot; Pit Wall Ledger) &ndash; Superfly</title>
+<meta name="description" content="Superfly Motos cart — option A, the WooCommerce two-column cart hardened into a ledger with a sticky totals console.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,500;0,600;0,700&family=Archivo+Black&family=Chakra+Petch:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  html,body{ margin:0; }
+  body{
+    background:#0a0a0a;
+    background-image:repeating-linear-gradient(45deg,
+      rgba(255,255,255,.024) 0, rgba(255,255,255,.024) 2px,
+      rgba(0,0,0,0) 2px, rgba(0,0,0,0) 6px);
+    color:#f2f2f4; font-family:"Archivo","Inter",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════ PASTE FROM HERE ═══════════ -->
+<style>
+/* ============================================================
+   OPTION A — "Pit Wall Ledger"
+   The smallest step from a stock WooCommerce cart. The page keeps
+   the two-column shape WooCommerce already ships — the line-item
+   table on the left, the cart-collaterals block on the right — so
+   the template override is cosmetic, not structural.
+
+   What changes:
+     - the table reads as a ledger: mono index column, hard rules,
+       no zebra striping, totals in Chakra Petch like the spec
+       chips on the product pages
+     - the collaterals column becomes a sticky console, the same
+       device as the account area telemetry strip
+     - a free-shipping progress bar sits above the console
+
+   Cheapest of the three: cart.php keeps its structure, everything
+   here is cart.css plus the progress partial.
+
+   FIGURES: product names and prices are taken from the catalogue.
+   The RM600 free-shipping threshold, the RM18 flat rate and the 6%
+   SST line are INVENTED for layout (marked with a dagger in the
+   page) — confirm all three with the operator before this ships.
+
+   The qty steppers and remove buttons below are DEMO ONLY. On the
+   real site qty is a number input inside the cart form and the
+   totals only move after "Update cart" (or via an AJAX cart
+   plugin, if one is chosen).
+   ============================================================ */
+.cta{
+  --c-bg:#0a0a0a;
+  --c-panel:#131317;
+  --c-sunk:#0d0d10;
+  --c-text:#f2f2f4;
+  --c-muted:rgba(242,242,244,.58);
+  --c-faint:rgba(242,242,244,.34);
+  --c-line:rgba(242,242,244,.12);
+  --c-accent:#ec1e79;
+  --c-blue:#29abe2;
+  --c-title:"Archivo Black","Arial Black",sans-serif;
+  --c-body:"Archivo","Inter",sans-serif;
+  --c-tech:"Chakra Petch","Archivo",sans-serif;
+
+  max-width:1240px; margin:0 auto; padding:40px 24px 96px;
+  font-family:var(--c-body); color:var(--c-text);
+}
+
+/* ---- page head ---- */
+.cta__crumbs{ margin:0 0 26px; font-family:var(--c-tech); font-size:10.5px;
+  letter-spacing:.2em; text-transform:uppercase; color:var(--c-faint); }
+.cta__crumbs a{ color:var(--c-faint); text-decoration:none; }
+.cta__crumbs a:hover{ color:var(--c-accent); }
+.cta__crumbs span{ margin:0 8px; }
+
+.cta__head{ display:flex; align-items:flex-end; justify-content:space-between;
+  gap:20px; flex-wrap:wrap; padding-bottom:20px; border-bottom:1px solid var(--c-line); margin:0 0 28px; }
+.cta__h1{ margin:0; font-family:var(--c-title); font-size:clamp(30px,5vw,46px);
+  line-height:.96; text-transform:uppercase; letter-spacing:-.02em; }
+.cta__h1 em{ font-style:normal; color:var(--c-accent); }
+.cta__count{ margin:0; font-family:var(--c-tech); font-size:11px; font-weight:700;
+  letter-spacing:.2em; text-transform:uppercase; color:var(--c-faint); }
+
+.cta__grid{ display:grid; grid-template-columns:minmax(0,1fr) 360px; gap:28px; align-items:start; }
+
+/* ---- the ledger ---- */
+.cta__ledger{ border:1px solid var(--c-line); background:var(--c-panel); }
+.cta__lrow{
+  display:grid; grid-template-columns:34px 92px minmax(0,1fr) 120px 128px 96px 34px;
+  gap:16px; align-items:center; padding:16px 18px; border-bottom:1px solid var(--c-line);
+}
+.cta__lrow:last-child{ border-bottom:0; }
+.cta__lrow--head{ padding:12px 18px; background:var(--c-sunk); }
+.cta__lrow--head b{ font-family:var(--c-tech); font-size:10px; font-weight:700;
+  letter-spacing:.18em; text-transform:uppercase; color:var(--c-faint); }
+.cta__lrow--head .r{ text-align:right; }
+
+.cta__no{ font-family:var(--c-tech); font-size:12px; font-weight:700; color:var(--c-faint); }
+.cta__shot{ aspect-ratio:1; display:grid; place-items:center; background:var(--c-sunk);
+  border:1px solid var(--c-line); font-family:var(--c-tech); font-size:9px;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--c-faint); text-align:center; padding:4px; }
+.cta__name{ margin:0; font-size:14.5px; font-weight:600; line-height:1.35; }
+.cta__name a{ color:inherit; text-decoration:none; }
+.cta__name a:hover{ color:var(--c-accent); }
+.cta__meta{ margin:6px 0 0; display:flex; gap:8px; flex-wrap:wrap; }
+.cta__tag{ font-family:var(--c-tech); font-size:9.5px; font-weight:700; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--c-muted); border:1px solid var(--c-line); padding:4px 8px; }
+.cta__tag--blue{ color:var(--c-blue); border-color:rgba(41,171,226,.4); }
+.cta__sku{ margin:6px 0 0; font-family:var(--c-tech); font-size:10px;
+  letter-spacing:.14em; color:var(--c-faint); }
+.cta__unit{ text-align:right; font-family:var(--c-tech); font-size:14px; color:var(--c-muted); }
+
+.cta__qty{ display:grid; grid-template-columns:34px minmax(0,1fr) 34px; border:1px solid var(--c-line); }
+.cta__qty button{ background:none; border:0; color:var(--c-muted); font-size:16px;
+  line-height:1; padding:9px 0; cursor:pointer; font-family:var(--c-tech); }
+.cta__qty button:hover{ color:var(--c-accent); }
+.cta__qty input{ box-sizing:border-box; width:100%; border:0; border-left:1px solid var(--c-line);
+  border-right:1px solid var(--c-line); background:none; color:var(--c-text); text-align:center;
+  font-family:var(--c-tech); font-size:14px; font-weight:700; padding:9px 0;
+  -moz-appearance:textfield; appearance:textfield; }
+.cta__qty input::-webkit-outer-spin-button,
+.cta__qty input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+
+.cta__line{ text-align:right; font-family:var(--c-tech); font-size:16px; font-weight:700; }
+.cta__x{ background:none; border:1px solid var(--c-line); color:var(--c-faint);
+  width:30px; height:30px; line-height:1; cursor:pointer; font-size:15px; }
+.cta__x:hover{ border-color:var(--c-accent); color:var(--c-accent); }
+
+.cta__stock{ margin:8px 0 0; font-family:var(--c-tech); font-size:10px; letter-spacing:.16em;
+  text-transform:uppercase; color:#57c98a; }
+.cta__stock--hold{ color:#e0a33c; }
+
+/* ---- actions under the ledger ---- */
+.cta__acts{ display:flex; gap:12px; flex-wrap:wrap; align-items:center;
+  margin:18px 0 0; padding:16px 18px; border:1px solid var(--c-line); background:var(--c-sunk); }
+.cta__coupon{ display:flex; gap:10px; flex:1 1 320px; }
+.cta__coupon input{ box-sizing:border-box; flex:1 1 auto; min-width:0; padding:12px 14px;
+  background:rgba(255,255,255,.03); border:1px solid var(--c-line); color:var(--c-text);
+  font-family:var(--c-tech); font-size:12px; letter-spacing:.16em; text-transform:uppercase; }
+.cta__coupon input:focus{ border-color:var(--c-accent); outline:none; }
+.cta__coupon input::placeholder{ color:var(--c-faint); letter-spacing:.16em; }
+
+.cta__ghost{ display:inline-flex; align-items:center; gap:8px; padding:12px 16px;
+  border:1px solid var(--c-line); background:none; color:var(--c-muted);
+  font-family:var(--c-tech); font-size:10.5px; font-weight:700; letter-spacing:.16em;
+  text-transform:uppercase; cursor:pointer; text-decoration:none; }
+.cta__ghost:hover{ border-color:var(--c-accent); color:var(--c-accent); }
+
+/* ---- the console ---- */
+.cta__side{ position:sticky; top:24px; display:grid; gap:16px; }
+
+.cta__ship{ border:1px solid var(--c-line); background:var(--c-panel); padding:18px; }
+.cta__ship p{ margin:0; font-family:var(--c-tech); font-size:10.5px; font-weight:700;
+  letter-spacing:.16em; text-transform:uppercase; color:var(--c-faint); }
+.cta__ship p b{ color:var(--c-text); }
+.cta__ship p.is-clear b{ color:#57c98a; }
+.cta__bar{ height:4px; background:var(--c-sunk); border:1px solid var(--c-line); margin:12px 0 0; }
+.cta__bar i{ display:block; height:100%; background:var(--c-accent); transition:width .35s ease; }
+
+.cta__console{ border:1px solid var(--c-line); background:var(--c-panel); }
+.cta__ctab{ background:var(--c-accent); color:#fff; font-family:var(--c-tech); font-size:10px;
+  font-weight:700; letter-spacing:.2em; text-transform:uppercase; padding:8px 16px; }
+.cta__rows{ margin:0; padding:20px 18px; }
+.cta__row{ display:flex; align-items:baseline; justify-content:space-between; gap:14px;
+  padding:11px 0; border-bottom:1px solid var(--c-line); }
+.cta__row:last-of-type{ border-bottom:0; }
+.cta__row dt{ font-family:var(--c-tech); font-size:11px; font-weight:700; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--c-faint); }
+.cta__row dd{ margin:0; font-family:var(--c-tech); font-size:15px; font-weight:700; }
+.cta__row--free dd{ color:#57c98a; }
+.cta__row--total{ border-top:1px solid var(--c-line); margin-top:6px; padding-top:16px; }
+.cta__row--total dt{ color:var(--c-text); font-size:12px; }
+.cta__row--total dd{ font-family:var(--c-title); font-size:28px; color:var(--c-accent); }
+.cta__note{ margin:0; padding:0 18px 18px; font-family:var(--c-tech); font-size:10px;
+  letter-spacing:.12em; text-transform:uppercase; color:var(--c-faint); line-height:1.7; }
+
+.cta__go{ display:block; width:100%; box-sizing:border-box; text-align:center;
+  padding:18px 20px; background:var(--c-accent); border:1px solid var(--c-accent); color:#fff;
+  font-family:var(--c-tech); font-size:13px; font-weight:700; letter-spacing:.2em;
+  text-transform:uppercase; cursor:pointer; text-decoration:none; }
+.cta__go:hover{ filter:brightness(1.12); }
+.cta__trust{ display:grid; gap:10px; border:1px solid var(--c-line); background:var(--c-sunk); padding:16px 18px; }
+.cta__trust div{ display:grid; grid-template-columns:16px minmax(0,1fr); gap:10px;
+  align-items:start; font-size:12.5px; line-height:1.55; color:var(--c-muted); }
+.cta__trust svg{ width:15px; height:15px; fill:none; stroke:var(--c-accent); stroke-width:1.6; margin-top:2px; }
+
+/* ---- empty state ---- */
+.cta__empty{ display:none; place-items:center; gap:16px; padding:70px 24px; text-align:center;
+  border:1px dashed var(--c-line); background:var(--c-panel); }
+.cta.is-empty .cta__empty{ display:grid; }
+.cta.is-empty .cta__grid{ display:none; }
+.cta__empty h2{ margin:0; font-family:var(--c-title); font-size:22px; text-transform:uppercase; }
+.cta__empty p{ margin:0; font-size:13.5px; color:var(--c-muted); max-width:46ch; line-height:1.65; }
+.cta__empty svg{ width:38px; height:38px; fill:none; stroke:var(--c-faint); stroke-width:1.2; }
+
+@media (max-width:1040px){
+  .cta__grid{ grid-template-columns:minmax(0,1fr); }
+  .cta__side{ position:static; }
+}
+@media (max-width:720px){
+  .cta__lrow{ grid-template-columns:70px minmax(0,1fr) 30px; gap:14px; row-gap:12px; padding:16px; }
+  .cta__lrow--head{ display:none; }
+  .cta__no{ display:none; }
+  .cta__unit{ grid-column:2; text-align:left; font-size:13px; }
+  .cta__qty{ grid-column:2; max-width:132px; }
+  .cta__line{ grid-column:2; text-align:left; }
+  .cta__x{ grid-row:1; grid-column:3; }
+}
+</style>
+
+<div class="cta" id="ctaRoot">
+
+  <nav class="cta__crumbs" aria-label="Breadcrumb">
+    <a href="#">Home</a><span>/</span><a href="#">Shop</a><span>/</span>Cart
+  </nav>
+
+  <header class="cta__head">
+    <h1 class="cta__h1">Your <em>cart</em></h1>
+    <p class="cta__count"><b id="ctaCount">4</b> items &middot; reserved 30 min&dagger;</p>
+  </header>
+
+  <div class="cta__grid">
+
+    <div>
+      <div class="cta__ledger" id="ctaItems">
+        <div class="cta__lrow cta__lrow--head">
+          <b>#</b><b></b><b>Item</b><b class="r">Unit</b><b>Qty</b><b class="r">Line</b><b></b>
+        </div>
+
+        <div class="cta__lrow" data-item data-unit="211.40">
+          <span class="cta__no">01</span>
+          <div class="cta__shot"><span>Product shot</span></div>
+          <div>
+            <p class="cta__name"><a href="#">Project A+ Super Shocks Adjustable Suspension</a></p>
+            <p class="cta__meta">
+              <span class="cta__tag">Little Boy</span>
+              <span class="cta__tag cta__tag--blue">Silver Chrome / Black</span>
+            </p>
+            <p class="cta__sku">SKU SUS-AS-UNI-330-SC-BK</p>
+            <p class="cta__stock">In stock</p>
+          </div>
+          <div class="cta__unit">RM211.40</div>
+          <div class="cta__qty">
+            <button type="button" data-step="-1" aria-label="Decrease quantity">&minus;</button>
+            <input type="number" min="1" value="1" aria-label="Quantity">
+            <button type="button" data-step="1" aria-label="Increase quantity">+</button>
+          </div>
+          <div class="cta__line" data-line>RM211.40</div>
+          <button class="cta__x" type="button" data-remove aria-label="Remove item">&times;</button>
+        </div>
+
+        <div class="cta__lrow" data-item data-unit="448.00">
+          <span class="cta__no">02</span>
+          <div class="cta__shot"><span>Product shot</span></div>
+          <div>
+            <p class="cta__name"><a href="#">Project X 4 Spoke Sport Rims</a></p>
+            <p class="cta__meta">
+              <span class="cta__tag">1.6 x 14</span>
+              <span class="cta__tag cta__tag--blue">Gold</span>
+            </p>
+            <p class="cta__sku">SKU pending&dagger;</p>
+            <p class="cta__stock">In stock</p>
+          </div>
+          <div class="cta__unit">RM448.00</div>
+          <div class="cta__qty">
+            <button type="button" data-step="-1" aria-label="Decrease quantity">&minus;</button>
+            <input type="number" min="1" value="1" aria-label="Quantity">
+            <button type="button" data-step="1" aria-label="Increase quantity">+</button>
+          </div>
+          <div class="cta__line" data-line>RM448.00</div>
+          <button class="cta__x" type="button" data-remove aria-label="Remove item">&times;</button>
+        </div>
+
+        <div class="cta__lrow" data-item data-unit="38.00">
+          <span class="cta__no">03</span>
+          <div class="cta__shot"><span>Product shot</span></div>
+          <div>
+            <p class="cta__name"><a href="#">Superfly Racing Decal Set&dagger;</a></p>
+            <p class="cta__meta"><span class="cta__tag">Magenta</span></p>
+            <p class="cta__sku">SKU pending&dagger;</p>
+            <p class="cta__stock cta__stock--hold">Ships in 5&ndash;7 days</p>
+          </div>
+          <div class="cta__unit">RM38.00</div>
+          <div class="cta__qty">
+            <button type="button" data-step="-1" aria-label="Decrease quantity">&minus;</button>
+            <input type="number" min="1" value="2" aria-label="Quantity">
+            <button type="button" data-step="1" aria-label="Increase quantity">+</button>
+          </div>
+          <div class="cta__line" data-line>RM76.00</div>
+          <button class="cta__x" type="button" data-remove aria-label="Remove item">&times;</button>
+        </div>
+      </div>
+
+      <div class="cta__acts">
+        <form class="cta__coupon" onsubmit="return false">
+          <input type="text" placeholder="Coupon code" aria-label="Coupon code">
+          <button class="cta__ghost" type="submit">Apply</button>
+        </form>
+        <a class="cta__ghost" href="#">&larr; Keep shopping</a>
+        <button class="cta__ghost" type="button">Update cart</button>
+      </div>
+    </div>
+
+    <aside class="cta__side">
+      <div class="cta__ship">
+        <p id="ctaShipMsg">RM<b id="ctaGap">0.00</b> to free shipping&dagger;</p>
+        <div class="cta__bar"><i id="ctaBar" style="width:100%"></i></div>
+      </div>
+
+      <div class="cta__console">
+        <div class="cta__ctab">Order summary</div>
+        <dl class="cta__rows">
+          <div class="cta__row"><dt>Subtotal</dt><dd id="ctaSub">RM735.40</dd></div>
+          <div class="cta__row cta__row--free"><dt>Shipping&dagger;</dt><dd id="ctaShipVal">Free</dd></div>
+          <div class="cta__row"><dt>SST 6%&dagger;</dt><dd id="ctaTax">RM44.12</dd></div>
+          <div class="cta__row cta__row--total"><dt>Total</dt><dd id="ctaTotal">RM779.52</dd></div>
+        </dl>
+        <p class="cta__note">&dagger; Threshold, flat rate, reservation window, SST line and the two pending SKUs are placeholders &mdash; confirm before build.</p>
+      </div>
+
+      <a class="cta__go" href="#">Proceed to checkout</a>
+
+      <div class="cta__trust">
+        <div>
+          <svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 5-3 7-7 9-4-2-7-4-7-9V6z"/></svg>
+          <span>6-month warranty on every part, registered at <b>/warranty</b>.</span>
+        </div>
+        <div>
+          <svg viewBox="0 0 24 24"><path d="M3 7h13v10H3zM16 10h3l2 3v4h-5z"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>
+          <span>West Malaysia 2&ndash;4 working days, East Malaysia 4&ndash;7.&dagger;</span>
+        </div>
+        <div>
+          <svg viewBox="0 0 24 24"><path d="M4 6h16v12H4z"/><path d="M4 10h16"/></svg>
+          <span>Card, FPX and e-wallet at checkout.&dagger;</span>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="cta__empty">
+    <svg viewBox="0 0 24 24"><path d="M4 5h3l2 10h9l2-7H7"/><circle cx="10" cy="19" r="1.6"/><circle cx="18" cy="19" r="1.6"/></svg>
+    <h2>Nothing in the cart</h2>
+    <p>Remove all three rows to see this. On the live cart it replaces the ledger entirely and sends the rider back to the shop.</p>
+    <a class="cta__ghost" href="#">Browse the shop</a>
+  </div>
+</div>
+
+<script>
+/* DEMO ONLY. The live cart is a WooCommerce form: qty is a plain number
+   input and the totals recalculate server-side on "Update cart". This
+   script exists so the layout can be judged with numbers that move. */
+(function () {
+  var root = document.getElementById('ctaRoot');
+  if (!root) return;
+
+  var FREE = 600;    /* invented threshold */
+  var FLAT = 18;     /* invented flat rate */
+  var TAX  = 0.06;   /* invented SST line */
+
+  function money(n) {
+    return 'RM' + n.toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function recalc() {
+    var rows = root.querySelectorAll('[data-item]');
+    var sub = 0, count = 0;
+
+    rows.forEach(function (row) {
+      var unit = parseFloat(row.dataset.unit) || 0;
+      var input = row.querySelector('input');
+      var qty = Math.max(1, parseInt(input.value, 10) || 1);
+      input.value = qty;
+      sub += unit * qty;
+      count += qty;
+      row.querySelector('[data-line]').textContent = money(unit * qty);
+    });
+
+    root.classList.toggle('is-empty', rows.length === 0);
+
+    var ship = sub >= FREE ? 0 : FLAT;
+    var tax = (sub + ship) * TAX;
+
+    document.getElementById('ctaCount').textContent = count;
+    document.getElementById('ctaSub').textContent = money(sub);
+    document.getElementById('ctaShipVal').textContent = ship === 0 ? 'Free' : money(ship);
+    document.getElementById('ctaTax').textContent = money(tax);
+    document.getElementById('ctaTotal').textContent = money(sub + ship + tax);
+
+    var gap = Math.max(0, FREE - sub);
+    var msg = document.getElementById('ctaShipMsg');
+    document.getElementById('ctaBar').style.width = Math.min(100, (sub / FREE) * 100) + '%';
+    msg.classList.toggle('is-clear', gap === 0);
+    msg.innerHTML = gap === 0
+      ? '<b>Free shipping unlocked</b>&dagger;'
+      : 'RM<b>' + gap.toFixed(2) + '</b> to free shipping&dagger;';
+  }
+
+  root.addEventListener('click', function (e) {
+    var step = e.target.closest('[data-step]');
+    if (step) {
+      var input = step.parentNode.querySelector('input');
+      input.value = Math.max(1, (parseInt(input.value, 10) || 1) + parseInt(step.dataset.step, 10));
+      recalc();
+      return;
+    }
+    var kill = e.target.closest('[data-remove]');
+    if (kill) {
+      kill.closest('[data-item]').remove();
+      recalc();
+    }
+  });
+
+  root.addEventListener('input', function (e) {
+    if (e.target.matches('[data-item] input')) recalc();
+  });
+
+  recalc();
+})();
+</script>
+<!-- ═══════════ TO HERE ═══════════ -->
+
+</body>
+</html>

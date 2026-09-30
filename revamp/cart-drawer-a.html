@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cart drawer (A &middot; Restyled Mini-Cart) &ndash; Superfly</title>
+<meta name="description" content="Superfly Motos cart drawer — option A, WooCommerce's own Mini-Cart block drawer restyled. Same DOM, same words, CSS only.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,500;0,600;0,700&family=Archivo+Black&family=Chakra+Petch:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  html,body{ margin:0; }
+  body{
+    background:#0a0a0a;
+    background-image:repeating-linear-gradient(45deg,
+      rgba(255,255,255,.024) 0, rgba(255,255,255,.024) 2px,
+      rgba(0,0,0,0) 2px, rgba(0,0,0,0) 6px);
+    color:#f2f2f4; font-family:"Archivo","Inter",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  /* ---- stand-in page behind the drawer, NOT part of the design ---- */
+  .demo__bar{ display:flex; align-items:center; justify-content:space-between; gap:20px;
+    padding:18px 24px; border-bottom:1px solid rgba(242,242,244,.12); position:sticky; top:0;
+    background:rgba(10,10,10,.9); backdrop-filter:blur(8px); z-index:10; }
+  .demo__logo{ font-family:"Archivo Black",sans-serif; font-size:17px; letter-spacing:-.02em; text-transform:uppercase; }
+  .demo__logo b{ color:#ec1e79; }
+  .demo__nav{ display:flex; gap:22px; font-family:"Chakra Petch",sans-serif; font-size:11px;
+    font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:rgba(242,242,244,.58); }
+  .demo__cart{ position:relative; display:inline-flex; align-items:center; gap:10px; padding:10px 16px;
+    background:none; border:1px solid rgba(242,242,244,.12); color:#f2f2f4; cursor:pointer;
+    font-family:"Chakra Petch",sans-serif; font-size:11px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; }
+  .demo__cart:hover{ border-color:#ec1e79; color:#ec1e79; }
+  .demo__cart b{ display:grid; place-items:center; min-width:19px; height:19px; padding:0 5px;
+    background:#ec1e79; color:#fff; font-size:11px; }
+  .demo{ max-width:1240px; margin:0 auto; padding:0 24px 120px; }
+  .demo__note{ margin:34px 0 0; padding:16px 18px; border:1px dashed rgba(242,242,244,.12);
+    background:#0d0d10; font-size:13px; line-height:1.7; color:rgba(242,242,244,.58); max-width:78ch; }
+  .demo__note b{ color:#f2f2f4; }
+  .demo__grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:14px; margin:26px 0 0; }
+  .demo__tile{ aspect-ratio:4/3; display:grid; place-items:center; border:1px solid rgba(242,242,244,.12);
+    background:#101014; font-family:"Chakra Petch",sans-serif; font-size:9px; letter-spacing:.16em;
+    text-transform:uppercase; color:rgba(242,242,244,.34); }
+  .demo__switch{ display:flex; gap:10px; flex-wrap:wrap; margin:26px 0 0; }
+  .demo__switch a{ padding:10px 15px; border:1px solid rgba(242,242,244,.12); color:rgba(242,242,244,.58);
+    font-family:"Chakra Petch",sans-serif; font-size:10.5px; font-weight:700; letter-spacing:.16em;
+    text-transform:uppercase; text-decoration:none; }
+  .demo__switch a:hover{ border-color:#ec1e79; color:#ec1e79; }
+  .demo__switch a[aria-current]{ border-color:#ec1e79; color:#ec1e79; }
+  @media (max-width:640px){
+    .demo__nav{ display:none; }          /* scaffolding only — it overflows a phone */
+    .demo__bar{ padding:14px 16px; }
+    .demo{ padding:0 16px 120px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="demo__bar">
+  <span class="demo__logo">SUPER<b>FLY</b></span>
+  <nav class="demo__nav"><span>Shop</span><span>Suspension</span><span>Rims</span><span>Brakes</span></nav>
+  <button class="demo__cart" type="button" data-open-cart>Cart <b id="cdaBadge">3</b></button>
+</header>
+
+<main class="demo">
+  <p class="demo__note">
+    <b>Stand-in page.</b> The bar above and the tiles below are scaffolding so the drawer can be judged
+    in context &mdash; they are not part of the proposal. Click <b>Cart</b> to reopen the drawer; Esc or
+    the overlay closes it. Cart contents are the real ones from the live drawer.
+  </p>
+  <p class="demo__switch">
+    <a href="cart-drawer-a.html" aria-current="page">A &middot; Restyled Mini-Cart</a>
+    <a href="cart-drawer-b.html">B &middot; Pit Board</a>
+    <a href="cart-drawer-c.html">C &middot; Console / Sheet</a>
+  </p>
+  <div class="demo__grid">
+    <div class="demo__tile">Product</div><div class="demo__tile">Product</div>
+    <div class="demo__tile">Product</div><div class="demo__tile">Product</div>
+  </div>
+</main>
+
+<!-- ═══════════ PASTE FROM HERE ═══════════ -->
+<style>
+/* ============================================================
+   OPTION A — "Restyled Mini-Cart"
+   The drawer WooCommerce already opens from the header, wearing
+   the theme's clothes. Nothing is replaced: the Mini-Cart block
+   stays in parts/header.html, its React markup stays exactly as
+   it is, and this is CSS against the classes it already renders.
+
+   It keeps WooCommerce's own structure and WORDS, because they
+   are what the block prints:
+     "Your cart (items: 3)" / the product name / the unit price /
+     the short description / stepper + bin / the line total right
+     "Subtotal" / "Shipping and discounts calculated at checkout."
+     "View my cart"  |  "Go to checkout"
+
+   What changes is only how it looks: the serif heading becomes
+   Archivo Black, the white checkout slab becomes magenta, the
+   two footer buttons stop competing (ghost + solid, not two
+   slabs), the rows get a hard-edged thumbnail and a rule, the
+   bin icon goes quiet until the row is hovered.
+
+   What it CANNOT do, because the DOM is WooCommerce's:
+     - a free-shipping progress bar (no element to hang it on)
+     - an upsell strip inside the drawer
+     - reordering the footer, a step indicator, a bottom sheet
+   Those need option B or C.
+
+   Cheapest by a wide margin: it drops into woocommerce.css
+   section 7 (replacing the two-line rule at woocommerce.css:789),
+   no block override, no build step, nothing to re-do when
+   WooCommerce updates — except that a class rename in a future
+   Woo release will quietly undo parts of it. That is the trade.
+
+   CONTENTS below are the real ones from the live drawer:
+   Project C2 Brake Caliper RM215.00, Superfly Project X 4 Spoke
+   Sport Rims (Chameleon) RM574.00 x 2, subtotal RM1,363.00.
+   Nothing here is invented.
+   ============================================================ */
+.cda{
+  --d-panel:#131317;
+  --d-sunk:#0d0d10;
+  --d-text:#f2f2f4;
+  --d-muted:rgba(242,242,244,.58);
+  --d-faint:rgba(242,242,244,.34);
+  --d-line:rgba(242,242,244,.12);
+  --d-accent:#ec1e79;
+  --d-blue:#29abe2;
+  --d-title:"Archivo Black","Arial Black",sans-serif;
+  --d-body:"Archivo","Inter",sans-serif;
+  --d-tech:"Chakra Petch","Archivo",sans-serif;
+}
+
+/* .wc-block-components-drawer__screen-overlay */
+.cda__overlay{
+  position:fixed; inset:0; z-index:90; background:rgba(4,4,6,.72);
+  opacity:0; visibility:hidden; transition:opacity .28s ease, visibility .28s;
+}
+.cda.is-open .cda__overlay{ opacity:1; visibility:visible; }
+
+/* .wc-block-mini-cart__drawer */
+.cda__drawer{
+  position:fixed; top:0; right:0; bottom:0; z-index:91; width:min(420px,100vw);
+  display:flex; flex-direction:column; background:var(--d-panel);
+  border-left:1px solid var(--d-line); color:var(--d-text); font-family:var(--d-body);
+  transform:translateX(100%); transition:transform .32s cubic-bezier(.22,1,.36,1);
+}
+.cda.is-open .cda__drawer{ transform:translateX(0); }
+
+/* .wc-block-mini-cart__title + the block's close button */
+.cda__head{ display:flex; align-items:center; justify-content:space-between; gap:16px;
+  padding:22px; border-bottom:1px solid var(--d-line); }
+.cda__head h2{ margin:0; font-family:var(--d-title); font-size:18px; letter-spacing:.01em;
+  text-transform:uppercase; line-height:1.1; }
+.cda__head h2 span{ color:var(--d-accent); }
+.cda__close{ flex:none; width:32px; height:32px; line-height:1; background:none;
+  border:1px solid var(--d-line); color:var(--d-faint); font-size:16px; cursor:pointer; }
+.cda__close:hover{ border-color:var(--d-accent); color:var(--d-accent); }
+
+/* .wc-block-mini-cart__items — the only scrolling region */
+.cda__items{ flex:1 1 auto; overflow-y:auto; padding:0 22px; margin:0; list-style:none; }
+.cda__item{ display:grid; grid-template-columns:76px minmax(0,1fr); gap:15px;
+  padding:20px 0; border-bottom:1px solid var(--d-line); }
+.cda__item:last-child{ border-bottom:0; }
+.cda__shot{ aspect-ratio:1; display:grid; place-items:center; overflow:hidden;
+  background:var(--d-sunk); border:1px solid var(--d-line); font-family:var(--d-tech);
+  font-size:8px; letter-spacing:.14em; text-transform:uppercase; color:var(--d-faint);
+  text-align:center; padding:4px; }
+.cda__shot img{ width:100%; height:100%; object-fit:cover; display:block; }
+.cda__body{ min-width:0; }
+.cda__top{ display:grid; grid-template-columns:minmax(0,1fr) auto; gap:12px; align-items:start; }
+.cda__name{ margin:0; font-size:14px; font-weight:600; line-height:1.4; }
+.cda__name a{ color:inherit; text-decoration:none; }
+.cda__name a:hover{ color:var(--d-accent); }
+/* the line total the block prints top-right */
+.cda__line{ font-family:var(--d-tech); font-size:15px; font-weight:700; white-space:nowrap; }
+
+/* .wc-block-components-product-price — the unit price under the name */
+.cda__unit{ margin:7px 0 0; font-family:var(--d-tech); font-size:12px; color:var(--d-muted); }
+/* .wc-block-components-product-metadata — short description / variation */
+.cda__var{ margin:6px 0 0; font-size:12.5px; line-height:1.55; color:var(--d-faint); }
+.cda__var b{ color:var(--d-blue); font-weight:600; }
+
+.cda__foot{ display:flex; align-items:center; gap:14px; margin:13px 0 0; }
+.cda__qty{ display:grid; grid-template-columns:30px 40px 30px; border:1px solid var(--d-line); }
+.cda__qty button{ background:none; border:0; color:var(--d-muted); font-family:var(--d-tech);
+  font-size:14px; line-height:1; padding:8px 0; cursor:pointer; }
+.cda__qty button:hover{ color:var(--d-accent); }
+.cda__qty input{ box-sizing:border-box; width:100%; border:0; border-left:1px solid var(--d-line);
+  border-right:1px solid var(--d-line); background:none; color:var(--d-text); text-align:center;
+  font-family:var(--d-tech); font-size:13px; font-weight:700; padding:8px 0;
+  -moz-appearance:textfield; appearance:textfield; }
+.cda__qty input::-webkit-outer-spin-button,
+.cda__qty input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+/* the block's bin button — quiet until the row is hovered */
+.cda__bin{ width:30px; height:30px; display:grid; place-items:center; background:none; border:0;
+  color:transparent; cursor:pointer; }
+.cda__item:hover .cda__bin, .cda__bin:focus{ color:var(--d-faint); }
+.cda__bin:hover{ color:var(--d-accent); }
+.cda__bin svg{ width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:1.5; }
+
+/* .wc-block-mini-cart__footer */
+.cda__totals{ border-top:1px solid var(--d-line); background:var(--d-sunk); padding:20px 22px 22px; }
+.cda__sub{ display:flex; align-items:baseline; justify-content:space-between; gap:14px; margin:0 0 6px; }
+.cda__sub dt{ font-family:var(--d-tech); font-size:11px; font-weight:700; letter-spacing:.18em;
+  text-transform:uppercase; color:var(--d-faint); }
+.cda__sub dd{ margin:0; font-family:var(--d-title); font-size:25px; color:var(--d-text); }
+.cda__small{ margin:0 0 16px; font-size:12px; color:var(--d-faint); }
+.cda__btns{ display:grid; grid-template-columns:1fr 1.25fr; gap:10px; }
+.cda__view{ display:grid; place-items:center; padding:15px 12px; border:1px solid var(--d-line);
+  background:none; color:var(--d-muted); font-family:var(--d-tech); font-size:11px; font-weight:700;
+  letter-spacing:.16em; text-transform:uppercase; text-decoration:none; }
+.cda__view:hover{ border-color:var(--d-accent); color:var(--d-accent); }
+.cda__go{ display:grid; place-items:center; padding:15px 12px; background:var(--d-accent);
+  border:1px solid var(--d-accent); color:#fff; font-family:var(--d-tech); font-size:11px;
+  font-weight:700; letter-spacing:.16em; text-transform:uppercase; text-decoration:none; }
+.cda__go:hover{ filter:brightness(1.12); }
+
+/* .wc-block-mini-cart__empty-cart */
+.cda__empty{ display:none; flex:1 1 auto; place-content:center; justify-items:center; gap:16px;
+  padding:40px 30px; text-align:center; }
+.cda.is-empty .cda__empty{ display:grid; }
+.cda.is-empty .cda__items, .cda.is-empty .cda__totals{ display:none; }
+.cda__empty h3{ margin:0; font-family:var(--d-title); font-size:18px; text-transform:uppercase; }
+.cda__empty p{ margin:0; font-size:13px; line-height:1.65; color:var(--d-muted); max-width:34ch; }
+.cda__empty svg{ width:34px; height:34px; fill:none; stroke:var(--d-faint); stroke-width:1.2; }
+.cda__ghost{ display:inline-flex; padding:12px 18px; border:1px solid var(--d-line); background:none;
+  color:var(--d-muted); font-family:var(--d-tech); font-size:10.5px; font-weight:700;
+  letter-spacing:.16em; text-transform:uppercase; cursor:pointer; text-decoration:none; }
+.cda__ghost:hover{ border-color:var(--d-accent); color:var(--d-accent); }
+
+@media (prefers-reduced-motion:reduce){
+  .cda__drawer, .cda__overlay{ transition-duration:.001ms; }
+}
+</style>
+
+<div class="cda" id="cdaRoot">
+  <div class="cda__overlay" data-close-cart></div>
+
+  <aside class="cda__drawer" role="dialog" aria-modal="true" aria-label="Your cart" id="cdaDrawer">
+    <div class="cda__head">
+      <h2>Your cart <span>(items: <i id="cdaCount">3</i>)</span></h2>
+      <button class="cda__close" type="button" data-close-cart aria-label="Close cart">&times;</button>
+    </div>
+
+    <ul class="cda__items" id="cdaItems">
+
+      <li class="cda__item" data-item data-unit="215.00">
+        <div class="cda__shot"><span>Photo pending</span></div>
+        <div class="cda__body">
+          <div class="cda__top">
+            <h3 class="cda__name"><a href="#">Project C2 Brake Caliper</a></h3>
+            <span class="cda__line" data-line>RM215.00</span>
+          </div>
+          <p class="cda__unit">RM215.00</p>
+          <p class="cda__var">Radial-mount brake caliper.</p>
+          <div class="cda__foot">
+            <div class="cda__qty">
+              <button type="button" data-step="-1" aria-label="Decrease quantity">&minus;</button>
+              <input type="number" min="1" value="1" aria-label="Quantity">
+              <button type="button" data-step="1" aria-label="Increase quantity">+</button>
+            </div>
+            <button class="cda__bin" type="button" data-remove aria-label="Remove item">
+              <svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg>
+            </button>
+          </div>
+        </div>
+      </li>
+
+      <li class="cda__item" data-item data-unit="574.00">
+        <div class="cda__shot"><img src="assets/products/wheels/rim-projectx-chameleon.jpg" alt=""></div>
+        <div class="cda__body">
+          <div class="cda__top">
+            <h3 class="cda__name"><a href="#">Superfly Project X 4 Spoke Sport Rims (Chameleon)</a></h3>
+            <span class="cda__line" data-line>RM1,148.00</span>
+          </div>
+          <p class="cda__unit">RM574.00</p>
+          <p class="cda__var">Model: <b>EGO 18T 1.6-1.6&times;14</b></p>
+          <div class="cda__foot">
+            <div class="cda__qty">
+              <button type="button" data-step="-1" aria-label="Decrease quantity">&minus;</button>
+              <input type="number" min="1" value="2" aria-label="Quantity">
+              <button type="button" data-step="1" aria-label="Increase quantity">+</button>
+            </div>
+            <button class="cda__bin" type="button" data-remove aria-label="Remove item">
+              <svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg>
+            </button>
+          </div>
+        </div>
+      </li>
+    </ul>
+
+    <div class="cda__totals">
+      <dl class="cda__sub"><dt>Subtotal</dt><dd id="cdaSub">RM1,363.00</dd></dl>
+      <p class="cda__small">Shipping and discounts calculated at checkout.</p>
+      <div class="cda__btns">
+        <a class="cda__view" href="#">View my cart</a>
+        <a class="cda__go" href="#">Go to checkout</a>
+      </div>
+    </div>
+
+    <div class="cda__empty">
+      <svg viewBox="0 0 24 24"><path d="M4 5h3l2 10h9l2-7H7"/><circle cx="10" cy="19" r="1.6"/><circle cx="18" cy="19" r="1.6"/></svg>
+      <h3>Your cart is empty</h3>
+      <p>Remove both items to see this. It is WooCommerce's own empty state, restyled.</p>
+      <a class="cda__ghost" href="#">Start shopping</a>
+    </div>
+  </aside>
+</div>
+
+<script>
+/* DEMO ONLY. The live drawer is the Mini-Cart block: it opens itself,
+   traps focus itself and updates its own totals over the Store API.
+   This script exists so the design can be opened and judged. */
+(function () {
+  var root = document.getElementById('cdaRoot');
+  var drawer = document.getElementById('cdaDrawer');
+  if (!root) return;
+
+  var opener = null;
+
+  function money(n) {
+    return 'RM' + n.toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function recalc() {
+    var rows = root.querySelectorAll('[data-item]');
+    var sub = 0, count = 0;
+    rows.forEach(function (row) {
+      var unit = parseFloat(row.dataset.unit) || 0;
+      var input = row.querySelector('input[type=number]');
+      var qty = Math.max(1, parseInt(input.value, 10) || 1);
+      input.value = qty;
+      sub += unit * qty;
+      count += qty;
+      row.querySelector('[data-line]').textContent = money(unit * qty);
+    });
+    root.classList.toggle('is-empty', rows.length === 0);
+    document.getElementById('cdaCount').textContent = count;
+    document.getElementById('cdaSub').textContent = money(sub);
+    document.getElementById('cdaBadge').textContent = count;
+  }
+
+  function open(from) {
+    opener = from || null;
+    root.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+    (drawer.querySelector('[data-close-cart]') || drawer).focus();
+  }
+  function close() {
+    root.classList.remove('is-open');
+    document.body.style.overflow = '';
+    if (opener) opener.focus();
+  }
+
+  document.addEventListener('click', function (e) {
+    var openBtn = e.target.closest('[data-open-cart]');
+    if (openBtn) { open(openBtn); return; }
+    if (e.target.closest('[data-close-cart]')) { close(); return; }
+
+    var step = e.target.closest('[data-step]');
+    if (step) {
+      var input = step.parentNode.querySelector('input[type=number]');
+      input.value = Math.max(1, (parseInt(input.value, 10) || 1) + parseInt(step.dataset.step, 10));
+      recalc();
+      return;
+    }
+    var kill = e.target.closest('[data-remove]');
+    if (kill) { kill.closest('[data-item]').remove(); recalc(); }
+  });
+
+  root.addEventListener('input', function (e) {
+    if (e.target.matches('[data-item] input[type=number]')) recalc();
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && root.classList.contains('is-open')) close();
+  });
+
+  recalc();
+  open();   /* demo opens on load so the drawer is the first thing seen */
+})();
+</script>
+<!-- ═══════════ TO HERE ═══════════ -->
+
+</body>
+</html>
