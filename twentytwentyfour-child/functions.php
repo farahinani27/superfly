@@ -1683,3 +1683,484 @@ function superfly_not_found_assets() {
 		filemtime( get_stylesheet_directory() . '/assets/css/404.css' )
 	);
 }
+
+
+/* =============================================================
+ * THE CART DRAWER
+ * Replaces WooCommerce's Mini-Cart block, which used to sit in
+ * parts/header.html and drew its own drawer — serif heading,
+ * white checkout slab, no room inside it for anything of ours.
+ * Design B from revamp/cart-drawer-b.html, chosen 2026-09-30.
+ *
+ * Four pieces:
+ *   [superfly_cart_button]   the navbar button (parts/header.html)
+ *   superfly_cart_drawer()   prints the shell once, at wp_footer
+ *   superfly_cart_drawer_html()   renders the contents
+ *   superfly/v1/cart-drawer  reads and writes the cart
+ *
+ * NOTHING ABOUT THE CART IS PRINTED INTO THE PAGE. The shell goes
+ * out empty and assets/js/cart-drawer.js fills it from the route
+ * on load and again on every open. That is deliberate: this site
+ * has LiteSpeed Cache installed, Plesk can cache in front of it,
+ * and a page holding one customer's cart must never be servable
+ * to another. It also means the drawer is right on a page that
+ * came out of any cache.
+ *
+ * The same renderer draws the first paint and every refresh, so a
+ * row cannot look one way on load and another way after a tap.
+ *
+ * NO FREE-SHIPPING BAR AND NO TOTAL — operator's decision. The
+ * drawer shows the subtotal and then WooCommerce's own line,
+ * "Shipping and discounts calculated at checkout.", which is also
+ * the honest one: with no address there is no shipping figure, so
+ * a total here would change on the next screen.
+ *
+ * Looks: assets/css/cart-drawer.css
+ * ============================================================= */
+
+// The navbar button. A shortcode because parts/header.html is a
+// block template part, and a shortcode block is how the currency
+// switcher already gets in there.
+add_shortcode( 'superfly_cart_button', 'superfly_cart_button' );
+function superfly_cart_button() {
+	if ( ! function_exists( 'WC' ) ) {
+		return '';
+	}
+
+	// The count starts empty and is filled by the script — see the
+	// note about caches above.
+	return '<button type="button" class="sf-cart-btn" aria-label="' . esc_attr__( 'Open cart', 'superfly' ) . '">'
+		. '<span class="sf-cart-btn__count" hidden></span>'
+		. '</button>';
+}
+
+
+// The drawer itself, printed once per page at the very end of the
+// body — not inside the navbar, whose backdrop-filter would trap a
+// fixed child in its stacking context.
+add_action( 'wp_footer', 'superfly_cart_drawer' );
+function superfly_cart_drawer() {
+	if ( ! function_exists( 'WC' ) || is_admin() ) {
+		return;
+	}
+	?>
+	<div class="sf-cart" data-items-label="<?php esc_attr_e( 'items', 'superfly' ); ?>">
+		<div class="sf-cart__overlay"></div>
+
+		<aside class="sf-cart__drawer" role="dialog" aria-modal="true" tabindex="-1"
+			aria-label="<?php esc_attr_e( 'Your cart', 'superfly' ); ?>">
+
+			<div class="sf-cart__head">
+				<h2><?php esc_html_e( 'Your cart', 'superfly' ); ?> &middot;
+					<b class="sf-cart__count">0</b> <?php esc_html_e( 'items', 'superfly' ); ?></h2>
+				<button type="button" class="sf-cart__close"
+					aria-label="<?php esc_attr_e( 'Close cart', 'superfly' ); ?>">&times;</button>
+			</div>
+
+			<div class="sf-cart__body"></div>
+		</aside>
+	</div>
+	<?php
+}
+
+
+// Everything inside .sf-cart__body. Returns the empty state when
+// there is no cart, which is also what a visitor with no session
+// gets — no notice, no warning, just the empty drawer.
+function superfly_cart_drawer_html() {
+	if ( ! superfly_cart_drawer_boot() ) {
+		return superfly_cart_drawer_empty();
+	}
+
+	$cart  = WC()->cart;
+	$items = $cart->get_cart();
+
+	if ( empty( $items ) ) {
+		return superfly_cart_drawer_empty();
+	}
+
+	ob_start();
+	?>
+	<ul class="sf-cart__items">
+		<?php
+		foreach ( $items as $key => $item ) {
+			$product = isset( $item['data'] ) ? $item['data'] : null;
+
+			if ( ! $product || ! $product->exists() || $item['quantity'] <= 0 ) {
+				continue;
+			}
+
+			// a plugin may hide a line (a bundle's children, say)
+			if ( ! apply_filters( 'woocommerce_widget_cart_item_visible', true, $item, $key ) ) {
+				continue;
+			}
+
+			$name      = apply_filters( 'woocommerce_cart_item_name', $product->get_name(), $item, $key );
+			$permalink = $product->is_visible() ? $product->get_permalink( $item ) : '';
+			$thumb     = apply_filters( 'woocommerce_cart_item_thumbnail', $product->get_image( 'woocommerce_thumbnail', array( 'alt' => '' ) ), $item, $key );
+			?>
+			<li class="sf-cart__item">
+				<div class="sf-cart__shot"><?php echo wp_kses_post( $thumb ); ?></div>
+
+				<div class="sf-cart__body-col">
+					<div class="sf-cart__top">
+						<h3 class="sf-cart__name">
+							<?php if ( $permalink ) : ?>
+								<a href="<?php echo esc_url( $permalink ); ?>"><?php echo wp_kses_post( $name ); ?></a>
+							<?php else : ?>
+								<?php echo wp_kses_post( $name ); ?>
+							<?php endif; ?>
+						</h3>
+						<span class="sf-cart__line">
+							<?php echo wp_kses_post( $cart->get_product_subtotal( $product, $item['quantity'] ) ); ?>
+						</span>
+					</div>
+
+					<?php
+					$chips = superfly_cart_drawer_chips( $product, $item );
+
+					if ( $chips ) :
+						?>
+						<div class="sf-cart__chips">
+							<?php foreach ( $chips as $chip ) : ?>
+								<span class="sf-cart__chip <?php echo esc_attr( $chip['class'] ); ?>">
+									<?php echo esc_html( $chip['text'] ); ?>
+								</span>
+							<?php endforeach; ?>
+						</div>
+					<?php endif; ?>
+
+					<div class="sf-cart__foot">
+						<?php if ( $product->is_sold_individually() ) : ?>
+							<span class="sf-cart__chip"><?php esc_html_e( 'One only', 'superfly' ); ?></span>
+						<?php else : ?>
+							<div class="sf-cart__qty">
+								<button type="button" data-step="-1"
+									data-key="<?php echo esc_attr( $key ); ?>"
+									aria-label="<?php esc_attr_e( 'Decrease quantity', 'superfly' ); ?>"
+									<?php disabled( 1, (int) $item['quantity'] ); ?>>&minus;</button>
+								<input type="number" min="1" inputmode="numeric"
+									value="<?php echo esc_attr( $item['quantity'] ); ?>"
+									data-key="<?php echo esc_attr( $key ); ?>"
+									aria-label="<?php esc_attr_e( 'Quantity', 'superfly' ); ?>">
+								<button type="button" data-step="1"
+									data-key="<?php echo esc_attr( $key ); ?>"
+									aria-label="<?php esc_attr_e( 'Increase quantity', 'superfly' ); ?>">+</button>
+							</div>
+						<?php endif; ?>
+
+						<span class="sf-cart__each">
+							<?php
+							/* translators: %s: the price of one of this item */
+							printf( esc_html__( '%s each', 'superfly' ), wp_kses_post( wc_price( wc_get_price_to_display( $product ) ) ) );
+							?>
+						</span>
+
+						<button type="button" class="sf-cart__bin"
+							data-remove data-key="<?php echo esc_attr( $key ); ?>"
+							aria-label="<?php esc_attr_e( 'Remove item', 'superfly' ); ?>">
+							<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg>
+						</button>
+					</div>
+				</div>
+			</li>
+			<?php
+		}
+		?>
+	</ul>
+
+	<?php echo superfly_cart_drawer_cross_sells(); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+
+	<div class="sf-cart__totals">
+		<dl>
+			<div class="sf-cart__row">
+				<dt><?php esc_html_e( 'Subtotal', 'superfly' ); ?></dt>
+				<dd><?php echo wp_kses_post( $cart->get_cart_subtotal() ); ?></dd>
+			</div>
+		</dl>
+
+		<p class="sf-cart__small"><?php esc_html_e( 'Shipping and discounts calculated at checkout.', 'superfly' ); ?></p>
+
+		<?php // one row, cart first — the same order WooCommerce's own drawer used ?>
+		<div class="sf-cart__btns">
+			<a class="sf-cart__view" href="<?php echo esc_url( wc_get_cart_url() ); ?>">
+				<?php esc_html_e( 'View my cart', 'superfly' ); ?>
+			</a>
+			<a class="sf-cart__go" href="<?php echo esc_url( wc_get_checkout_url() ); ?>">
+				<?php esc_html_e( 'Go to checkout', 'superfly' ); ?>
+			</a>
+		</div>
+	</div>
+	<?php
+
+	return ob_get_clean();
+}
+
+
+// The chips under an item's name: what makes this line different
+// from the same product bought another way, then its stock state.
+function superfly_cart_drawer_chips( $product, $item ) {
+	$chips = array();
+
+	if ( $product->is_type( 'variation' ) ) {
+		// Woo's own formatting, values only — "Chameleon, EGO 18T 1.6-1.6×14"
+		$variation = wc_get_formatted_variation( $product, true, false );
+
+		foreach ( array_filter( array_map( 'trim', explode( ',', $variation ) ) ) as $value ) {
+			$chips[] = array(
+				'text'  => $value,
+				'class' => 'sf-cart__chip--blue',
+			);
+		}
+	}
+
+	if ( ! $product->is_in_stock() ) {
+		$chips[] = array(
+			'text'  => __( 'Out of stock', 'superfly' ),
+			'class' => 'sf-cart__chip--hold',
+		);
+	} elseif ( $product->is_on_backorder( $item['quantity'] ) ) {
+		$chips[] = array(
+			'text'  => __( 'On backorder', 'superfly' ),
+			'class' => 'sf-cart__chip--hold',
+		);
+	} else {
+		$chips[] = array(
+			'text'  => __( 'In stock', 'superfly' ),
+			'class' => 'sf-cart__chip--ok',
+		);
+	}
+
+	return $chips;
+}
+
+
+// "Goes well with" — WooCommerce's own cross-sells for whatever is
+// in the cart (Product data → Linked Products → Cross-sells). The
+// whole strip is left out when nothing in the cart has any, rather
+// than filling it with unrelated products.
+function superfly_cart_drawer_cross_sells() {
+	$ids = WC()->cart->get_cross_sells();
+
+	if ( empty( $ids ) ) {
+		return '';
+	}
+
+	$ids = array_slice( $ids, 0, 6 );
+
+	ob_start();
+	?>
+	<div class="sf-cart__up">
+		<h3><?php esc_html_e( 'Goes well with', 'superfly' ); ?></h3>
+		<div class="sf-cart__rail">
+			<?php
+			foreach ( $ids as $id ) {
+				$product = wc_get_product( $id );
+
+				if ( ! $product || ! $product->is_visible() ) {
+					continue;
+				}
+				?>
+				<a class="sf-cart__card" href="<?php echo esc_url( $product->get_permalink() ); ?>">
+					<div class="sf-cart__ctile">
+						<?php echo wp_kses_post( $product->get_image( 'woocommerce_gallery_thumbnail', array( 'alt' => '' ) ) ); ?>
+					</div>
+					<div>
+						<h4><?php echo esc_html( $product->get_name() ); ?></h4>
+						<p><?php echo wp_kses_post( $product->get_price_html() ); ?></p>
+					</div>
+				</a>
+				<?php
+			}
+			?>
+		</div>
+	</div>
+	<?php
+
+	return ob_get_clean();
+}
+
+
+function superfly_cart_drawer_empty() {
+	ob_start();
+	?>
+	<div class="sf-cart__empty">
+		<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h3l2 10h9l2-7H7"/><circle cx="10" cy="19" r="1.6"/><circle cx="18" cy="19" r="1.6"/></svg>
+		<h3><?php esc_html_e( 'Nothing in the cart', 'superfly' ); ?></h3>
+		<p><?php esc_html_e( 'Parts you add appear here. Everything Superfly makes carries a 6-month warranty.', 'superfly' ); ?></p>
+		<a class="sf-cart__ghost" href="<?php echo esc_url( wc_get_page_permalink( 'shop' ) ); ?>">
+			<?php esc_html_e( 'Start shopping', 'superfly' ); ?>
+		</a>
+	</div>
+	<?php
+
+	return ob_get_clean();
+}
+
+
+// The cart is not loaded on a REST request the way it is on a page
+// view, so ask WooCommerce for it. wc_load_cart() brings the
+// session cookie with it, which is what keeps a guest's cart theirs.
+function superfly_cart_drawer_boot() {
+	if ( ! function_exists( 'WC' ) ) {
+		return false;
+	}
+
+	if ( ! WC()->cart && function_exists( 'wc_load_cart' ) ) {
+		wc_load_cart();
+	}
+
+	if ( ! WC()->cart ) {
+		return false;
+	}
+
+	// get_cart() is the call that pulls the session into the cart
+	// object — get_cart_item() and set_quantity() do not. Without it
+	// a write looks at an empty cart, decides the customer's own line
+	// is not in it, and returns the cart unchanged with a 200.
+	if ( did_action( 'wp_loaded' ) ) {
+		WC()->cart->get_cart();
+	}
+
+	return true;
+}
+
+
+add_action( 'wp_enqueue_scripts', 'superfly_cart_drawer_assets', 20 );
+function superfly_cart_drawer_assets() {
+	if ( ! function_exists( 'WC' ) ) {
+		return;
+	}
+
+	// The drawer is on every page, so its fonts have to be too — the
+	// same handle the hero and the shop pages use, so it loads once.
+	wp_enqueue_style(
+		'superfly-hero-fonts',
+		'https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800&family=Archivo+Black&family=Chakra+Petch:wght@500;600;700&display=swap',
+		array(),
+		null
+	);
+
+	wp_enqueue_style(
+		'superfly-cart-drawer',
+		get_stylesheet_directory_uri() . '/assets/css/cart-drawer.css',
+		array( 'superfly-child-style', 'superfly-navbar', 'superfly-hero-fonts' ),
+		filemtime( get_stylesheet_directory() . '/assets/css/cart-drawer.css' )
+	);
+
+	wp_enqueue_script(
+		'superfly-cart-drawer',
+		get_stylesheet_directory_uri() . '/assets/js/cart-drawer.js',
+		array(),
+		filemtime( get_stylesheet_directory() . '/assets/js/cart-drawer.js' ),
+		true
+	);
+
+	wp_localize_script(
+		'superfly-cart-drawer',
+		'superflyCart',
+		array(
+			'rest'  => esc_url_raw( rest_url( 'superfly/v1/' ) ),
+			'nonce' => wp_create_nonce( 'wp_rest' ),
+		)
+	);
+}
+
+
+// Reading and writing the visitor's own cart.
+//
+//   GET   superfly/v1/cart-drawer        → { html, count }
+//   POST  superfly/v1/cart-drawer/item   → { html, count }
+//         { key: "<cart item key>", quantity: <n> }   0 removes
+//
+// Open to everyone, because a guest has a cart too. The write is
+// nonce-checked all the same: without it any other site could
+// empty a visitor's cart from a hidden form.
+add_action( 'rest_api_init', 'superfly_cart_drawer_routes' );
+function superfly_cart_drawer_routes() {
+	register_rest_route(
+		'superfly/v1',
+		'/cart-drawer',
+		array(
+			'methods'             => WP_REST_Server::READABLE,
+			'permission_callback' => '__return_true',
+			'callback'            => 'superfly_cart_drawer_read',
+		)
+	);
+
+	register_rest_route(
+		'superfly/v1',
+		'/cart-drawer/item',
+		array(
+			'methods'             => WP_REST_Server::CREATABLE,
+			'permission_callback' => '__return_true',
+			'callback'            => 'superfly_cart_drawer_write',
+			'args'                => array(
+				'key'      => array(
+					'required'          => true,
+					'type'              => 'string',
+					'sanitize_callback' => 'sanitize_text_field',
+				),
+				'quantity' => array(
+					'required' => true,
+					'type'     => 'integer',
+				),
+			),
+		)
+	);
+}
+
+
+function superfly_cart_drawer_read() {
+	superfly_cart_drawer_boot();
+
+	return superfly_cart_drawer_response();
+}
+
+
+function superfly_cart_drawer_write( WP_REST_Request $request ) {
+	if ( ! wp_verify_nonce( $request->get_header( 'X-WP-Nonce' ), 'wp_rest' ) ) {
+		return new WP_Error( 'superfly_cart_nonce', __( 'Expired. Reload the page and try again.', 'superfly' ), array( 'status' => 403 ) );
+	}
+
+	if ( ! superfly_cart_drawer_boot() ) {
+		return new WP_Error( 'superfly_cart_missing', __( 'No cart.', 'superfly' ), array( 'status' => 500 ) );
+	}
+
+	$cart     = WC()->cart;
+	$key      = $request['key'];
+	$quantity = max( 0, (int) $request['quantity'] );
+
+	// The key is the customer's own cart item key; anything not in
+	// their cart is a stale drawer, not an error worth shouting about.
+	if ( ! $cart->get_cart_item( $key ) ) {
+		return superfly_cart_drawer_response();
+	}
+
+	if ( 0 === $quantity ) {
+		$cart->remove_cart_item( $key );
+	} else {
+		$cart->set_quantity( $key, $quantity, true );
+	}
+
+	$cart->calculate_totals();
+
+	return superfly_cart_drawer_response();
+}
+
+
+function superfly_cart_drawer_response() {
+	$count = ( function_exists( 'WC' ) && WC()->cart ) ? WC()->cart->get_cart_contents_count() : 0;
+
+	$response = rest_ensure_response(
+		array(
+			'html'  => superfly_cart_drawer_html(),
+			'count' => $count,
+		)
+	);
+
+	// never let a cart sit in a proxy or a browser cache
+	$response->header( 'Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0' );
+
+	return $response;
+}

@@ -1,0 +1,763 @@
+/* =============================================================
+ * SUPERFLY — CART DRAWER
+ * Replaces WooCommerce's Mini-Cart block (wp:woocommerce/mini-cart),
+ * which used to sit in parts/header.html between the currency
+ * switcher and the account icon. That block drew its own drawer:
+ * a serif heading, a white checkout slab, and no room for anything
+ * of ours inside it.
+ *
+ * This is design B from revamp/cart-drawer-b.html, chosen by the
+ * operator on 2026-09-30.
+ *
+ * DELIBERATELY ABSENT: a free-shipping bar and a Total. The drawer
+ * shows the subtotal and then WooCommerce's own line, "Shipping and
+ * discounts calculated at checkout." Until the customer gives an
+ * address there is no shipping figure, so a total in here would be
+ * a number that changes on the next screen.
+ *
+ * The markup comes from functions.php (superfly_cart_drawer_html)
+ * and is re-rendered by the same PHP over
+ * /wp-json/superfly/v1/cart-drawer, so nothing in assets/js draws
+ * a row. If a row looks wrong, the renderer is the place to fix it.
+ *
+ * CONTENTS
+ *   1. The navbar button
+ *   2. The drawer shell
+ *   3. Items
+ *   4. Cross-sells
+ *   5. Footer
+ *   6. Empty
+ *   7. Phones
+ * ============================================================= */
+
+
+/* -------------------------------------------------------------
+ * 1. THE NAVBAR BUTTON
+ * Takes the place of .wc-block-mini-cart__button, so it inherits
+ * the spacing .sf-navbar__actions already sets. The icon is the
+ * same Font Awesome cart the mini-cart was given in navbar.css.
+ * ------------------------------------------------------------- */
+.sf-navbar .sf-cart-btn {
+	position: relative;
+	display: flex;
+	align-items: center;
+	padding: 0;
+	border: 0;
+	background: transparent;
+	color: var(--sf-navbar-text);
+	cursor: pointer;
+	line-height: 1;
+}
+
+.sf-navbar .sf-cart-btn::before {
+	content: "\f07a";                  /* fa-shopping-cart */
+	font-family: "Font Awesome 5 Free";
+	font-weight: 900;
+	font-size: 17px;
+	line-height: 1;
+	-webkit-font-smoothing: antialiased;
+}
+
+/* The count bubble, only drawn when the cart has something in it.
+   A circle at one digit and a pill past that: the box is 18px square
+   until the number outgrows it, because min-width and height are
+   equal and the padding only bites at two digits and up. */
+.sf-navbar .sf-cart-btn__count {
+	display: grid;
+	place-items: center;
+	box-sizing: border-box;
+	min-width: 18px;
+	height: 18px;
+	margin-left: -6px;
+	margin-top: -10px;
+	padding: 0 5px;
+	border-radius: 999px;
+	background: var(--sf-navbar-accent);
+	color: #ffffff;
+	font-family: "Chakra Petch", "Archivo", sans-serif;
+	font-size: 10px;
+	font-weight: 700;
+	line-height: 1;
+}
+
+.sf-navbar .sf-cart-btn__count:empty,
+.sf-navbar .sf-cart-btn__count[hidden] {
+	display: none;
+}
+
+
+/* -------------------------------------------------------------
+ * 2. THE DRAWER SHELL
+ * Printed once at wp_footer, outside the navbar, so the backdrop
+ * filter on the bar cannot trap it in a stacking context.
+ * ------------------------------------------------------------- */
+.sf-cart {
+	--d-panel:  #131317;
+	--d-sunk:   #0d0d10;
+	--d-text:   #f2f2f4;
+	--d-muted:  rgba(242, 242, 244, 0.58);
+	--d-faint:  rgba(242, 242, 244, 0.34);
+	--d-line:   rgba(242, 242, 244, 0.12);
+	--d-accent: #ec1e79;
+	--d-blue:   #29abe2;
+	--d-title:  "Archivo Black", "Arial Black", sans-serif;
+	--d-body:   "Archivo", "Inter", sans-serif;
+	--d-tech:   "Chakra Petch", "Archivo", sans-serif;
+}
+
+.sf-cart__overlay {
+	position: fixed;
+	inset: 0;
+	z-index: 99990;
+	background: rgba(4, 4, 6, 0.72);
+	opacity: 0;
+	visibility: hidden;
+	transition: opacity 0.28s ease, visibility 0.28s;
+}
+
+.sf-cart.is-open .sf-cart__overlay {
+	opacity: 1;
+	visibility: visible;
+}
+
+.sf-cart__drawer {
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 99991;
+	display: flex;
+	flex-direction: column;
+	width: min(440px, 100vw);
+	background: var(--d-panel);
+	border-left: 1px solid var(--d-line);
+	color: var(--d-text);
+	font-family: var(--d-body);
+	transform: translateX(100%);
+	transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sf-cart.is-open .sf-cart__drawer {
+	transform: translateX(0);
+}
+
+/* The panel takes focus when it opens (see cart-drawer.js) purely so
+   screen readers land in it. It is a 440px lit panel over a dimmed
+   page — it does not also need a ring around it to be findable. The
+   controls inside keep theirs. */
+.sf-cart__drawer:focus,
+.sf-cart__drawer:focus-visible {
+	outline: none;
+}
+
+/* The admin bar is fixed at the top with z-index 99999 — above this
+   drawer and everything else — so it covers the drawer's heading for
+   anyone logged in. Start the drawer below it instead. The three
+   heights are WordPress's own: 32px, 46px under 783px, and nothing
+   under 601px, where the bar stops being fixed and scrolls away.
+   Customers never see any of this. */
+body.admin-bar .sf-cart__drawer {
+	top: 32px;
+}
+
+@media screen and (max-width: 782px) {
+	body.admin-bar .sf-cart__drawer {
+		top: 46px;
+	}
+}
+
+@media screen and (max-width: 600px) {
+	body.admin-bar .sf-cart__drawer {
+		top: 0;
+	}
+}
+
+/* while a change is in flight the panel stops taking clicks, so a
+   double tap on + cannot race two writes against the same cart */
+.sf-cart.is-busy .sf-cart__body {
+	opacity: 0.55;
+	pointer-events: none;
+}
+
+.sf-cart__head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	padding: 18px 20px;
+	border-bottom: 1px solid var(--d-line);
+}
+
+.sf-cart__head h2 {
+	margin: 0;
+	font-family: var(--d-tech);
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.26em;
+	text-transform: uppercase;
+	color: var(--d-faint);
+}
+
+.sf-cart__head h2 b {
+	color: var(--d-text);
+}
+
+.sf-cart__close {
+	display: grid;
+	place-items: center;        /* the x sits dead centre of the circle */
+	flex: none;
+	box-sizing: border-box;
+	width: 30px;
+	height: 30px;
+	padding: 0;
+	border: 1px solid var(--d-line);
+	border-radius: 6px;         /* softened, not a circle */
+	background: none;
+	color: var(--d-faint);
+	font-size: 15px;
+	line-height: 1;
+	cursor: pointer;
+}
+
+.sf-cart__close:hover {
+	border-color: var(--d-accent);
+	color: var(--d-accent);
+}
+
+/* everything the renderer replaces lives in here */
+.sf-cart__body {
+	display: flex;
+	flex-direction: column;
+	flex: 1 1 auto;
+	min-height: 0;
+	transition: opacity 0.15s ease;
+}
+
+
+/* -------------------------------------------------------------
+ * 3. ITEMS
+ * ------------------------------------------------------------- */
+.sf-cart__items {
+	flex: 1 1 auto;
+	overflow-y: auto;
+	margin: 0;
+	padding: 0 20px;
+	list-style: none;
+
+	/* scrollbar-color INHERITS, and scrollbar.css sets it on html, so
+	   this list arrives carrying the site's pink — which is enough on
+	   its own to make Chrome throw away the rules below. Back to the
+	   initial value, and the pseudo-elements are honoured again. */
+	scrollbar-color: auto;
+}
+
+/* The site's own bar (assets/css/scrollbar.css) is 10px of solid
+   Superfly pink — right for a whole page, far too loud for a 440px
+   panel, where it reads as a second magenta button. Quiet rail here,
+   pink only when the customer is actually dragging it.
+   --------------------------------------------------------------
+   The engines are split on purpose. Chrome 121+ DISCARDS every
+   ::-webkit-scrollbar rule on an element that also sets the standard
+   scrollbar-width or scrollbar-color, and its own "thin" is 10px —
+   so setting both here left the bar exactly the size it started.
+   Blink and WebKit get the pseudo-elements; Firefox, which has no
+   pseudo-elements, gets the standard properties in a block only it
+   reads. */
+.sf-cart__items::-webkit-scrollbar {
+	width: 6px;
+}
+
+.sf-cart__items::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+.sf-cart__items::-webkit-scrollbar-thumb {
+	border-radius: 999px;
+	background: rgba(242, 242, 244, 0.22);
+}
+
+.sf-cart__items::-webkit-scrollbar-thumb:hover,
+.sf-cart__items::-webkit-scrollbar-thumb:active {
+	background: var(--d-accent);
+}
+
+/* Firefox only — -moz-appearance is the cheapest thing no other
+   engine claims to support */
+@supports (-moz-appearance: none) {
+	.sf-cart__items {
+		scrollbar-width: thin;
+		scrollbar-color: rgba(242, 242, 244, 0.22) transparent;
+	}
+}
+
+.sf-cart__item {
+	display: grid;
+	grid-template-columns: 64px minmax(0, 1fr);
+	gap: 14px;
+	padding: 16px 0;
+	border-bottom: 1px solid var(--d-line);
+}
+
+.sf-cart__item:last-child {
+	border-bottom: 0;
+}
+
+.sf-cart__shot {
+	display: grid;
+	place-items: center;
+	aspect-ratio: 1;
+	overflow: hidden;
+	background: #101014;
+	border: 1px solid var(--d-line);
+	font-family: var(--d-tech);
+	font-size: 7.5px;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--d-faint);
+	text-align: center;
+	padding: 4px;
+}
+
+.sf-cart__shot img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.sf-cart__body-col {
+	min-width: 0;
+}
+
+.sf-cart__top {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto;
+	gap: 12px;
+	align-items: start;
+}
+
+/* the family is spelled out because theme.json gives every h1-h6 the
+   site's serif heading font, and these are h3s inside the drawer */
+.sf-cart__name {
+	margin: 0;
+	font-family: var(--d-body);
+	font-size: 13.5px;
+	font-weight: 600;
+	line-height: 1.35;
+}
+
+.sf-cart__name a {
+	color: inherit;
+	text-decoration: none;
+}
+
+.sf-cart__name a:hover {
+	color: var(--d-accent);
+}
+
+.sf-cart__line {
+	font-family: var(--d-tech);
+	font-size: 14.5px;
+	font-weight: 700;
+	white-space: nowrap;
+}
+
+/* the variation / stock chips */
+.sf-cart__chips {
+	display: flex;
+	gap: 6px;
+	flex-wrap: wrap;
+	margin: 9px 0 0;
+}
+
+.sf-cart__chip {
+	padding: 4px 8px;
+	border: 1px solid var(--d-line);
+	font-family: var(--d-tech);
+	font-size: 9px;
+	font-weight: 700;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: var(--d-muted);
+}
+
+.sf-cart__chip--blue {
+	color: var(--d-blue);
+	border-color: rgba(41, 171, 226, 0.4);
+}
+
+.sf-cart__chip--ok {
+	color: #57c98a;
+	border-color: rgba(87, 201, 138, 0.4);
+}
+
+.sf-cart__chip--hold {
+	color: #e0a33c;
+	border-color: rgba(224, 163, 60, 0.4);
+}
+
+.sf-cart__foot {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	margin: 12px 0 0;
+}
+
+.sf-cart__qty {
+	display: grid;
+	grid-template-columns: 28px 36px 28px;
+	border: 1px solid var(--d-line);
+}
+
+.sf-cart__qty button {
+	padding: 7px 0;
+	background: none;
+	border: 0;
+	color: var(--d-muted);
+	font-family: var(--d-tech);
+	font-size: 14px;
+	line-height: 1;
+	cursor: pointer;
+}
+
+.sf-cart__qty button:hover {
+	color: var(--d-accent);
+}
+
+.sf-cart__qty button[disabled] {
+	color: var(--d-faint);
+	cursor: default;
+}
+
+.sf-cart__qty input {
+	box-sizing: border-box;
+	width: 100%;
+	padding: 7px 0;
+	border: 0;
+	border-left: 1px solid var(--d-line);
+	border-right: 1px solid var(--d-line);
+	background: none;
+	color: var(--d-text);
+	text-align: center;
+	font-family: var(--d-tech);
+	font-size: 13px;
+	font-weight: 700;
+	-moz-appearance: textfield;
+	appearance: textfield;
+}
+
+.sf-cart__qty input::-webkit-outer-spin-button,
+.sf-cart__qty input::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+.sf-cart__each {
+	margin-right: auto;
+	font-family: var(--d-tech);
+	font-size: 10px;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--d-faint);
+}
+
+.sf-cart__bin {
+	display: grid;
+	place-items: center;
+	width: 28px;
+	height: 28px;
+	padding: 0;
+	background: none;
+	border: 0;
+	color: var(--d-faint);
+	cursor: pointer;
+}
+
+.sf-cart__bin:hover {
+	color: var(--d-accent);
+}
+
+.sf-cart__bin svg {
+	width: 15px;
+	height: 15px;
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 1.5;
+}
+
+
+/* -------------------------------------------------------------
+ * 4. CROSS-SELLS
+ * WooCommerce's own cross-sells for what is in the cart (Product
+ * data → Linked Products → Cross-sells). The whole strip is left
+ * out when no product in the cart has any.
+ * ------------------------------------------------------------- */
+.sf-cart__up {
+	padding: 14px 20px 16px;
+	border-top: 1px solid var(--d-line);
+	background: var(--d-sunk);
+}
+
+.sf-cart__up h3 {
+	margin: 0 0 11px;
+	font-family: var(--d-tech);
+	font-size: 9.5px;
+	font-weight: 700;
+	letter-spacing: 0.22em;
+	text-transform: uppercase;
+	color: var(--d-faint);
+}
+
+.sf-cart__rail {
+	display: flex;
+	gap: 10px;
+	overflow-x: auto;
+	padding-bottom: 2px;
+	scroll-snap-type: x mandatory;
+	scrollbar-width: none;
+}
+
+.sf-cart__rail::-webkit-scrollbar {
+	display: none;
+}
+
+.sf-cart__card {
+	display: grid;
+	flex: 0 0 172px;
+	grid-template-columns: 44px minmax(0, 1fr);
+	gap: 10px;
+	align-items: center;
+	padding: 9px;
+	background: var(--d-panel);
+	border: 1px solid var(--d-line);
+	color: inherit;
+	text-decoration: none;
+	scroll-snap-align: start;
+	transition: border-color 0.2s ease;
+}
+
+.sf-cart__card:hover {
+	border-color: rgba(236, 30, 121, 0.55);
+}
+
+.sf-cart__ctile {
+	display: grid;
+	place-items: center;
+	aspect-ratio: 1;
+	overflow: hidden;
+	background: #101014;
+	border: 1px solid var(--d-line);
+}
+
+.sf-cart__ctile img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.sf-cart__card h4 {
+	margin: 0;
+	font-family: var(--d-body);       /* same reason as .sf-cart__name */
+	font-size: 11.5px;
+	font-weight: 600;
+	line-height: 1.3;
+}
+
+.sf-cart__card p {
+	margin: 4px 0 0;
+	font-family: var(--d-tech);
+	font-size: 11.5px;
+	font-weight: 700;
+	color: var(--d-accent);
+}
+
+/* WooCommerce prints a price range as <del>/<ins> — flatten it */
+.sf-cart__card p del {
+	display: none;
+}
+
+.sf-cart__card p ins {
+	text-decoration: none;
+}
+
+
+/* -------------------------------------------------------------
+ * 5. FOOTER
+ * Subtotal, one line of small print, one magenta action. No
+ * shipping row and no total — see the note at the top.
+ * ------------------------------------------------------------- */
+/* Kept deliberately compact: this block is fixed to the bottom of the
+   drawer, so every pixel it takes is a pixel of the item list. At the
+   first sizes it stood 230px tall on a 441px-wide panel, which on a
+   phone pushed the second item off the screen. */
+.sf-cart__totals {
+	padding: 14px 20px 16px;
+	border-top: 1px solid var(--d-line);
+}
+
+/* A dl carries a 1em margin of its own in every browser, which was
+   landing on top of this block's padding and standing the subtotal
+   32px off the rule instead of 14px. */
+.sf-cart__totals dl {
+	margin: 0;
+}
+
+.sf-cart__row {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 14px;
+	margin: 0 0 6px;
+}
+
+.sf-cart__row dt {
+	font-family: var(--d-tech);
+	font-size: 10.5px;
+	font-weight: 700;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: var(--d-faint);
+}
+
+.sf-cart__row dd {
+	margin: 0;
+	font-family: var(--d-title);
+	font-size: 20px;
+	color: var(--d-text);
+}
+
+.sf-cart__small {
+	margin: 0 0 12px;
+	font-size: 11.5px;
+	line-height: 1.5;
+	color: var(--d-faint);
+}
+
+/* Both actions on one row. The columns are uneven on purpose — the
+   magenta one is wider, so "one loud action, one quiet one" survives
+   them sitting side by side. */
+.sf-cart__btns {
+	display: grid;
+	grid-template-columns: 1fr 1.3fr;
+	gap: 10px;
+}
+
+.sf-cart__go,
+.sf-cart__view {
+	display: grid;
+	place-items: center;
+	box-sizing: border-box;
+	padding: 13px 10px;
+	font-family: var(--d-tech);
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	text-align: center;
+	text-decoration: none;
+}
+
+.sf-cart__go {
+	background: var(--d-accent);
+	border: 1px solid var(--d-accent);
+	color: #ffffff;
+}
+
+.sf-cart__go:hover {
+	filter: brightness(1.12);
+	color: #ffffff;
+}
+
+.sf-cart__view {
+	background: none;
+	border: 1px solid var(--d-line);
+	color: var(--d-muted);
+}
+
+.sf-cart__view:hover {
+	border-color: var(--d-accent);
+	color: var(--d-accent);
+}
+
+
+/* -------------------------------------------------------------
+ * 6. EMPTY
+ * ------------------------------------------------------------- */
+.sf-cart__empty {
+	display: grid;
+	flex: 1 1 auto;
+	place-content: center;
+	justify-items: center;
+	gap: 16px;
+	padding: 40px 30px;
+	text-align: center;
+}
+
+.sf-cart__empty h3 {
+	margin: 0;
+	font-family: var(--d-title);
+	font-size: 18px;
+	text-transform: uppercase;
+}
+
+.sf-cart__empty p {
+	margin: 0;
+	max-width: 34ch;
+	font-size: 13px;
+	line-height: 1.65;
+	color: var(--d-muted);
+}
+
+.sf-cart__empty svg {
+	width: 34px;
+	height: 34px;
+	fill: none;
+	stroke: var(--d-faint);
+	stroke-width: 1.2;
+}
+
+.sf-cart__ghost {
+	display: inline-flex;
+	padding: 12px 18px;
+	background: none;
+	border: 1px solid var(--d-line);
+	color: var(--d-muted);
+	font-family: var(--d-tech);
+	font-size: 10.5px;
+	font-weight: 700;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	text-decoration: none;
+}
+
+.sf-cart__ghost:hover {
+	border-color: var(--d-accent);
+	color: var(--d-accent);
+}
+
+
+/* -------------------------------------------------------------
+ * 7. PHONES
+ * ------------------------------------------------------------- */
+@media (max-width: 480px) {
+	.sf-cart__items,
+	.sf-cart__up,
+	.sf-cart__totals,
+	.sf-cart__head {
+		padding-left: 16px;
+		padding-right: 16px;
+	}
+
+	.sf-cart__each {
+		display: none;              /* the unit price is the first thing to go */
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.sf-cart__drawer,
+	.sf-cart__overlay {
+		transition-duration: 0.001ms;
+	}
+}

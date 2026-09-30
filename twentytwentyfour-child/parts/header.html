@@ -17,7 +17,14 @@
 [superfly_currency]
 <!-- /wp:shortcode -->
 
-			<!-- wp:woocommerce/mini-cart /-->
+			<!-- The Mini-Cart block used to sit here. It is now the theme's
+			     own drawer: functions.php + assets/css/cart-drawer.css.
+			     The navigation block above still ignores the hooked
+			     woocommerce/mini-cart, so WooCommerce does not put its
+			     own back. -->
+			<!-- wp:shortcode -->
+[superfly_cart_button]
+<!-- /wp:shortcode -->
 
 			<!-- wp:woocommerce/customer-account {"displayStyle":"icon_only","iconStyle":"line","iconClass":"wc-block-customer-account__account-icon"} /-->
 
